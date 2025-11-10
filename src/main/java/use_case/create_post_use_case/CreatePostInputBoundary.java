@@ -1,4 +1,4 @@
-package create_post_use_case;
+package use_case.create_post_use_case;
 
 public interface CreatePostInputBoundary {
 }

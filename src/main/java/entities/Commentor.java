@@ -5,7 +5,7 @@ public class Commentor extends User{
         super(full_name, username, email, password);
     }
 
-    public Post replyToPost(Post post, String text, String username){
+    public Post replyToPost(Post post, String text){
         //TODO: implement replyToPost
         return null;
     }

@@ -3,14 +3,13 @@ import java.util.Date;
 
 public class Post {
 
-    private Date creation_date;
+    private Date creation_date = new Date();
     private String creator_username;
     private String content;
-    private int[] votes;
+    private int[] votes =  new int[2];
 
     public Date getCreationDate() {
-        // TODO
-        return new Date();
+        return this.creation_date;
     }
 
     public void editText(String text) {
@@ -18,8 +17,7 @@ public class Post {
     }
 
     public int[] getVotes() {
-        // TODO
-        return new int[0];
+        return this.votes;
     }
 
     public String getTranslation(String language) {
@@ -28,11 +26,11 @@ public class Post {
     }
 
     public void upvote() {
-        // TODO
+        this.votes[0]++;
     }
 
     public void downvote() {
-        // TODO
+        this.votes[1]++;
     }
 
 }

@@ -1,5 +1,9 @@
 package use_case.create_post_use_case;
 
+import entities.Post;
+
+import java.util.ArrayList;
+
 public interface CreatePostUserDataAccessInterface {
 
     // Checks for existence of posts with the name indicated in their title.
@@ -12,8 +16,8 @@ public interface CreatePostUserDataAccessInterface {
     Post getPost(String title);
 
     //Get all viewable Posts.
-    Post<> getAllPosts();
+    ArrayList<Post> getAllPosts();
 
     //Get all Posts with keyword in title
-    Post<> getSelectPosts(String keyword);
+    ArrayList<Post> getSelectPosts(String keyword);
 }

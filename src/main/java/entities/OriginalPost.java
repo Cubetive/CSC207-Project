@@ -7,7 +7,8 @@ public class OriginalPost extends Post {
 
 
     public OriginalPost(String title, String content, String username) {
-        // TODO
+        this.title = title;
+        this.content =
     }
 
     public ReplyPost replyToPost(String text, String username) {

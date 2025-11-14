@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public interface CreatePostUserDataAccessInterface {
 
     // Checks for existence of posts with the name indicated in their title.
-    Boolean existswithname(String name);
+    Boolean existsWithName(String name);
 
     // Saves a post to database.
     void save(Post post);

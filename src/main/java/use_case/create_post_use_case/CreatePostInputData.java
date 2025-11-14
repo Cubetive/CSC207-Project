@@ -9,4 +9,8 @@ public class CreatePostInputData {
         this.content = content;
     }
 
+    String getTitle() {return title;}
+
+    String getContent() {return content;}
+
 }

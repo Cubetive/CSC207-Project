@@ -1,5 +1,7 @@
 package use_case.create_post_use_case;
 
+import entities.Post;
+
 public class CreatePostInteractor implements CreatePostInputBoundary{
     private final CreatePostUserDataAccessInterface createPostUserDataAccessInterface;
     private final CreatePostOutputBoundary createPostOutputBoundary;
@@ -13,6 +15,11 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
 
     @Override
     public void execute(CreatePostInputData createPostInputData) {
+        String content = createPostInputData.getContent();
+        String title = createPostInputData.getTitle();
+
+        //TODO
+        Post post = new Post();
 
     }
 }

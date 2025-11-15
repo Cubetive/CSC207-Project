@@ -40,4 +40,12 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
 
         }
     }
+
+    public void switchToBrowseView() {
+        createPostOutputBoundary.switchToBrowseView();
+    }
+
+    public void switchToSearchView() {
+        createPostOutputBoundary.switchToSearchView();
+    }
 }

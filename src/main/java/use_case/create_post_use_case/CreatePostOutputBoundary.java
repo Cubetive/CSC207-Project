@@ -5,4 +5,8 @@ public interface CreatePostOutputBoundary {
     void prepareCreatedView(CreatePostOutputData createPostOutputData);
 
     void prepareMissingFieldView();
+
+    void switchToBrowseView();
+
+    void switchToSearchView();
 }

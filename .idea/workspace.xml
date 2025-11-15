@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="Added getContent and getCreatorUsername. Fixed getCreationDate">
+    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="CreatePostInteractor mostly Complete.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762902916487</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="CreatePostInteractor mostly Complete.">
+      <option name="closed" value="true" />
+      <created>1763165126745</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1763165126745</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -165,6 +173,7 @@
     <MESSAGE value="Fixed interface CreatePostUserDataAccessInterface." />
     <MESSAGE value="Input Boundary." />
     <MESSAGE value="UserDataAccessInteface Part1" />
-    <option name="LAST_COMMIT_MESSAGE" value="UserDataAccessInteface Part1" />
+    <MESSAGE value="CreatePostInteractor mostly Complete." />
+    <option name="LAST_COMMIT_MESSAGE" value="CreatePostInteractor mostly Complete." />
   </component>
 </project>

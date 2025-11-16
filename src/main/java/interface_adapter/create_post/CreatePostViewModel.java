@@ -1,5 +1,6 @@
 package interface_adapter.create_post;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public class CreatePostViewModel {
@@ -32,4 +33,13 @@ public class CreatePostViewModel {
     public void firePropertyChange() {
         support.firePropertyChange("state", null, this.state);
     }
+
+    public void firePropertyChange(String propertyName) {
+        this.support.firePropertyChange(propertyName, null, this.state);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.support.addPropertyChangeListener(listener);
+    }
+
 }

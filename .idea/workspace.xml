@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="" />
+    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="Elementary Implementation of Controller and Presenter, View Model">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -165,7 +167,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763166319544</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Elementary Implementation of Controller and Presenter, View Model">
+      <option name="closed" value="true" />
+      <created>1763266363063</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1763266363063</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -179,6 +189,7 @@
     <MESSAGE value="UserDataAccessInteface Part1" />
     <MESSAGE value="CreatePostInteractor mostly Complete." />
     <MESSAGE value="Added view switches to Interactor and Output Boundary." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added view switches to Interactor and Output Boundary." />
+    <MESSAGE value="Elementary Implementation of Controller and Presenter, View Model" />
+    <option name="LAST_COMMIT_MESSAGE" value="Elementary Implementation of Controller and Presenter, View Model" />
   </component>
 </project>

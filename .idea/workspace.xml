@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="Elementary Implementation of Controller and Presenter, View Model">
+    <list default="true" id="682545be-d8cc-4159-80be-9ffc861ca516" name="Changes" comment="Updated Switch methods and prepareMissingFieldView in Presenter.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputBoundary.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +176,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763266363063</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Updated Switch methods and prepareMissingFieldView in Presenter.">
+      <option name="closed" value="true" />
+      <created>1763302640463</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1763302640463</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -194,6 +199,7 @@
     <MESSAGE value="CreatePostInteractor mostly Complete." />
     <MESSAGE value="Added view switches to Interactor and Output Boundary." />
     <MESSAGE value="Elementary Implementation of Controller and Presenter, View Model" />
-    <option name="LAST_COMMIT_MESSAGE" value="Elementary Implementation of Controller and Presenter, View Model" />
+    <MESSAGE value="Updated Switch methods and prepareMissingFieldView in Presenter." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated Switch methods and prepareMissingFieldView in Presenter." />
   </component>
 </project>

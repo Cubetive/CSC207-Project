@@ -10,5 +10,5 @@ public interface CreatePostOutputBoundary {
 
     void switchToSearchView();
 
-    void switchToSignInView();
+    void switchToSignUpView();
 }

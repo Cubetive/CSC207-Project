@@ -17,13 +17,16 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
     private ViewManagerModel viewManagerModel;
 
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
-                               SignupViewModel signupViewModel) {
+                               SignupViewModel signupViewModel,
+                               ViewManagerModel viewManagerModel) {
         this.createPostViewModel = createPostViewModel;
         this.signupViewModel = signupViewModel;
+        this.viewManagerModel = viewManagerModel;
     }
 
     public void prepareCreatedView(CreatePostOutputData createPostOutputData) {
         //TODO
+        // Case 1: return to Browsing when finishing reading post.
         //final BrowingState browsingState = BrowsingViewModel.getState();
         // Update Browing state with necessary information if any
         //this.browseViewModel.firePropertyChange();
@@ -31,22 +34,32 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         //CreatePostViewModel.setState(new CreatePostState());
 
         //this.viewManagerModel.setState(BrowseViewModel.getname());
+        // Case 2: read Post after finishing.
     }
 
     public void prepareMissingFieldView() {
         //TODO
+        final CreatePostState createPostState = createPostViewModel.getState();
+        createPostState.setMissingError("Missing content or title.");
+        createPostViewModel.firePropertyChange();
     }
 
-    public void switchToSignInView() {
+    public void switchToSignUpView() {
         //TODO
+        //viewManagerModel.setState(signupViewModel.getViewName);
+        viewManagerModel.firePropertyChanged();
     }
 
     public void switchToBrowseView() {
         //TODO
+        //viewManagerModel.setState(BrowseViewModel.getViewName);
+        viewManagerModel.firePropertyChanged();
     }
 
     public void switchToSearchView() {
         //TODO
+        //viewManagerModel.setState(SearchViewModel.getViewName);
+        viewManagerModel.firePropertyChanged();
     }
 
 }

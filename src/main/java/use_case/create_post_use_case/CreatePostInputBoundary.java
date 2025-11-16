@@ -8,6 +8,6 @@ public interface CreatePostInputBoundary {
 
     public void switchToSearchView();
 
-    public void switchToSignInView();
+    public void switchToSignUpView();
 
 }

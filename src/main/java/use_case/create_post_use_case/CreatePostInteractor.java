@@ -50,7 +50,7 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         createPostOutputBoundary.switchToSearchView();
     }
 
-    public void switchToSignInView() {
+    public void switchToSignUpView() {
         createPostOutputBoundary.switchToSignInView();
     }
 }

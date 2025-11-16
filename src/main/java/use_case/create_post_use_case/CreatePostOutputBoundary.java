@@ -9,4 +9,6 @@ public interface CreatePostOutputBoundary {
     void switchToBrowseView();
 
     void switchToSearchView();
+
+    void switchToSignInView();
 }

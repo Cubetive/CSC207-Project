@@ -4,4 +4,10 @@ public interface CreatePostInputBoundary {
 
     void execute(CreatePostInputData createPostInputData);
 
+    public void switchToBrowseView();
+
+    public void switchToSearchView();
+
+    public void switchToSignInView();
+
 }

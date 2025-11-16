@@ -1,5 +1,6 @@
 package use_case.create_post_use_case;
 
+import entities.OriginalPost;
 import entities.Post;
 
 public class CreatePostInteractor implements CreatePostInputBoundary{
@@ -25,16 +26,16 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
             return;
         }
         else {
-            Post post = new Post(title, content, username); // Create Post object.
+            OriginalPost originalPost = new OriginalPost(title, content, username); // Create Post object.
             // TODO: Update for OriginalPost Signature
 
-            createPostUserDataAccessInterface.save(post); //saves the Post to Database.
+            createPostUserDataAccessInterface.save(originalPost); //saves the Post to Database.
 
             CreatePostOutputData createPostOutputData = new CreatePostOutputData(
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreationDate(),
-                    post.getVotes()
+                    originalPost.getTitle(),
+                    originalPost.getContent(),
+                    originalPost.getCreationDate(),
+                    originalPost.getVotes()
             ); //Create the output object for display.
             createPostOutputBoundary.prepareCreatedView(createPostOutputData); //Send output to presenter.
 
@@ -47,5 +48,9 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
 
     public void switchToSearchView() {
         createPostOutputBoundary.switchToSearchView();
+    }
+
+    public void switchToSignInView() {
+        createPostOutputBoundary.switchToSignInView();
     }
 }

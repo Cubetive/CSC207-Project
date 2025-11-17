@@ -13,7 +13,7 @@ public class User {
     private String profilePicture;
     private String bio;
     private List<OriginalPost> original_posts;
-    private List<DirectMessage> messages;
+    //private List<DirectMessage> messages;
     private List<ReplyPost> replies;
 
     public User(String full_name, String username, String email, String password){
@@ -23,7 +23,7 @@ public class User {
         this.password = password;
         this.dateJoined = new Date();
         this.original_posts = new ArrayList<>();
-        this.messages = new ArrayList<>();
+        //this.messages = new ArrayList<>();
         this.replies = new ArrayList<>();
     }
 
@@ -103,9 +103,9 @@ public class User {
         return original_posts;
     }
 
-    public List<DirectMessage> getMessages() {
-        return messages;
-    }
+//    public List<DirectMessage> getMessages() {
+//        return messages;
+//    }
 
     public List<ReplyPost> getReplies() {
         return replies;
@@ -132,9 +132,9 @@ public class User {
         this.original_posts.add(post);
     }
 
-    public void addMessage(DirectMessage message) {
-        this.messages.add(message);
-    }
+//    public void addMessage(DirectMessage message) {
+//        this.messages.add(message);
+//    }
 
     public void addReply(ReplyPost reply) {
         this.replies.add(reply);

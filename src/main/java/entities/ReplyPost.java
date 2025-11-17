@@ -7,6 +7,7 @@ public class ReplyPost extends Post {
 
     public ReplyPost(String content, String username) {
         // TODO
+        super(content, username);
     }
 
     public ThreadPost replyToPost(String text, String username) {

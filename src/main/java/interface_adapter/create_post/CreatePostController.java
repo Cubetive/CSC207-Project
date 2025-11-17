@@ -31,6 +31,6 @@ public class CreatePostController {
     }
 
     public void switchToSignInView() {
-        createPostInteractor.switchToSignInView();
+        createPostInteractor.switchToSignUpView();
     }
 }

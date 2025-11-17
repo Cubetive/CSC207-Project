@@ -26,9 +26,9 @@ public class User {
 
         // sample posts
 
-        this.original_posts.add(new OriginalPost("Test 1", "abc", username));
-        this.original_posts.add(new OriginalPost("Test 2", "abc", username));
-        this.original_posts.add(new OriginalPost("Test 3", "abc", username));
+        this.original_posts.add(new OriginalPost("Test 1", username, "abc"));
+        this.original_posts.add(new OriginalPost("Test 2", username, "abc"));
+        this.original_posts.add(new OriginalPost("Test 3", username, "abc"));
     }
 
     public void login() {

@@ -23,7 +23,6 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         String username = createPostInputData.getCreator_username();
         if (content.isEmpty() | title.isEmpty()) {
             createPostOutputBoundary.prepareMissingFieldView();
-            return;
         }
         else {
             OriginalPost originalPost = new OriginalPost(title, content, username); // Create Post object.

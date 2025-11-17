@@ -14,13 +14,6 @@ import java.beans.PropertyChangeListener;
 
 public class CreatingPostView extends JPanel implements ActionListener, PropertyChangeListener {
     private final CreatePostViewModel createPostViewModel;
-    private final JTextField titleTextField = new  JTextField(30);
-    private final JTextArea contentTextField = new  JTextArea(10, 30);
-
-    private final JButton createPostButton = new  JButton("Create Post");
-    //private final JButton logoutButton = new  JButton("Logout");
-    //private final JButton searchButton = new  JButton("Search");
-    //private final JButton browseButton = new  JButton("Browse");
 
     private CreatePostController createPostController;
 
@@ -31,12 +24,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         final JLabel header = new JLabel("Create New Post");
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //Label for titleTextField
-        final JLabel title = new JLabel("Title");
-
-        //Label for contentTextField
-        final  JLabel content = new JLabel("Content");
-
+        final JButton createPostButton = new  JButton("Create Post");
         createPostButton.addActionListener(
                 // Button Logic
                 new ActionListener() {
@@ -57,24 +45,30 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         //TODO: Add ActionListeners for other buttons.
 
         //Placeholder Labels for future buttons
-        final JLabel logout = new JLabel("Logout");
-        final JLabel search = new JLabel("Search");
-        final JLabel browse = new JLabel("Browse");
+        final JButton logout = new JButton("Logout");
+        final JButton search = new JButton("Search");
+        final JButton browse = new JButton("Browse");
+        final JButton profile = new JButton("Profile");
         final JPanel buttons = new JPanel();
         buttons.add(logout);
         buttons.add(search);
         buttons.add(browse);
+        buttons.add(profile);
         buttons.add(createPostButton);
 
         //Content setup.
         final JPanel contentPanel = new JPanel();
+        final JTextArea contentTextField = new  JTextArea(10, 30);
+        final  JLabel content = new JLabel("Content");
         contentPanel.add(content);
-        contentPanel.add(this.contentTextField);
+        contentPanel.add(contentTextField);
 
         //Title setup.
         final JPanel titlePanel = new JPanel();
+        final JTextField titleTextField = new  JTextField(30);
+        final JLabel title = new JLabel("Title");
         titlePanel.add(title);
-        titlePanel.add(this.titleTextField);
+        titlePanel.add(titleTextField);
 
         //Final Self Setup (This is a JPanel)
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

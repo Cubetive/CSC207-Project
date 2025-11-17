@@ -51,6 +51,6 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
     }
 
     public void switchToSignUpView() {
-        createPostOutputBoundary.switchToSignInView();
+        createPostOutputBoundary.switchToSignUpView();
     }
 }

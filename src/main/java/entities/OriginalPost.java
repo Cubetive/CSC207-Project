@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OriginalPost extends Post {
-    private String title;
-    private List<ReplyPost> replies = new ArrayList<>();
+    private final String title;
+    private final List<ReplyPost> replies = new ArrayList<>();
 
 
     public OriginalPost(String title, String content, String username) {
@@ -12,12 +12,15 @@ public class OriginalPost extends Post {
         this.title = title;
     }
 
-    public ReplyPost replyToPost(String text, String username) {
-        // TODO
-        return new ReplyPost(text, username);
+    public ReplyPost replyToPost(String username, String content) {
+        ReplyPost replyPost = new ReplyPost(username, content);
+        replies.add(replyPost);
+        return replyPost;
     }
 
     public String getTitle() {
         return title;
     }
+
+    public List<ReplyPost> getReplies() { return this.replies; }
 }

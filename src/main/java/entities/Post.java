@@ -7,12 +7,14 @@ public abstract class Post {
     private String creator_username;
     private String content;
     private int[] votes;
+    private Post referencedPost;
 
     public Post(String creator_username, String content) {
         this.creator_username = creator_username;
         this.content = content;
         this.creation_date = new Date();
         this.votes = new int[2];
+        this.referencedPost = null;
     }
 
     public Date getCreationDate() {
@@ -46,6 +48,18 @@ public abstract class Post {
 
     public void downvote() {
        // TODO
+    }
+
+    public Post getReferencedPost() {
+        return this.referencedPost;
+    }
+
+    public void setReferencedPost(Post referencedPost) {
+        this.referencedPost = referencedPost;
+    }
+
+    public boolean hasReference() {
+        return this.referencedPost != null;
     }
 
 }

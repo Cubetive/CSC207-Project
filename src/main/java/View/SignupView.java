@@ -89,9 +89,10 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         toLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // For now, just show a message that login isn't implemented yet
                 JOptionPane.showMessageDialog(
                     SignupView.this,
-                    "Login view not yet implemented.",
+                    "Login functionality coming soon!",
                     "Info",
                     JOptionPane.INFORMATION_MESSAGE
                 );
@@ -217,14 +218,9 @@ public class SignupView extends JPanel implements PropertyChangeListener {
                 updateViewFromState(state);
             } else if (evt.getSource() == viewManagerModel) {
                 final String newView = (String) evt.getNewValue();
-                if ("login".equals(newView)) {
-                    // Signup was successful - show success dialog
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Account created successfully!\n(Login view not yet implemented)",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
+                if ("browse posts".equals(newView)) {
+                    // Signup was successful - view will switch to browse posts
+                    // No need to show a dialog as the view change is immediate
                 }
             }
         }

@@ -36,8 +36,8 @@ public class SignupPresenter implements SignupOutputBoundary {
         signupViewModel.setState(signupState);
         signupViewModel.firePropertyChanged();
 
-        // Switch to login view after successful signup
-        viewManagerModel.setState("login");
+        // Switch to browse posts view after successful signup
+        viewManagerModel.setState("browse posts");
         viewManagerModel.firePropertyChanged();
     }
 
@@ -64,7 +64,7 @@ public class SignupPresenter implements SignupOutputBoundary {
 
     @Override
     public void switchToLoginView() {
-        viewManagerModel.setState("login");
+        viewManagerModel.setState("browse posts");
         viewManagerModel.firePropertyChanged();
     }
 }

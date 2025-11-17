@@ -60,27 +60,27 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         final JLabel logout = new JLabel("Logout");
         final JLabel search = new JLabel("Search");
         final JLabel browse = new JLabel("Browse");
-        final JFrame buttons = new JFrame();
+        final JPanel buttons = new JPanel();
         buttons.add(logout);
         buttons.add(search);
         buttons.add(browse);
         buttons.add(createPostButton);
 
         //Content setup.
-        final JFrame contentFrame = new JFrame();
-        contentFrame.add(content);
-        contentFrame.add(this.contentTextField);
+        final JPanel contentPanel = new JPanel();
+        contentPanel.add(content);
+        contentPanel.add(this.contentTextField);
 
         //Title setup.
-        final JFrame titleFrame = new JFrame();
-        titleFrame.add(title);
-        titleFrame.add(this.titleTextField);
+        final JPanel titlePanel = new JPanel();
+        titlePanel.add(title);
+        titlePanel.add(this.titleTextField);
 
         //Final Self Setup (This is a JPanel)
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(header);
-        this.add(titleFrame);
-        this.add(contentFrame);
+        this.add(titlePanel);
+        this.add(contentPanel);
         this.add(buttons);
 
     }

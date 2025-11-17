@@ -10,6 +10,8 @@ import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.create_post_use_case.CreatePostUserDataAccessInterface;
 
+import javax.swing.*;
+
 public class TestCreatePostUI {
     public static void main(String[] args) {
         CreatePostViewModel viewModel = new CreatePostViewModel();
@@ -27,6 +29,10 @@ public class TestCreatePostUI {
         CreatePostController controller = new CreatePostController(interactor);
         CreatingPostView view = new CreatingPostView(viewModel);
         view.setController(controller);
-        view.setVisible(true);
+        JFrame frame = new JFrame();
+        frame.add(view);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 }

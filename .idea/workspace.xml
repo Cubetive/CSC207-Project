@@ -5,15 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostUI.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.TestCreatePostUI.executor": "Run",
     "git-widget-placeholder": "Post-Creation"
   }
 }]]></component>

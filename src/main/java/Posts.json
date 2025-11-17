@@ -1,0 +1,32 @@
+[
+  {
+    "title": "SomeTitle",
+    "username": "SomeUsername",
+    "date": "11/17/2025",
+    "content": "Some random description and extra words",
+    "Replies": [
+      {
+        "username": "Commenter1",
+        "date":"11/17/2025",
+        "content": "Some random first comment.",
+        "replies": []
+      },
+      {
+        "username": "Commenter2",
+        "date":"11/17/2025",
+        "content": "Some random second comment.",
+        "replies": [
+          {
+          "username": "Responder_To_Commenter2",
+          "date": "11/17/2025",
+          "content": "Some random response to the second comment",
+          "replies": []
+          }
+        ]
+      }
+    ]
+  }
+
+
+
+]

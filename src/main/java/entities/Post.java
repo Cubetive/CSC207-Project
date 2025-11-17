@@ -20,7 +20,7 @@ public abstract class Post {
     }
 
     public void editText(String text) {
-        // TODO
+        this.content = text;
     }
 
     public int[] getVotes() {

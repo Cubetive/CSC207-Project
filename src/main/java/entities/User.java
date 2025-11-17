@@ -13,7 +13,6 @@ public class User {
     private String profilePicture;
     private String bio;
     private List<OriginalPost> original_posts;
-    private List<DirectMessage> messages;
     private List<ReplyPost> replies;
 
     public User(String full_name, String username, String email, String password){
@@ -23,7 +22,6 @@ public class User {
         this.password = password;
         this.dateJoined = new Date();
         this.original_posts = new ArrayList<>();
-        this.messages = new ArrayList<>();
         this.replies = new ArrayList<>();
     }
 
@@ -53,8 +51,13 @@ public class User {
     }
 
     public List<OriginalPost> searchPosts(String keyword) {
-        // TODO: Implement searchPosts
-        return List.of();
+        List<OriginalPost> search_list = new ArrayList<OriginalPost>();
+        for(int i = 0; i < this.original_posts.size(); i++) {
+            if (this.original_posts.get(i).getTitle().contains(keyword)) {
+                search_list.add(this.original_posts.get(i));
+            }
+        }
+        return search_list;
     }
 
     public String translateText(Post post, String output_lang) {
@@ -103,10 +106,6 @@ public class User {
         return original_posts;
     }
 
-    public List<DirectMessage> getMessages() {
-        return messages;
-    }
-
     public List<ReplyPost> getReplies() {
         return replies;
     }
@@ -130,10 +129,6 @@ public class User {
 
     public void addOriginalPost(OriginalPost post) {
         this.original_posts.add(post);
-    }
-
-    public void addMessage(DirectMessage message) {
-        this.messages.add(message);
     }
 
     public void addReply(ReplyPost reply) {

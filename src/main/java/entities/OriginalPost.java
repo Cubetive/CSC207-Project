@@ -14,7 +14,7 @@ public class OriginalPost extends Post {
 
     public ReplyPost replyToPost(String text, String username) {
         // TODO
-        return new ReplyPost(text, username);
+        return new ReplyPost(username, text);
     }
 
     public String getTitle() {

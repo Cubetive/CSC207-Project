@@ -23,6 +23,12 @@ public class User {
         this.dateJoined = new Date();
         this.original_posts = new ArrayList<>();
         this.replies = new ArrayList<>();
+
+        // sample posts
+
+        this.original_posts.add(new OriginalPost("Test 1", "abc", username));
+        this.original_posts.add(new OriginalPost("Test 2", "abc", username));
+        this.original_posts.add(new OriginalPost("Test 3", "abc", username));
     }
 
     public void login() {
@@ -53,7 +59,7 @@ public class User {
     public List<OriginalPost> searchPosts(String keyword) {
         List<OriginalPost> search_list = new ArrayList<OriginalPost>();
         for(int i = 0; i < this.original_posts.size(); i++) {
-            if (this.original_posts.get(i).getTitle().contains(keyword)) {
+            if (this.original_posts.get(i).getTitle().toLowerCase().contains(keyword.toLowerCase())) {
                 search_list.add(this.original_posts.get(i));
             }
         }

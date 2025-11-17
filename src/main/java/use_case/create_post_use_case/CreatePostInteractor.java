@@ -1,16 +1,15 @@
 package use_case.create_post_use_case;
 
 import entities.OriginalPost;
-import entities.Post;
 
 public class CreatePostInteractor implements CreatePostInputBoundary{
-    private final CreatePostUserDataAccessInterface createPostUserDataAccessInterface;
+    private final CreatePostDataAccessInterface createPostUserDataAccessInterface;
     private final CreatePostOutputBoundary createPostOutputBoundary;
     //TODO Replace output boundary with presenter when implemented.
     //TODO Replace interface with data access object when implemented.
 
     public CreatePostInteractor(
-            CreatePostUserDataAccessInterface createPostUserDataAccessInterface,
+            CreatePostDataAccessInterface createPostUserDataAccessInterface,
             CreatePostOutputBoundary createPostOutputBoundary) {
         this.createPostUserDataAccessInterface = createPostUserDataAccessInterface;
         this.createPostOutputBoundary = createPostOutputBoundary;
@@ -22,7 +21,7 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         String title = createPostInputData.getTitle();
         String username = createPostInputData.getCreator_username();
         if (content.isEmpty() | title.isEmpty()) {
-            createPostOutputBoundary.prepareMissingFieldView();
+            createPostOutputBoundary.prepareMissingFieldView("Missing content or title.");
         }
         else {
             OriginalPost originalPost = new OriginalPost(title, content, username); // Create Post object.

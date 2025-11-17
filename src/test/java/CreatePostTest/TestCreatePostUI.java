@@ -8,7 +8,6 @@ import interface_adapter.create_post.CreatePostViewModel;
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
-import use_case.create_post_use_case.CreatePostUserDataAccessInterface;
 
 import javax.swing.*;
 

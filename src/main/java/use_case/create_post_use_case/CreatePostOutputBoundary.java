@@ -4,7 +4,7 @@ public interface CreatePostOutputBoundary {
 
     void prepareCreatedView(CreatePostOutputData createPostOutputData);
 
-    void prepareMissingFieldView();
+    void prepareMissingFieldView(String error);
 
     void switchToBrowseView();
 

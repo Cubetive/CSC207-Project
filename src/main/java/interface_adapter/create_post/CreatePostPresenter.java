@@ -36,10 +36,10 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         // Case 2: read Post after finishing.
     }
 
-    public void prepareMissingFieldView() {
+    public void prepareMissingFieldView(String error) {
         //TODO
         final CreatePostState createPostState = createPostViewModel.getState();
-        createPostState.setMissingError("Missing content or title.");
+        createPostState.setMissingError(error);
         createPostViewModel.firePropertyChange();
     }
 

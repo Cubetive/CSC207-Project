@@ -4,7 +4,7 @@ import entities.Post;
 
 import java.util.ArrayList;
 
-public interface CreatePostUserDataAccessInterface {
+public interface CreatePostDataAccessInterface {
 
     // Checks for existence of posts with the name indicated in their title.
     //Boolean existsWithName(String name);

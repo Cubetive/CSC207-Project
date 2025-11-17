@@ -2,12 +2,11 @@ package CreatePostTest;
 
 import entities.OriginalPost;
 import entities.Post;
-import use_case.create_post_use_case.CreatePostInputBoundary;
-import use_case.create_post_use_case.CreatePostUserDataAccessInterface;
+import use_case.create_post_use_case.CreatePostDataAccessInterface;
 
 import java.util.ArrayList;
 
-public class ExampleDataBaseObject implements CreatePostUserDataAccessInterface {
+public class ExampleDataBaseObject implements CreatePostDataAccessInterface {
     public void save(Post post) {}
 
     public Post getPost(String title) {

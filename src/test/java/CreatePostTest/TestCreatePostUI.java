@@ -5,7 +5,6 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.create_post.CreatePostController;
 import interface_adapter.create_post.CreatePostPresenter;
 import interface_adapter.create_post.CreatePostViewModel;
-import interface_adapter.signup.SignupViewModel;
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
@@ -16,7 +15,6 @@ public class TestCreatePostUI {
         CreatePostViewModel viewModel = new CreatePostViewModel();
         final CreatePostOutputBoundary presenter = new CreatePostPresenter(
                 viewModel,
-                new SignupViewModel(),
                 new ViewManagerModel()
         );
 

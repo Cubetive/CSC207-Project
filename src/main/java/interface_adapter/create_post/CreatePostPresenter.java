@@ -13,14 +13,13 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
     private CreatePostViewModel createPostViewModel;
     //TODO BrowseViewModel
     //TODO SearchViewModel
-    private SignupViewModel signupViewModel;
+    //private SignupViewModel signupViewModel;
     private ViewManagerModel viewManagerModel;
 
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
-                               SignupViewModel signupViewModel,
                                ViewManagerModel viewManagerModel) {
         this.createPostViewModel = createPostViewModel;
-        this.signupViewModel = signupViewModel;
+        //this.signupViewModel = signupViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 

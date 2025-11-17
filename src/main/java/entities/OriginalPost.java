@@ -7,14 +7,14 @@ public class OriginalPost extends Post {
     private List<ReplyPost> replies = new ArrayList<>();
 
 
-    public OriginalPost(String title, String content, String username) {
-        super(username, content);
+    public OriginalPost(String title, String username, String text) {
+        super(username, text);
         this.title = title;
     }
 
-    public ReplyPost replyToPost(String text, String username) {
+    public ReplyPost replyToPost(String username, String text) {
         // TODO
-        return new ReplyPost(text, username);
+        return new ReplyPost(username, text);
     }
 
     public String getTitle() {

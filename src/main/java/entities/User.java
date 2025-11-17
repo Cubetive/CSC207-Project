@@ -13,7 +13,6 @@ public class User {
     private String profilePicture;
     private String bio;
     private List<OriginalPost> original_posts;
-    private List<DirectMessage> messages;
     private List<ReplyPost> replies;
 
     public User(String full_name, String username, String email, String password){
@@ -23,12 +22,7 @@ public class User {
         this.password = password;
         this.dateJoined = new Date();
         this.original_posts = new ArrayList<>();
-        this.messages = new ArrayList<>();
         this.replies = new ArrayList<>();
-    }
-
-    public void signUp() {
-        // TODO: Implement signUp
     }
 
     public void login() {
@@ -57,8 +51,13 @@ public class User {
     }
 
     public List<OriginalPost> searchPosts(String keyword) {
-        // TODO: Implement searchPosts
-        return List.of();
+        List<OriginalPost> search_list = new ArrayList<OriginalPost>();
+        for(int i = 0; i < this.original_posts.size(); i++) {
+            if (this.original_posts.get(i).getTitle().contains(keyword)) {
+                search_list.add(this.original_posts.get(i));
+            }
+        }
+        return search_list;
     }
 
     public String translateText(Post post, String output_lang) {
@@ -83,6 +82,10 @@ public class User {
         return email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -103,12 +106,33 @@ public class User {
         return original_posts;
     }
 
-    public List<DirectMessage> getMessages() {
-        return messages;
-    }
-
     public List<ReplyPost> getReplies() {
         return replies;
+    }
+
+    // Setters for mutable fields
+    public void setFullName(String full_name) {
+        this.full_name = full_name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void addOriginalPost(OriginalPost post) {
+        this.original_posts.add(post);
+    }
+
+    public void addReply(ReplyPost reply) {
+        this.replies.add(reply);
     }
 }
 

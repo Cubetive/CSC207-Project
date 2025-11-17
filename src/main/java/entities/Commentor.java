@@ -8,6 +8,7 @@ public class Commentor extends User{
     public Post replyToPost(Post post, String text){
         //TODO: implement replyToPost
         return null;
+
     }
 
     public void deletePost(ReplyPost post){

@@ -89,7 +89,6 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         toLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // For now, just show a message that login isn't implemented yet
                 JOptionPane.showMessageDialog(
                     SignupView.this,
                     "Login functionality coming soon!",

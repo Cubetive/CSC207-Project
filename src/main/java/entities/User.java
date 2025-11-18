@@ -30,7 +30,9 @@ public class User {
     }
 
     public void changePassword(String oldPassword, String newPassword) {
-        // TODO: Implement changePassword
+        if (this.password.equals(oldPassword)) {
+            this.password = newPassword;
+        }
     }
 
     public void logout() {
@@ -38,7 +40,15 @@ public class User {
     }
 
     public void editProfile(String full_name, String bio, String profilePicture) {
-        // TODO: Implement editProfile
+        if (full_name != null && !full_name.trim().isEmpty()) {
+            this.full_name = full_name;
+        }
+        if (bio != null) {
+            this.bio = bio;
+        }
+        if (profilePicture != null) {
+            this.profilePicture = profilePicture;
+        }
     }
 
     public void viewProfile() {
@@ -113,6 +123,10 @@ public class User {
     // Setters for mutable fields
     public void setFullName(String full_name) {
         this.full_name = full_name;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setPassword(String password) {

@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsState;

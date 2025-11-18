@@ -1,8 +1,8 @@
 package app;
 
-import View.BrowsePostsView;
-import View.SignupView;
-import View.ViewManager;
+import view.BrowsePostsView;
+import view.SignupView;
+import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
 import entities.CommonUserFactory;

@@ -1,4 +1,4 @@
-package app;
+package View;
 
 import interface_adapter.ViewManagerModel;
 
@@ -8,10 +8,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * The View Manager handles switching between different views.
+ * The View Manager for the program. It listens for property change events
+ * in the ViewManagerModel and updates which View should be visible.
  */
 public class ViewManager implements PropertyChangeListener {
-
     private final CardLayout cardLayout;
     private final JPanel views;
     private final ViewManagerModel viewManagerModel;
@@ -25,9 +25,9 @@ public class ViewManager implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("state".equals(evt.getPropertyName())) {
-            final String viewName = (String) evt.getNewValue();
-            cardLayout.show(views, viewName);
+        if (evt.getPropertyName().equals("state")) {
+            final String viewModelName = (String) evt.getNewValue();
+            cardLayout.show(views, viewModelName);
         }
     }
 }

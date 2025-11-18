@@ -20,7 +20,7 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
         state.setPosts(outputData.getPosts());
         state.setErrorMessage(null);
         viewModel.setState(state);
-        viewModel.firePropertyChanged();
+        viewModel.firePropertyChange();
     }
 
     @Override
@@ -28,6 +28,6 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
         final BrowsePostsState state = viewModel.getState();
         state.setErrorMessage(errorMessage);
         viewModel.setState(state);
-        viewModel.firePropertyChanged();
+        viewModel.firePropertyChange();
     }
 }

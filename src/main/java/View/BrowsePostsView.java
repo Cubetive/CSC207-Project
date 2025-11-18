@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
  */
 public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
-    private final String viewName = "browse posts";
     private final BrowsePostsViewModel viewModel;
     private BrowsePostsController controller;
 
@@ -146,7 +145,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     }
 
     public String getViewName() {
-        return viewName;
+        return viewModel.getViewName();
     }
 
     public void setController(BrowsePostsController controller) {

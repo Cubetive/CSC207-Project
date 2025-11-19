@@ -125,6 +125,12 @@ public class TranslationDataAccess implements TranslationDataAccessInterface {
             return "ERROR: Translation Failed (Network/IO): " + e.getMessage();
         }
     }
+    public boolean isLanguageSupported(String targetLangCode) {
+        if  (targetLangCode == null || !SUPPORTED_LANGUAGES.contains(targetLangCode)) {
+            throw new IllegalArgumentException("Invalid target language code: " + targetLangCode);
+        }
+        else return true;
+    }
 
     /**
      * Parses the JSON response to extract the translated text using substring search.

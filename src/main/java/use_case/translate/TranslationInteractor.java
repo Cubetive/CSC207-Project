@@ -1,122 +1,65 @@
 package use_case.translate;
-
-import use_case.read_post.ReadPostDataAccessInterface;
-import entities.OriginalPost;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
  * The Translation Interactor (Use Case), which contains the application-specific business logic.
- * It is responsible for orchestrating post fetching, language detection, and translation.
- * It also implements a simple caching mechanism by checking if the required translation
- * is already stored within the OriginalPost entity.
+ * It coordinates the flow of data and rules, using an ExecutorService to ensure time-consuming
+ * Data Access (network calls) runs on a background thread, preventing the UI from freezing.
  */
-public class TranslationInteractor implements TranslationInputBoundary {
+public class TranslationInteractor {
 
-    private final ReadPostDataAccessInterface postDataAccessObject;
-    private final TranslationDataAccessInterface translationDataAccessObject;
+    private final TranslationDataAccessInterface dataAccess;
     private final TranslationOutputBoundary outputBoundary;
     private final ExecutorService executor;
 
     public TranslationInteractor(
-            ReadPostDataAccessInterface postDataAccessObject,
-            TranslationDataAccessInterface translationDataAccessObject,
+            TranslationDataAccessInterface dataAccess,
             TranslationOutputBoundary outputBoundary) {
-        this.postDataAccessObject = postDataAccessObject;
-        this.translationDataAccessObject = translationDataAccessObject;
+        this.dataAccess = dataAccess;
         this.outputBoundary = outputBoundary;
+        // Use a single thread pool for sequential, predictable execution of tasks
         this.executor = Executors.newSingleThreadExecutor();
     }
 
     /**
-     * Executes the translation use case logic on a background thread.
+     * Executes the translation use case logic. This method submits the actual work
+     * to a background thread to prevent blocking the Swing Event Dispatch Thread (EDT).
      *
-     * @param inputData The input data from the Controller, containing the post ID and target language code.
+     * @param inputData The input data from the Controller.
      */
-    @Override
     public void execute(TranslationInputData inputData) {
-        final long postId = inputData.getPostId();
-        final String targetLanguageCode = inputData.getTargetLanguage(); // Using inputData.getTargetLanguage()
-
         executor.submit(() -> {
-            OriginalPost post = postDataAccessObject.getPostById(postId);
-
-            if (post == null) {
-                outputBoundary.presentFailure("Error: Post with ID " + postId + " was not found.");
-                return;
-            }
-
-            final String sourceText = post.getContent();
-            String sourceLanguageCode; // Determined via detection, since OriginalPost doesn't store it
-
             try {
-                // 1. VALIDATION & LANGUAGE DETECTION:
-                if (sourceText.trim().isEmpty()) {
+                // 1. Validation Logic
+                if (inputData.getSourceText().trim().isEmpty()) {
                     outputBoundary.presentFailure("Cannot translate empty text.");
                     return;
                 }
 
-                if (!translationDataAccessObject.isLanguageSupported(targetLanguageCode)) {
+                // This check now works because the interface was updated.
+                if (!dataAccess.isLanguageSupported(inputData.getTargetLanguage())) {
                     outputBoundary.presentFailure("Target language is not supported.");
                     return;
                 }
 
-                // Determine the source language code first (required for Output Data and translation call)
-                sourceLanguageCode = translationDataAccessObject.detectLanguage(sourceText);
-
-                // Check if the detected language is the same as the target language
-                if (sourceLanguageCode.equalsIgnoreCase(targetLanguageCode)) {
-                    // We don't need a full TranslationOutputData object if no translation is attempted.
-                    outputBoundary.presentFailure("Source and target languages are the same (" + targetLanguageCode + "). No translation needed.");
-                    return;
-                }
-
-                // 2. CACHING CHECK: Check if the translation already exists in the post entity
-                // NOTE: This assumes post.getTranslation() now exists as per the discussion logic.
-                String cachedTranslation = post.getTranslation(targetLanguageCode);
-
-                if (cachedTranslation != null && !cachedTranslation.trim().isEmpty()) {
-                    // Translation is cached. We use the *detected* sourceLanguageCode for the output.
-                    TranslationOutputData outputData = new TranslationOutputData(
-                            cachedTranslation,
-                            targetLanguageCode,
-                            sourceLanguageCode,
-                            postId,
-                            true // <-- CACHE HIT: Set to true
-                    );
-                    outputBoundary.presentSuccess(outputData);
-                    return;
-                }
-
-                // 3. DATA ACCESS CALL: Cache Miss - Perform API translation
-                String translatedText = translationDataAccessObject.translate(
-                        sourceText,
-                        sourceLanguageCode, // Use the detected code
-                        targetLanguageCode
+                // 2. Data Access Call (This is the long-running network operation)
+                String translatedText = dataAccess.translate(
+                        inputData.getSourceText(),
+                        inputData.getTargetLanguage()
                 );
 
-                // 4. PRESENT RESULT
+                // 3. Prepare and Present Result
                 if (translatedText.startsWith("ERROR:")) {
                     outputBoundary.presentFailure(translatedText);
                 } else {
-                    // Success: Prepare output data
-                    // NOTE: This is where we would call post.addTranslation(targetLanguageCode, translatedText)
-                    // and save the post back to the database in a real application.
-
-                    TranslationOutputData outputData = new TranslationOutputData(
-                            translatedText,
-                            targetLanguageCode,
-                            sourceLanguageCode,
-                            postId,
-                            false // <-- CACHE MISS: Set to false
-                    );
+                    TranslationOutputData outputData = new TranslationOutputData(translatedText);
                     outputBoundary.presentSuccess(outputData);
                 }
-
             } catch (Exception e) {
-                // Catch network, API, or unexpected runtime errors
-                outputBoundary.presentFailure("A translation error occurred: " + e.getMessage());
+                // Catch unexpected runtime errors
+                outputBoundary.presentFailure("An unexpected error occurred during translation: " + e.getMessage());
             }
         });
     }
@@ -127,12 +70,14 @@ public class TranslationInteractor implements TranslationInputBoundary {
     public void shutdown() {
         executor.shutdown();
         try {
+            // Wait a little while for existing tasks to terminate
             if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
+                executor.shutdownNow(); // Cancel currently executing tasks
             }
         } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
             executor.shutdownNow();
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // Preserve interrupt status
         }
     }
 }

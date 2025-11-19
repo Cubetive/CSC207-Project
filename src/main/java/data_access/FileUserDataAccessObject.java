@@ -153,7 +153,9 @@ public class FileUserDataAccessObject implements
     public void updateUserProfile(String username, String fullName, String bio, String profilePicture) {
         User user = usersByUsername.get(username);
         if (user != null) {
-            user.editProfile(fullName, bio, profilePicture);
+            user.setFullName(fullName);
+            user.setBio(bio);
+            user.setProfilePicture(profilePicture);
             saveUsers(); // Persist changes
         }
     }

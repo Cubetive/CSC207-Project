@@ -34,10 +34,10 @@ public class SignupPresenter implements SignupOutputBoundary {
         signupState.setRepeatPasswordError(null);
 
         signupViewModel.setState(signupState);
-        signupViewModel.firePropertyChanged();
+        signupViewModel.firePropertyChange();
 
-        // Switch to login view after successful signup
-        viewManagerModel.setState("login");
+        // Switch to browse posts view after successful signup
+        viewManagerModel.setState("browse posts");
         viewManagerModel.firePropertyChanged();
     }
 
@@ -59,12 +59,12 @@ public class SignupPresenter implements SignupOutputBoundary {
             signupState.setUsernameError(errorMessage);
         }
 
-        signupViewModel.firePropertyChanged();
+        signupViewModel.firePropertyChange();
     }
 
     @Override
     public void switchToLoginView() {
-        viewManagerModel.setState("login");
+        viewManagerModel.setState("browse posts");
         viewManagerModel.firePropertyChanged();
     }
 }

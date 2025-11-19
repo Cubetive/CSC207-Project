@@ -17,6 +17,4 @@ public interface TranslationDataAccessInterface {
      * @throws Exception if the network request or API call fails.
      */
     String translate(String text, String targetLangCode) throws Exception;
-
-    public boolean isLanguageSupported(String targetLangCode);
 }

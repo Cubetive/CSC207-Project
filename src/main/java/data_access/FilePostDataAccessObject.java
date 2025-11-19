@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import entities.OriginalPost;
+import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
 
 import java.io.FileReader;
@@ -45,6 +46,12 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface 
                     final String content = postObj.get("content").getAsString();
 
                     final OriginalPost post = new OriginalPost(title, content, username);
+
+                    if (postObj.has("replies")) {
+                        final JsonArray repliesArray = postObj.getAsJsonArray("replies");
+                        parseReplies(repliesArray, post.getReplies());
+                    }
+
                     posts.add(post);
                 }
             }
@@ -53,5 +60,30 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface 
         }
 
         return posts;
+    }
+
+    /**
+     * Recursively parses reply posts from JSON and adds them to the given list.
+     * @param repliesArray the JSON array containing reply data
+     * @param repliesList the list to add the constructed ReplyPost entities to
+     */
+    private void parseReplies(JsonArray repliesArray, List<ReplyPost> repliesList) {
+        for (JsonElement replyElement : repliesArray) {
+            final JsonObject replyObj = replyElement.getAsJsonObject();
+
+            final String username = replyObj.get("username").getAsString();
+            final String content = replyObj.get("content").getAsString();
+
+            // Construct the ReplyPost entity through its constructor
+            final ReplyPost reply = new ReplyPost(username, content);
+
+            // Recursively parse nested replies (lowercase "replies")
+            if (replyObj.has("replies")) {
+                final JsonArray nestedRepliesArray = replyObj.getAsJsonArray("replies");
+                parseReplies(nestedRepliesArray, reply.getReplies());
+            }
+
+            repliesList.add(reply);
+        }
     }
 }

@@ -6,21 +6,24 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface that
- * interacts with the Google Cloud Translation API via HTTP.
+ * interacts with the Google Cloud Translation API (V2) via HTTP GET.
  *
- * This class encapsulates all external details (API key, URL, JSON parsing).
+ * NOTE: This class is placed in the 'use_case.translate' package, which is
+ * unconventional for a Data Access Object (DAO). A DAO should typically
+ * reside in a 'data_access' package.
  */
 public class TranslationDataAccess implements TranslationDataAccessInterface {
 
-    // IMPORTANT: In a production environment, this key should be stored securely
-    // (e.g., environment variables) and NEVER hardcoded.
-    private static final String GOOGLE_API_KEY = "AIzaSyDBiXSSL6z57ri4AJXgKC_Wam_T_va0XB8";
+    // The environment variable name used to retrieve the API key
+    private static final String apiKeyName = "GOOGLE_API_KEY";
+
+    // Retrieve the API key from the OS environment variables
+    private static final String apiKey = System.getenv(apiKeyName);
+
     private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
 
     public static final List<String> SUPPORTED_LANGUAGES = List.of(
@@ -32,262 +35,121 @@ public class TranslationDataAccess implements TranslationDataAccessInterface {
     );
 
     /**
-     * Executes the API call to get the translation.
+     * Checks if the given language code is supported by our application configuration.
+     * This implementation has been corrected to return a boolean instead of throwing an exception.
+     *
+     * @param targetLangCode The target language code (e.g., "es").
+     * @return true if the language is supported, false otherwise.
+     */
+    @Override
+    public boolean isLanguageSupported(String targetLangCode) {
+        if (targetLangCode == null) {
+            return false;
+        }
+        // CORRECTED: Returns true or false, adhering to the interface contract.
+        return SUPPORTED_LANGUAGES.contains(targetLangCode.toLowerCase());
+    }
+
+    /**
+     * Executes the API call to get the translation using an HTTP GET request.
      *
      * @param text The text content to translate.
      * @param targetLangCode The target language code (e.g., "es" for Spanish).
      * @return The translated text, or an error message if translation fails.
-     * @throws Exception if any network or API error occurs.
      */
     @Override
-    public String translate(String text, String targetLangCode) throws Exception {
+    public String translate(String text, String targetLangCode) {
         if (text == null || text.trim().isEmpty()) {
-            throw new IllegalArgumentException("Cannot translate empty text.");
-        }
-        if (targetLangCode == null || !SUPPORTED_LANGUAGES.contains(targetLangCode)) {
-            throw new IllegalArgumentException("Invalid or unsupported target language code: " + targetLangCode);
+            return "ERROR: Cannot translate empty text.";
         }
 
-        // URL Encode the text content
-        String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
-
-        // Build the full URL using GET query parameters
-        String fullApiUrl = String.format(
-                "%s?target=%s&key=%s&q=%s",
-                TRANSLATE_API_BASE_URL,
-                targetLangCode,
-                GOOGLE_API_KEY,
-                encodedText
-        );
-
-        URL url = new URL(fullApiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Accept", "application/json");
-
-        int responseCode = connection.getResponseCode();
-
-        // Read the response stream (either success or error stream)
-        BufferedReader br;
-        if (responseCode >= 200 && responseCode < 300) {
-            br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-        } else {
-            br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+        // Use the non-throwing check here
+        if (!isLanguageSupported(targetLangCode)) {
+            return "ERROR: Invalid or unsupported target language code: " + targetLangCode;
         }
 
-        StringBuilder response = new StringBuilder();
-        String responseLine;
-        while ((responseLine = br.readLine()) != null) {
-            response.append(responseLine.trim());
-        }
-        br.close();
-
-        String apiResponse = response.toString();
-
-        if (responseCode != 200) {
-            throw new Exception(String.format("Translation API Error (%d): %s", responseCode, apiResponse));
+        // 1. Check for API key presence
+        if (apiKey == null || apiKey.isEmpty()) {
+            return "ERROR: Google API Key is not set in the environment variable " + apiKeyName;
         }
 
-        // Parse and return the translated text
-        return parseTranslatedText(apiResponse);
-    }
-    public boolean isLanguageSupported(String targetLangCode) {
-        if  (targetLangCode == null || !SUPPORTED_LANGUAGES.contains(targetLangCode)) {
-            throw new IllegalArgumentException("Invalid target language code: " + targetLangCode);
+        try {
+            // URL Encode the text content
+            String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
+
+            // Build the full URL using GET query parameters (limited to 2K characters total URL length)
+            String fullApiUrl = String.format(
+                    "%s?target=%s&key=%s&q=%s",
+                    TRANSLATE_API_BASE_URL,
+                    targetLangCode,
+                    apiKey,
+                    encodedText
+            );
+
+            URL url = new URL(fullApiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setConnectTimeout(5000); // 5 seconds
+            connection.setReadTimeout(5000);    // 5 seconds
+
+            int responseCode = connection.getResponseCode();
+
+            // Read the response stream (either success or error stream)
+            BufferedReader br;
+            if (responseCode >= 200 && responseCode < 300) {
+                br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            } else {
+                br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+            }
+
+            StringBuilder response = new StringBuilder();
+            String responseLine;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            br.close();
+
+            String apiResponse = response.toString();
+
+            if (responseCode != 200) {
+                // Your fix using String concatenation is retained here:
+                return "ERROR: Translation API Error (" + responseCode + "): " + apiResponse;
+            }
+
+            // OPTIMIZED: Use robust substring search to parse the fixed JSON structure
+            return parseTranslatedText(apiResponse);
+
+        } catch (Exception e) {
+            System.err.println("Network or I/O Error during translation: " + e.getMessage());
+            return "ERROR: Translation Failed (Network/IO): " + e.getMessage();
         }
-        else return true;
     }
 
     /**
-     * Parses the JSON response to extract the translated text.
+     * Parses the JSON response to extract the translated text using substring search.
+     * This is far simpler and less error-prone than a custom JSON parser for a fixed API response.
      * Response structure: {"data": {"translations": [{"translatedText": "..."}]}}
      */
-    private String parseTranslatedText(String apiResponse) throws Exception {
-        // SimpleJsonParser (moved from TranslatorUI) is used here to avoid external libraries
-        try {
-            Map<String, Object> root = SimpleJsonParser.parse(apiResponse);
+    private String parseTranslatedText(String apiResponse) {
+        String textMarker = "\"translatedText\":\"";
+        int startIndex = apiResponse.indexOf(textMarker);
 
-            if (root.containsKey("data")) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> data = (Map<String, Object>) root.get("data");
-
-                if (data.containsKey("translations")) {
-                    @SuppressWarnings("unchecked")
-                    List<Object> translations = (List<Object>) data.get("translations");
-
-                    if (!translations.isEmpty()) {
-                        @SuppressWarnings("unchecked")
-                        Map<String, Object> firstTranslation = (Map<String, Object>) translations.get(0);
-
-                        String translatedText = (String) firstTranslation.get("translatedText");
-
-                        // Unescape common JSON characters
-                        return translatedText.replace("\\\"", "\"").replace("\\n", "\n").replace("\\/", "/");
-                    }
-                }
-            }
-
-            throw new Exception("JSON response was successful but could not find the translation text structure.");
-
-        } catch (Exception jsonEx) {
-            throw new Exception("Failed to parse JSON response. Raw Response: " + apiResponse +
-                    "\nParsing Error: " + jsonEx.getMessage(), jsonEx);
-        }
-    }
-
-    // --- SimpleJsonParser (Moved from original TranslatorUI to encapsulate API parsing) ---
-
-    private static class SimpleJsonParser {
-        public static Map<String, Object> parse(String json) throws Exception {
-            String trimmed = json.trim();
-            if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
-                throw new Exception("Invalid JSON object format.");
-            }
-            String inner = trimmed.substring(1, trimmed.length() - 1).trim();
-            return parseObject(inner);
+        if (startIndex == -1) {
+            return "ERROR: Translation Failed: Could not find translated text in response. Raw Response: " + apiResponse;
         }
 
-        @SuppressWarnings("unchecked")
-        private static Map<String, Object> parseObject(String content) throws Exception {
-            Map<String, Object> map = new HashMap<>();
-            int i = 0;
-            while (i < content.length()) {
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-                if (content.charAt(i) != '"') throw new Exception("Expected start of key quote at: " + i);
-                int keyStart = ++i;
-                int keyEnd = content.indexOf('"', keyStart);
-                if (keyEnd == -1) throw new Exception("Missing closing quote for key at: " + keyStart);
-                String key = content.substring(keyStart, keyEnd);
-                i = keyEnd + 1;
+        startIndex += textMarker.length();
+        // Look for the closing quote, skipping past the start index
+        int endIndex = apiResponse.indexOf("\"", startIndex);
 
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-                if (content.charAt(i) != ':') throw new Exception("Expected colon after key at: " + i);
-                i++;
-
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-
-                Object value;
-                char startChar = content.charAt(i);
-
-                if (startChar == '"') {
-                    int valStart = ++i;
-                    StringBuilder val = new StringBuilder();
-                    while(i < content.length()) {
-                        char c = content.charAt(i);
-                        // Simple unescaped quote check (note: this is a very basic parser)
-                        if (c == '"' && content.charAt(i-1) != '\\') {
-                            break;
-                        }
-                        val.append(c);
-                        i++;
-                    }
-                    if (i == content.length()) throw new Exception("Unclosed string value at: " + valStart);
-                    value = val.toString().replace("\\\"", "\"").replace("\\n", "\n");
-                    i++;
-                } else if (startChar == '{') {
-                    int objectEnd = findMatchingBrace(content, i);
-                    value = parseObject(content.substring(i + 1, objectEnd));
-                    i = objectEnd + 1;
-                } else if (startChar == '[') {
-                    int arrayEnd = findMatchingBracket(content, i);
-                    value = parseArray(content.substring(i + 1, arrayEnd));
-                    i = arrayEnd + 1;
-                } else {
-                    int valueEnd = content.indexOf(',', i);
-                    if (valueEnd == -1) valueEnd = content.length();
-                    value = content.substring(i, valueEnd).trim();
-                    i = valueEnd;
-                }
-
-                map.put(key, value);
-
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-
-                if (i < content.length() && content.charAt(i) == ',') {
-                    i++;
-                } else if (i < content.length()) {
-                    throw new Exception("Unexpected character after value at: " + i);
-                }
-            }
-            return map;
+        if (endIndex == -1) {
+            return "ERROR: Translation Failed: Could not find closing quote. Raw Response: " + apiResponse;
         }
 
-        private static List<Object> parseArray(String content) throws Exception {
-            List<Object> list = new java.util.ArrayList<>();
-            int i = 0;
+        String translatedText = apiResponse.substring(startIndex, endIndex);
 
-            while (i < content.length()) {
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-                if (i >= content.length()) break;
-
-                char startChar = content.charAt(i);
-                Object value;
-
-                if (startChar == '{') {
-                    int objectEnd = findMatchingBrace(content, i);
-                    value = parseObject(content.substring(i + 1, objectEnd));
-                    i = objectEnd + 1;
-                } else if (startChar == '"') {
-                    int valStart = ++i;
-                    StringBuilder val = new StringBuilder();
-                    while(i < content.length()) {
-                        char c = content.charAt(i);
-                        if (c == '"' && content.charAt(i-1) != '\\') {
-                            break;
-                        }
-                        val.append(c);
-                        i++;
-                    }
-                    if (i == content.length()) throw new Exception("Unclosed string value at: " + valStart);
-                    value = val.toString().replace("\\\"", "\"").replace("\\n", "\n");
-                    i++;
-                } else {
-                    throw new Exception("Unsupported value type in array at: " + i);
-                }
-
-                list.add(value);
-
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-
-                if (i < content.length() && content.charAt(i) == ',') {
-                    i++;
-                }
-            }
-            return list;
-        }
-
-        private static int findMatchingBrace(String json, int start) throws Exception {
-            int count = 0;
-            boolean inString = false;
-            for (int i = start; i < json.length(); i++) {
-                char c = json.charAt(i);
-                if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
-                    inString = !inString;
-                }
-                if (!inString) {
-                    if (c == '{') count++;
-                    else if (c == '}') count--;
-                }
-                if (count == 0 && i > start) return i;
-            }
-            throw new Exception("Unmatched brace starting at: " + start);
-        }
-
-        private static int findMatchingBracket(String json, int start) throws Exception {
-            int count = 0;
-            boolean inString = false;
-            for (int i = start; i < json.length(); i++) {
-                char c = json.charAt(i);
-                if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
-                    inString = !inString;
-                }
-                if (!inString) {
-                    if (c == '[') count++;
-                    else if (c == ']') count--;
-                }
-                if (count == 0 && i > start) return i;
-            }
-            throw new Exception("Unmatched bracket starting at: " + start);
-        }
+        // Unescape common JSON characters
+        return translatedText.replace("\\\"", "\"").replace("\\n", "\n").replace("\\/", "/");
     }
 }

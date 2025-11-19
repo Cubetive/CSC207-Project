@@ -17,7 +17,7 @@ public class TranslationInputData {
         return sourceText;
     }
 
-    public String getTargetLanguageCode() {
+    public String getTargetLanguage() {
         return targetLanguageCode;
     }
 }

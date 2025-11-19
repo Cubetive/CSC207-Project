@@ -1,17 +1,20 @@
 package entities;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReplyPost extends Post {
 
-    private List<ThreadPost> threads;
+    private final List<ReplyPost> replies = new ArrayList<>();
 
     public ReplyPost(String username, String content) {
         super(username, content);
     }
 
-    public ThreadPost replyToPost(String text, String username) {
-        // TODO
-        return new ThreadPost(username, text);
+    public ReplyPost replyToPost(String username, String content) {
+        ReplyPost replyPost = new ReplyPost(username, content);
+        replies.add(replyPost);
+        return replyPost;
     }
-    
+
+    public List<ReplyPost> getReplies() { return this.replies; }
 }

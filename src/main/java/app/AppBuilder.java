@@ -1,6 +1,7 @@
 package app;
 
 import view.BrowsePostsView;
+import view.PostReadingView;
 import view.SignupView;
 import view.ViewManager;
 import data_access.FilePostDataAccessObject;
@@ -11,12 +12,18 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsPresenter;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
+import interface_adapter.read_post.ReadPostController;
+import interface_adapter.read_post.ReadPostPresenter;
+import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
+import use_case.read_post.ReadPostInputBoundary;
+import use_case.read_post.ReadPostInteractor;
+import use_case.read_post.ReadPostOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -46,10 +53,12 @@ public class AppBuilder {
     // View models
     private SignupViewModel signupViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
+    private ReadPostViewModel readPostViewModel;
 
     // Views
     private SignupView signupView;
     private BrowsePostsView browsePostsView;
+    private PostReadingView postReadingView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -92,6 +101,17 @@ public class AppBuilder {
     }
 
     /**
+     * Adds the Read Post View to the application.
+     * @return this builder
+     */
+    public AppBuilder addReadPostView() {
+        readPostViewModel = new ReadPostViewModel();
+        postReadingView = new PostReadingView(readPostViewModel);
+        cardPanel.add(postReadingView, postReadingView.getViewName());
+        return this;
+    }
+
+    /**
      * Adds the Signup Use Case to the application.
      * @return this builder
      */
@@ -118,6 +138,38 @@ public class AppBuilder {
 
         final BrowsePostsController controller = new BrowsePostsController(browsePostsInteractor);
         browsePostsView.setController(controller);
+
+        // Set up post click listener to navigate to read post view
+        browsePostsView.setPostClickListener(postTitle -> {
+            if (postReadingView != null) {
+                viewManagerModel.setState(postReadingView.getViewName());
+                viewManagerModel.firePropertyChanged();
+                postReadingView.loadPost(postTitle);
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Adds the Read Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addReadPostUseCase() {
+        final ReadPostOutputBoundary readPostOutputBoundary =
+                new ReadPostPresenter(readPostViewModel);
+        final ReadPostInputBoundary readPostInteractor =
+                new ReadPostInteractor(postDataAccessObject, readPostOutputBoundary);
+
+        final ReadPostController controller = new ReadPostController(readPostInteractor);
+        postReadingView.setController(controller);
+
+        // Set up back button to navigate back to browse posts
+        postReadingView.setOnBackAction(() -> {
+            viewManagerModel.setState(browsePostsView.getViewName());
+            viewManagerModel.firePropertyChanged();
+        });
+
         return this;
     }
 

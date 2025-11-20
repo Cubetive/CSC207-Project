@@ -17,6 +17,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     private final BrowsePostsViewModel viewModel;
     private BrowsePostsController controller;
+    private PostClickListener postClickListener;
 
     private final JPanel postsPanel;
     private final JScrollPane scrollPane;
@@ -27,24 +28,40 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         this.viewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
+        this.setBackground(new Color(245, 245, 245));
 
-        // Title
+        // Title panel
+        final JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(70, 130, 180));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setFont(new Font("Arial", Font.BOLD, 26));
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        title.setForeground(Color.WHITE);
+        titlePanel.add(title);
 
         // Posts panel with vertical layout
         postsPanel = new JPanel();
         postsPanel.setLayout(new BoxLayout(postsPanel, BoxLayout.Y_AXIS));
-        postsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        postsPanel.setBackground(new Color(245, 245, 245));
+        postsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Scroll pane for posts
         scrollPane = new JScrollPane(postsPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         // Refresh button
         refreshButton = new JButton(BrowsePostsViewModel.REFRESH_BUTTON_LABEL);
+        refreshButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        refreshButton.setFocusPainted(false);
+        refreshButton.setBackground(new Color(70, 130, 180));
+        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        refreshButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         refreshButton.addActionListener(e -> {
             if (controller != null) {
                 controller.execute();
@@ -52,11 +69,12 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         });
 
         final JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(245, 245, 245));
         buttonPanel.add(refreshButton);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
 
         // Add components to view
-        this.add(title, BorderLayout.NORTH);
+        this.add(titlePanel, BorderLayout.NORTH);
         this.add(scrollPane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -79,20 +97,27 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         if (state.getErrorMessage() != null) {
             // Show error message
             final JLabel errorLabel = new JLabel(state.getErrorMessage());
-            errorLabel.setForeground(Color.RED);
+            errorLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+            errorLabel.setForeground(new Color(220, 53, 69));
             errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            postsPanel.add(Box.createVerticalGlue());
             postsPanel.add(errorLabel);
+            postsPanel.add(Box.createVerticalGlue());
         } else if (state.getPosts().isEmpty()) {
             // Show "no posts" message
             final JLabel noPostsLabel = new JLabel("No posts available");
+            noPostsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+            noPostsLabel.setForeground(new Color(120, 120, 120));
             noPostsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            postsPanel.add(Box.createVerticalGlue());
             postsPanel.add(noPostsLabel);
+            postsPanel.add(Box.createVerticalGlue());
         } else {
             // Display posts
             for (BrowsePostsOutputData.PostData post : state.getPosts()) {
                 final JPanel postPanel = createPostPanel(post);
                 postsPanel.add(postPanel);
-                postsPanel.add(Box.createVerticalStrut(10));
+                postsPanel.add(Box.createVerticalStrut(15));
             }
         }
 
@@ -106,25 +131,56 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private JPanel createPostPanel(BrowsePostsOutputData.PostData post) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY, 1),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createEmptyBorder(15, 18, 15, 18)
         ));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Make panel clickable with hover effect
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (postClickListener != null) {
+                    postClickListener.onPostClicked(post.getTitle());
+                }
+            }
+
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                panel.setBackground(new Color(248, 250, 252));
+                panel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(70, 130, 180), 2),
+                        BorderFactory.createEmptyBorder(14, 17, 14, 17)
+                ));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                panel.setBackground(Color.WHITE);
+                panel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                        BorderFactory.createEmptyBorder(15, 18, 15, 18)
+                ));
+            }
+        });
 
         // Title
         final JLabel titleLabel = new JLabel(post.getTitle());
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setForeground(new Color(50, 50, 50));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Username
         final JLabel usernameLabel = new JLabel("by " + post.getUsername());
-        usernameLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-        usernameLabel.setForeground(Color.GRAY);
+        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        usernameLabel.setForeground(new Color(120, 120, 120));
         usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Content
+        // Content preview
         final JTextArea contentArea = new JTextArea(post.getContent());
         contentArea.setFont(new Font("Arial", Font.PLAIN, 14));
         contentArea.setLineWrap(true);
@@ -132,11 +188,13 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         contentArea.setEditable(false);
         contentArea.setOpaque(false);
         contentArea.setFocusable(false);
-        contentArea.setCursor(Cursor.getDefaultCursor());
+        contentArea.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        contentArea.setForeground(new Color(80, 80, 80));
         contentArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contentArea.setRows(2);
 
         panel.add(titleLabel);
-        panel.add(Box.createVerticalStrut(5));
+        panel.add(Box.createVerticalStrut(6));
         panel.add(usernameLabel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(contentArea);
@@ -159,5 +217,16 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         if (controller != null) {
             controller.execute();
         }
+    }
+
+    public void setPostClickListener(PostClickListener listener) {
+        this.postClickListener = listener;
+    }
+
+    /**
+     * Interface for handling post clicks.
+     */
+    public interface PostClickListener {
+        void onPostClicked(String postTitle);
     }
 }

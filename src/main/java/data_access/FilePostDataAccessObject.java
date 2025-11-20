@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import entities.OriginalPost;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
+import use_case.read_post.ReadPostDataAccessInterface;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * File-based implementation of the DAO for reading post data from JSON.
  */
-public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface {
+public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface, ReadPostDataAccessInterface {
 
     private final String filePath;
     private final Gson gson;
@@ -85,5 +86,18 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface 
 
             repliesList.add(reply);
         }
+    }
+
+    @Override
+    public OriginalPost getPostByTitle(String title) {
+        final List<OriginalPost> allPosts = getAllPosts();
+
+        for (OriginalPost post : allPosts) {
+            if (post.getTitle().equals(title)) {
+                return post;
+            }
+        }
+
+        return null;
     }
 }

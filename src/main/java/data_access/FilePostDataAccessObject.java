@@ -11,7 +11,10 @@ import use_case.read_post.ReadPostDataAccessInterface;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +37,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
     @Override
     public List<OriginalPost> getAllPosts() {
         final List<OriginalPost> posts = new ArrayList<>();
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
         try (FileReader reader = new FileReader(filePath)) {
             final JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
@@ -45,18 +49,22 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
                     final String title = postObj.get("title").getAsString();
                     final String username = postObj.get("username").getAsString();
                     final String content = postObj.get("content").getAsString();
+                    final Date creationDate = dateFormat.parse(postObj.get("date").getAsString());
+                    final JsonArray votesArray = postObj.getAsJsonArray("votes");
+                    final int upvotes = votesArray.get(0).getAsInt();
+                    final int downvotes = votesArray.get(1).getAsInt();
 
-                    final OriginalPost post = new OriginalPost(title, content, username);
+                    final OriginalPost post = new OriginalPost(title, content, username, creationDate, upvotes, downvotes);
 
                     if (postObj.has("replies")) {
                         final JsonArray repliesArray = postObj.getAsJsonArray("replies");
-                        parseReplies(repliesArray, post.getReplies());
+                        parseReplies(repliesArray, post.getReplies(), dateFormat);
                     }
 
                     posts.add(post);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             System.err.println("Error reading posts from file: " + e.getMessage());
         }
 
@@ -67,21 +75,26 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
      * Recursively parses reply posts from JSON and adds them to the given list.
      * @param repliesArray the JSON array containing reply data
      * @param repliesList the list to add the constructed ReplyPost entities to
+     * @param dateFormat the date format to use for parsing dates
      */
-    private void parseReplies(JsonArray repliesArray, List<ReplyPost> repliesList) {
+    private void parseReplies(JsonArray repliesArray, List<ReplyPost> repliesList, SimpleDateFormat dateFormat) throws ParseException {
+
         for (JsonElement replyElement : repliesArray) {
             final JsonObject replyObj = replyElement.getAsJsonObject();
 
             final String username = replyObj.get("username").getAsString();
             final String content = replyObj.get("content").getAsString();
+            final Date creationDate = dateFormat.parse(replyObj.get("date").getAsString());
+            final JsonArray votesArray = replyObj.getAsJsonArray("votes");
+            final int upvotes = votesArray.get(0).getAsInt();
+            final int downvotes = votesArray.get(1).getAsInt();
 
-            // Construct the ReplyPost entity through its constructor
-            final ReplyPost reply = new ReplyPost(username, content);
+            final ReplyPost reply = new ReplyPost(username, content, creationDate, upvotes, downvotes);
 
-            // Recursively parse nested replies (lowercase "replies")
+            // Recursively parse nested replies
             if (replyObj.has("replies")) {
                 final JsonArray nestedRepliesArray = replyObj.getAsJsonArray("replies");
-                parseReplies(nestedRepliesArray, reply.getReplies());
+                parseReplies(nestedRepliesArray, reply.getReplies(), dateFormat);
             }
 
             repliesList.add(reply);

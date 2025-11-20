@@ -1,5 +1,6 @@
 package use_case.browse_posts;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,11 +25,18 @@ public class BrowsePostsOutputData {
         private final String title;
         private final String content;
         private final String username;
+        private final Date creationDate;
+        private final int upvotes;
+        private final int downvotes;
 
-        public PostData(String title, String content, String username) {
+        public PostData(String title, String content, String username,
+                       Date creationDate, int upvotes, int downvotes) {
             this.title = title;
             this.content = content;
             this.username = username;
+            this.creationDate = creationDate;
+            this.upvotes = upvotes;
+            this.downvotes = downvotes;
         }
 
         public String getTitle() {
@@ -41,6 +49,18 @@ public class BrowsePostsOutputData {
 
         public String getUsername() {
             return username;
+        }
+
+        public Date getCreationDate() {
+            return creationDate;
+        }
+
+        public int getUpvotes() {
+            return upvotes;
+        }
+
+        public int getDownvotes() {
+            return downvotes;
         }
     }
 }

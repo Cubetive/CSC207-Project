@@ -2,24 +2,28 @@
   {
     "title": "SomeTitle",
     "username": "SomeUsername",
-    "date": "11/17/2025",
+    "date": "11/20/2025",
     "content": "Some random description and extra words",
+    "votes": [5, 1],
     "replies": [
       {
         "username": "Commenter1",
         "date":"11/17/2025",
         "content": "Some random first comment.",
+        "votes": [2, 0],
         "replies": []
       },
       {
         "username": "Commenter2",
         "date":"11/17/2025",
         "content": "Some random second comment.",
+        "votes": [3, 1],
         "replies": [
           {
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
+            "votes": [1, 0],
             "replies": []
           }
         ]
@@ -31,22 +35,26 @@
     "username": "Clash Royale",
     "date": "11/17/2025",
     "content": "Some random description and extra words",
+    "votes": [12, 3],
     "replies": [
       {
         "username": "Commenter1",
         "date":"11/17/2025",
         "content": "Some random first comment.",
+        "votes": [4, 2],
         "replies": []
       },
       {
         "username": "Commenter2",
         "date":"11/17/2025",
         "content": "Some random second comment.",
+        "votes": [6, 1],
         "replies": [
           {
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
+            "votes": [2, 1],
             "replies": []
           }
         ]

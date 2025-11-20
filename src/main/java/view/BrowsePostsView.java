@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
 
 /**
  * The View for browsing posts.
@@ -174,8 +175,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titleLabel.setForeground(new Color(50, 50, 50));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Username
-        final JLabel usernameLabel = new JLabel("by " + post.getUsername());
+        // Username and creation date
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a");
+        final String dateString = dateFormat.format(post.getCreationDate());
+        final JLabel usernameLabel = new JLabel("by " + post.getUsername() + " • " + dateString);
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         usernameLabel.setForeground(new Color(120, 120, 120));
         usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -13,11 +13,6 @@ public class TranslationState {
     private String targetLanguage = "French";  // Default target language
     private String translationError = null; // Holds any error message
 
-    // NEW fields for advanced state tracking
-    private boolean isSuccessful = false;
-    private boolean isFromCache = false;
-    private String statusMessage = "Ready for translation.";
-
     // --- Constructor (Default) ---
     public TranslationState() {
         // Default constructor for initialization
@@ -35,11 +30,6 @@ public class TranslationState {
         this.sourceLanguage = copy.sourceLanguage;
         this.targetLanguage = copy.targetLanguage;
         this.translationError = copy.translationError;
-
-        // Copy NEW fields
-        this.isSuccessful = copy.isSuccessful;
-        this.isFromCache = copy.isFromCache;
-        this.statusMessage = copy.statusMessage;
     }
 
     // --- Getters ---
@@ -63,21 +53,6 @@ public class TranslationState {
         return translationError;
     }
 
-    // NEW Getters
-    public boolean isTranslationSuccessful() {
-        // We consider it successful if the explicit flag is set, or if an error message is absent
-        // (though relying on the explicit flag is better practice for the presenter).
-        return isSuccessful;
-    }
-
-    public boolean isFromCache() {
-        return isFromCache;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
-    }
-
     // --- Setters (Used by the Presenter or Controller) ---
     public void setInputText(String inputText) {
         this.inputText = inputText;
@@ -99,19 +74,6 @@ public class TranslationState {
         this.translationError = translationError;
     }
 
-    // NEW Setters
-    public void setTranslationSuccessful(boolean successful) {
-        isSuccessful = successful;
-    }
-
-    public void setFromCache(boolean fromCache) {
-        this.isFromCache = fromCache;
-    }
-
-    public void setStatusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
-    }
-
     // Optional: for debugging or logging
     @Override
     public String toString() {
@@ -121,9 +83,6 @@ public class TranslationState {
                 ", sourceLanguage='" + sourceLanguage + '\'' +
                 ", targetLanguage='" + targetLanguage + '\'' +
                 ", translationError='" + translationError + '\'' +
-                ", isSuccessful=" + isSuccessful +
-                ", isFromCache=" + isFromCache +
-                ", statusMessage='" + statusMessage + '\'' +
                 '}';
     }
 }

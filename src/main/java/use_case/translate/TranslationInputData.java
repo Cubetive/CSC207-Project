@@ -5,16 +5,16 @@ package use_case.translate;
  * Used by the Controller to pass data to the Interactor.
  */
 public class TranslationInputData {
-    private final String sourceText;
+    private final String originalText;
     private final String targetLanguageCode;
 
     public TranslationInputData(String sourceText, String targetLanguageCode) {
-        this.sourceText = sourceText;
+        this.originalText = sourceText;
         this.targetLanguageCode = targetLanguageCode;
     }
 
     public String getSourceText() {
-        return sourceText;
+        return originalText;
     }
 
     public String getTargetLanguage() {

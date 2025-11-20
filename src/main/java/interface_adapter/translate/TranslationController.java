@@ -32,13 +32,14 @@ public class TranslationController {
      *
      * @param originalText The text content to be translated.
      * @param targetLanguage The language code (e.g., "es", "fr") to translate into.
-     * @param postId The unique identifier of the content being translated (if applicable).
+     * @param sourceLanguage The original language of the original text.
      */
-    public void execute(String originalText, String targetLanguage, String postId) {
+    public void execute(String originalText, String targetLanguage, String sourceLanguage) {
         // 1. Package the raw input data into the TranslationInputData DTO.
         TranslationInputData inputData = new TranslationInputData(
                 originalText,
-                targetLanguage
+                targetLanguage,
+                sourceLanguage
         );
 
         // 2. Delegate the execution to the Use Case Interactor via the boundary interface.

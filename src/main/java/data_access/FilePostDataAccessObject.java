@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import entities.OriginalPost;
+import entities.Post;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
 
@@ -67,7 +68,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface 
      * @param repliesArray the JSON array containing reply data
      * @param repliesList the list to add the constructed ReplyPost entities to
      */
-    private void parseReplies(JsonArray repliesArray, List<ReplyPost> repliesList) {
+    private void parseReplies(JsonArray repliesArray, List<Post> repliesList) {
         for (JsonElement replyElement : repliesArray) {
             final JsonObject replyObj = replyElement.getAsJsonObject();
 

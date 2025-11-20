@@ -1,5 +1,6 @@
 package use_case.reply_post;
 
+import entities.Post;
 import entities.ReplyPost;
 
 /**
@@ -9,6 +10,7 @@ public interface ReplyPostDataAccessInterface {
     /**
      * Saves the reply of a post.
      * @param replyPost the reply to save
+     * @param parentPost the parent of the reply post
      */
-    void save(ReplyPost replyPost);
+    void save(ReplyPost replyPost, Post parentPost);
 }

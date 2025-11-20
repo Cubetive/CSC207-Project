@@ -1,5 +1,6 @@
 package use_case.reply_post;
 
+import entities.Post;
 import entities.ReplyPost;
 
 public class ReplyPostInteractor implements ReplyPostInputBoundary {
@@ -17,13 +18,14 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
         // The username should not be null
         final String username = replyPostInputData.getUsername();
         final String content = replyPostInputData.getContent();
+        final Post parentPost = replyPostInputData.getParentPost();
 
         if (content.isEmpty()) {
             replyPostPresenter.prepareFailureView("Fill in missing fields.");
         }
         else {
             final ReplyPost replyPost = new ReplyPost(username, content);
-            replyPostDataAccessObject.save(replyPost);
+            replyPostDataAccessObject.save(replyPost, parentPost);
 
             final ReplyPostOutputData replyPostOutputData = new ReplyPostOutputData(replyPost);
             replyPostPresenter.prepareSuccessView(replyPostOutputData);

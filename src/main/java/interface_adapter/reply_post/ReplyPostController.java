@@ -1,5 +1,6 @@
 package interface_adapter.reply_post;
 
+import entities.Post;
 import use_case.reply_post.ReplyPostInputBoundary;
 import use_case.reply_post.ReplyPostInputData;
 
@@ -14,9 +15,10 @@ public class ReplyPostController {
      * Executes the Reply Post Use Case
      * @param username the username of the replier
      * @param content the content of the reply
+     * @param parentPost the "parent" of the reply "node"
      */
-    public void execute(String username, String content) {
-        final ReplyPostInputData replyPostInputData = new ReplyPostInputData(username, content);
+    public void execute(String username, String content, Post parentPost) {
+        final ReplyPostInputData replyPostInputData = new ReplyPostInputData(username, content, parentPost);
         replyPostUseCaseInteractor.execute(replyPostInputData);
     }
 }

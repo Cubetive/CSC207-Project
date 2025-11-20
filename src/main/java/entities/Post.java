@@ -1,5 +1,7 @@
 package entities;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public abstract class Post {
 
@@ -7,12 +9,14 @@ public abstract class Post {
     private String creator_username;
     private String content;
     private int[] votes;
+    private final List<Post> replies;
 
     public Post(String creator_username, String content) {
         this.creator_username = creator_username;
         this.content = content;
         this.creation_date = new Date();
         this.votes = new int[2];
+        this.replies = new ArrayList<>();
     }
 
     public Date getCreationDate() {
@@ -34,6 +38,8 @@ public abstract class Post {
     public String getCreatorUsername() {
         return this.creator_username;
     }
+
+    public List<Post> getReplies() { return this.replies; }
 
     public String getTranslation(String language) {
         // TODO

@@ -30,6 +30,8 @@ public class TranslationInteractor {
      * @param inputData The input data from the Controller.
      */
     public void execute(TranslationInputData inputData) {
+        final String targetLanguage = inputData.getTargetLanguage();
+        final String sourceLanguage = inputData.getSourceLanguage();
         executor.submit(() -> {
             try {
                 // 1. Validation Logic
@@ -54,7 +56,7 @@ public class TranslationInteractor {
                 if (translatedText.startsWith("ERROR:")) {
                     outputBoundary.presentFailure(translatedText);
                 } else {
-                    TranslationOutputData outputData = new TranslationOutputData(translatedText);
+                    TranslationOutputData outputData = new TranslationOutputData(translatedText,  targetLanguage, sourceLanguage);
                     outputBoundary.presentSuccess(outputData);
                 }
             } catch (Exception e) {

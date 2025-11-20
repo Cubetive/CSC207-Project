@@ -10,11 +10,5 @@ public class ReplyPost extends Post {
         super(username, content);
     }
 
-    public ReplyPost replyToPost(String username, String content) {
-        ReplyPost replyPost = new ReplyPost(username, content);
-        replies.add(replyPost);
-        return replyPost;
-    }
-
     public List<ReplyPost> getReplies() { return this.replies; }
 }

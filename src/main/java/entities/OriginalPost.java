@@ -12,12 +12,6 @@ public class OriginalPost extends Post {
         this.title = title;
     }
 
-    public ReplyPost replyToPost(String username, String content) {
-        ReplyPost replyPost = new ReplyPost(username, content);
-        replies.add(replyPost);
-        return replyPost;
-    }
-
     public String getTitle() {
         return title;
     }

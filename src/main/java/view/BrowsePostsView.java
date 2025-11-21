@@ -146,7 +146,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (postClickListener != null) {
-                    postClickListener.onPostClicked(post.getTitle());
+                    postClickListener.onPostClicked(post.getId());
                 }
             }
 
@@ -230,6 +230,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
      * Interface for handling post clicks.
      */
     public interface PostClickListener {
-        void onPostClicked(String postTitle);
+        void onPostClicked(int postId);
     }
 }

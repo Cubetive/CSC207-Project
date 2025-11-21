@@ -1,5 +1,6 @@
 [
   {
+    "id": 1,
     "title": "SomeTitle",
     "username": "SomeUsername",
     "date": "11/20/2025",
@@ -7,6 +8,7 @@
     "votes": [5, 1],
     "replies": [
       {
+        "id": 2,
         "username": "Commenter1",
         "date":"11/17/2025",
         "content": "Some random first comment.",
@@ -14,12 +16,14 @@
         "replies": []
       },
       {
+        "id": 3,
         "username": "Commenter2",
         "date":"11/17/2025",
         "content": "Some random second comment.",
         "votes": [3, 1],
         "replies": [
           {
+            "id": 4,
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
@@ -31,6 +35,7 @@
     ]
   },
   {
+    "id": 5,
     "title": "I Love Clash Royale",
     "username": "Clash Royale",
     "date": "11/17/2025",
@@ -38,6 +43,7 @@
     "votes": [12, 3],
     "replies": [
       {
+        "id": 6,
         "username": "Commenter1",
         "date":"11/17/2025",
         "content": "Some random first comment.",
@@ -45,12 +51,14 @@
         "replies": []
       },
       {
+        "id": 7,
         "username": "Commenter2",
         "date":"11/17/2025",
         "content": "Some random second comment.",
         "votes": [6, 1],
         "replies": [
           {
+            "id": 8,
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",

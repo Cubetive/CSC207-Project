@@ -41,6 +41,7 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         for (OriginalPost post : posts) {
             final int[] votes = post.getVotes();
             final BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
+                    post.getId(),
                     post.getTitle(),
                     post.getContent(),
                     post.getCreatorUsername(),

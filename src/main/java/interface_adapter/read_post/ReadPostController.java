@@ -15,11 +15,11 @@ public class ReadPostController {
     }
 
     /**
-     * Executes the read post use case for the given post title.
-     * @param postTitle the title of the post to read
+     * Executes the read post use case for the given post ID.
+     * @param postId the unique identifier of the post to read
      */
-    public void execute(String postTitle) {
-        final ReadPostInputData inputData = new ReadPostInputData(postTitle);
+    public void execute(int postId) {
+        final ReadPostInputData inputData = new ReadPostInputData(postId);
         interactor.execute(inputData);
     }
 }

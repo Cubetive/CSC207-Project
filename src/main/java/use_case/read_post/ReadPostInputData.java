@@ -5,13 +5,13 @@ package use_case.read_post;
  */
 public class ReadPostInputData {
 
-    private final String postTitle;
+    private final int postId;
 
-    public ReadPostInputData(String postTitle) {
-        this.postTitle = postTitle;
+    public ReadPostInputData(int postId) {
+        this.postId = postId;
     }
 
-    public String getPostTitle() {
-        return postTitle;
+    public int getPostId() {
+        return postId;
     }
 }

@@ -46,6 +46,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
                 for (JsonElement element : jsonArray) {
                     final JsonObject postObj = element.getAsJsonObject();
 
+                    final int id = postObj.get("id").getAsInt();
                     final String title = postObj.get("title").getAsString();
                     final String username = postObj.get("username").getAsString();
                     final String content = postObj.get("content").getAsString();
@@ -54,7 +55,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
                     final int upvotes = votesArray.get(0).getAsInt();
                     final int downvotes = votesArray.get(1).getAsInt();
 
-                    final OriginalPost post = new OriginalPost(title, content, username, creationDate, upvotes, downvotes);
+                    final OriginalPost post = new OriginalPost(id, title, content, username, creationDate, upvotes, downvotes);
 
                     if (postObj.has("replies")) {
                         final JsonArray repliesArray = postObj.getAsJsonArray("replies");
@@ -82,6 +83,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
         for (JsonElement replyElement : repliesArray) {
             final JsonObject replyObj = replyElement.getAsJsonObject();
 
+            final int id = replyObj.get("id").getAsInt();
             final String username = replyObj.get("username").getAsString();
             final String content = replyObj.get("content").getAsString();
             final Date creationDate = dateFormat.parse(replyObj.get("date").getAsString());
@@ -89,7 +91,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
             final int upvotes = votesArray.get(0).getAsInt();
             final int downvotes = votesArray.get(1).getAsInt();
 
-            final ReplyPost reply = new ReplyPost(username, content, creationDate, upvotes, downvotes);
+            final ReplyPost reply = new ReplyPost(id, username, content, creationDate, upvotes, downvotes);
 
             // Recursively parse nested replies
             if (replyObj.has("replies")) {
@@ -107,6 +109,19 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
 
         for (OriginalPost post : allPosts) {
             if (post.getTitle().equals(title)) {
+                return post;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public OriginalPost getPostById(int id) {
+        final List<OriginalPost> allPosts = getAllPosts();
+
+        for (OriginalPost post : allPosts) {
+            if (post.getId() == id) {
                 return post;
             }
         }

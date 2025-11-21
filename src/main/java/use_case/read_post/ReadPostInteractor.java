@@ -23,10 +23,10 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
     @Override
     public void execute(ReadPostInputData inputData) {
         try {
-            final OriginalPost post = postDataAccess.getPostByTitle(inputData.getPostTitle());
+            final OriginalPost post = postDataAccess.getPostById(inputData.getPostId());
 
             if (post == null) {
-                outputBoundary.prepareFailView("Post not found: " + inputData.getPostTitle());
+                outputBoundary.prepareFailView("Post not found with ID: " + inputData.getPostId());
                 return;
             }
 

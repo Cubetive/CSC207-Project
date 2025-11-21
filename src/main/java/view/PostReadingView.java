@@ -381,12 +381,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * Loads a post by its title.
-     * @param postTitle the title of the post to load
+     * Loads a post by its ID.
+     * @param postId the unique identifier of the post to load
      */
-    public void loadPost(String postTitle) {
+    public void loadPost(int postId) {
         if (controller != null) {
-            controller.execute(postTitle);
+            controller.execute(postId);
         }
     }
 }

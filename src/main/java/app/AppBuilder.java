@@ -140,11 +140,11 @@ public class AppBuilder {
         browsePostsView.setController(controller);
 
         // Set up post click listener to navigate to read post view
-        browsePostsView.setPostClickListener(postTitle -> {
+        browsePostsView.setPostClickListener(postId -> {
             if (postReadingView != null) {
                 viewManagerModel.setState(postReadingView.getViewName());
                 viewManagerModel.firePropertyChanged();
-                postReadingView.loadPost(postTitle);
+                postReadingView.loadPost(postId);
             }
         });
 

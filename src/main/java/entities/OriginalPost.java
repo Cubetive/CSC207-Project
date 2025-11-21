@@ -1,5 +1,6 @@
 package entities;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OriginalPost extends Post {
@@ -7,8 +8,8 @@ public class OriginalPost extends Post {
     private final List<ReplyPost> replies = new ArrayList<>();
 
 
-    public OriginalPost(String title, String content, String username) {
-        super(username, content);
+    public OriginalPost(long id, String title, String content, String username, Date creation_date, int upvotes, int downvotes) {
+        super(id, username, content, creation_date, upvotes, downvotes);
         this.title = title;
     }
 

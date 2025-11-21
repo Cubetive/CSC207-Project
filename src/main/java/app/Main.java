@@ -13,8 +13,10 @@ public class Main {
         final JFrame application = appBuilder
                 .addSignupView()
                 .addBrowsePostsView()
+                .addReadPostView()
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
+                .addReadPostUseCase()
                 .build();
 
         application.pack();

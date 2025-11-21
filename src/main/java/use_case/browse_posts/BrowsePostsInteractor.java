@@ -26,15 +26,7 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
             final List<OriginalPost> posts = postDataAccess.getAllPosts();
 
             // Convert entity posts to output data
-            final List<BrowsePostsOutputData.PostData> postDataList = new ArrayList<>();
-            for (OriginalPost post : posts) {
-                final BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getCreatorUsername()
-                );
-                postDataList.add(postData);
-            }
+            final List<BrowsePostsOutputData.PostData> postDataList = getPostData(posts);
 
             final BrowsePostsOutputData outputData = new BrowsePostsOutputData(postDataList);
             outputBoundary.prepareSuccessView(outputData);
@@ -42,5 +34,23 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         } catch (Exception e) {
             outputBoundary.prepareFailView("Failed to load posts: " + e.getMessage());
         }
+    }
+
+    private static List<BrowsePostsOutputData.PostData> getPostData(List<OriginalPost> posts) {
+        final List<BrowsePostsOutputData.PostData> postDataList = new ArrayList<>();
+        for (OriginalPost post : posts) {
+            final int[] votes = post.getVotes();
+            final BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatorUsername(),
+                    post.getCreationDate(),
+                    votes[0],  // upvotes
+                    votes[1]   // downvotes
+            );
+            postDataList.add(postData);
+        }
+        return postDataList;
     }
 }

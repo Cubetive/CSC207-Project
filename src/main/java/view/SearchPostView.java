@@ -1,22 +1,38 @@
+package view;
+
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
-import java.awt.*;
-import java.util.List;
-import entities.User;
-import entities.OriginalPost;
 
-public class Main {
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import entities.OriginalPost;
+import interface_adapter.search_post.SearchPostController;
+import interface_adapter.search_post.SearchPostViewModel;
+import use_case.search_post.SearchPostInputData;
+
+public class SearchPostView {
 
     private JFrame frame;
     private JTextField searchField;
     private JList<String> postList;
     private DefaultListModel<String> listModel;
-    private User user;
+    private List<OriginalPost> original_posts = new ArrayList<>();
 
-    public Main() {
-        // Sample user
-        user = new User("John Doe", "john123", "john@example.com", "password");
+    private SearchPostViewModel searchPostViewModel;
+
+    public SearchPostView() {
+
+        // sample posts
+
+        this.original_posts.add(new OriginalPost("Test 1", "user1", "abc"));
+        this.original_posts.add(new OriginalPost("Test 2", "user2", "abc"));
+        this.original_posts.add(new OriginalPost("Test 3", "user3", "abc"));
+
+        searchPostViewModel = new SearchPostViewModel();
 
         // Create main frame
         frame = new JFrame("Searching Feature");
@@ -50,7 +66,7 @@ public class Main {
         mainPanel.add(scrollPane);
 
         // Populate list initially
-        updatePostList(user.getOriginalPosts());
+        searchPostViewModel.updatePostList(listModel, original_posts);
 
         // Add search listener
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -60,8 +76,8 @@ public class Main {
 
             private void searchPosts() {
                 String keyword = searchField.getText();
-                List<OriginalPost> filtered = user.searchPosts(keyword);
-                updatePostList(filtered);
+                SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(listModel, original_posts, keyword));
+                searchPostController.searchPosts();
             }
         });
 
@@ -70,14 +86,7 @@ public class Main {
         frame.setVisible(true);
     }
 
-    private void updatePostList(List<OriginalPost> posts) {
-        listModel.clear();
-        for (OriginalPost post : posts) {
-            listModel.addElement(post.getTitle());
-        }
-    }
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Main());
+        SwingUtilities.invokeLater(() -> new SearchPostView());
     }
 }

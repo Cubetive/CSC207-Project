@@ -18,6 +18,7 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.translate.TranslationViewModel; // NEW
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
@@ -54,6 +55,7 @@ public class AppBuilder {
     private SignupViewModel signupViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
+    private TranslationViewModel translationViewModel; // NEW
 
     // Views
     private SignupView signupView;
@@ -106,7 +108,7 @@ public class AppBuilder {
      */
     public AppBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        postReadingView = new PostReadingView(readPostViewModel);
+        postReadingView = new PostReadingView(readPostViewModel, translationViewModel); // NEW added new param
         cardPanel.add(postReadingView, postReadingView.getViewName());
         return this;
     }

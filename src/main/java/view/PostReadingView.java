@@ -353,6 +353,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
+        panel.add(commentTranslationPanel); // The entire, grouped translation UI
         panel.add(actionsPanel);
 
         // Add nested replies directly to panel

@@ -3,8 +3,6 @@ package view;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
-import interface_adapter.reply_post.ReplyPostController;
-import interface_adapter.reply_post.ReplyPostPresenter;
 import use_case.read_post.ReadPostOutputData;
 
 import javax.swing.*;
@@ -16,12 +14,9 @@ import java.beans.PropertyChangeListener;
  * The View for reading a post and its replies.
  */
 public class PostReadingView extends JPanel implements PropertyChangeListener {
-    public static final String CONFIRM_CANCEL_TITLE = "Cancel Reply";
-    public static final String CONFIRM_CANCEL_MESSAGE = "Are you sure? This draft will not be saved.";
 
     private final ReadPostViewModel viewModel;
     private ReadPostController controller;
-    private ReplyPostController replyController;
     private Runnable onBackAction;
 
     private final JButton backButton;
@@ -179,12 +174,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        commentButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            final String content = commentField.getText();
-            final long parentId = readPostState.getId();
-            sendReply(content, parentId);
-        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
@@ -223,12 +212,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             final ReadPostState state = (ReadPostState) evt.getNewValue();
             updateView(state);
         }
-        else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
-            // Clear comment field
-            commentField.setText("");
-            // "Refresh" page
-            loadPost(viewModel.getState().getId());
-        }
     }
 
     /**
@@ -250,7 +233,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         repliesPanel.removeAll();
         if (!state.getReplies().isEmpty()) {
             for (ReadPostOutputData.ReplyData reply : state.getReplies()) {
-                final JPanel replyPanel = createReplyPanel(reply);
+                final JPanel replyPanel = createReplyPanel(reply, 0);
 
                 // Wrapper to force full width
                 final JPanel fullWidthWrapper = new JPanel(new BorderLayout());
@@ -270,16 +253,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     /**
      * Creates a panel for displaying a single reply.
      * @param reply the reply data
+     * @param indentLevel the indentation level for nested replies
      */
-    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply) {
+    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply, int indentLevel) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
         // Add left indent for nested replies
+        final int leftIndent = indentLevel * 15;
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
-                BorderFactory.createEmptyBorder(12, 15, 12, 15)
+                BorderFactory.createEmptyBorder(12, 15 + leftIndent, 12, 15)
         ));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -293,8 +278,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         final JLabel usernameLabel = new JLabel(reply.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 13));
         usernameLabel.setForeground(new Color(70, 130, 180));
-
-        headerPanel.add(usernameLabel, BorderLayout.WEST);
 
         // Reply content
         final JTextArea replyContent = new JTextArea(reply.getContent());
@@ -365,100 +348,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         actionsPanel.add(Box.createHorizontalStrut(8));
         actionsPanel.add(replyButton);
 
-        // Reply box
-        final JPanel replyPanel = new JPanel(new BorderLayout());
-        replyPanel.setOpaque(false);
-        replyPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        replyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        replyPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(10, 12, 10, 12)
-        ));
-
-        final JTextField replyTextField = new JTextField();
-        replyTextField.setFont(new Font("Arial", Font.PLAIN, 14));
-        replyTextField.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
-
-        final JPanel replyActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        replyActionsPanel.setOpaque(false);
-        replyActionsPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        replyActionsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-
-        final JButton replyCancelButton = new JButton(ReadPostViewModel.CANCEL_REPLY);
-        replyCancelButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        replyCancelButton.setFocusPainted(false);
-        replyCancelButton.setBackground(new Color(186, 185, 185));
-        replyCancelButton.setForeground(Color.WHITE);
-        replyCancelButton.setOpaque(true);
-        replyCancelButton.setBorderPainted(false);
-        replyCancelButton.setContentAreaFilled(true);
-        replyCancelButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(50, 100, 150), 1),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)
-        ));
-        replyCancelButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        final JButton sendReplyButton = new JButton(ReadPostViewModel.REPLY_BUTTON_LABEL);
-        sendReplyButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        sendReplyButton.setFocusPainted(false);
-        sendReplyButton.setBackground(new Color(70, 130, 180));
-        sendReplyButton.setForeground(Color.WHITE);
-        sendReplyButton.setOpaque(true);
-        sendReplyButton.setBorderPainted(false);
-        sendReplyButton.setContentAreaFilled(true);
-        sendReplyButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(50, 100, 150), 1),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)
-        ));
-        sendReplyButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        replyActionsPanel.add(replyCancelButton);
-        replyActionsPanel.add(sendReplyButton);
-
-        replyPanel.add(replyTextField, BorderLayout.NORTH);
-        replyPanel.add(replyActionsPanel, BorderLayout.SOUTH);
-        // Initial disabling.
-        replyPanel.setVisible(false);
-
-        // Functionality for the buttons
-        replyButton.addActionListener(e -> {
-            replyPanel.setVisible(true);
-        });
-
-        replyCancelButton.addActionListener(e -> {
-            if (!replyTextField.getText().isEmpty()) {
-                // Prompt a confirmation message if there's a draft.
-                int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
-                        CONFIRM_CANCEL_TITLE, JOptionPane.YES_NO_OPTION);
-
-                // Return if the user does not choose yes.
-                if (userAnswer != JOptionPane.YES_OPTION) return;
-            }
-
-            replyPanel.setVisible(false);
-            replyTextField.setText("");
-        });
-
-        sendReplyButton.addActionListener(e -> {
-            final String replyText = replyTextField.getText();
-            final long parentId = reply.getId();
-            sendReply(replyText, parentId);
-        });
-
-        // Adding everything in
+        headerPanel.add(usernameLabel, BorderLayout.WEST);
         panel.add(headerPanel);
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
         panel.add(actionsPanel);
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(replyPanel);
 
         // Add nested replies directly to panel
         if (!reply.getNestedReplies().isEmpty()) {
             panel.add(Box.createVerticalStrut(12));
             for (ReadPostOutputData.ReplyData nestedReply : reply.getNestedReplies()) {
-                final JPanel nestedPanel = createReplyPanel(nestedReply);
+                final JPanel nestedPanel = createReplyPanel(nestedReply, indentLevel + 1);
                 panel.add(nestedPanel);
                 panel.add(Box.createVerticalStrut(8));
             }
@@ -475,8 +376,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.controller = controller;
     }
 
-    public void setReplyController(ReplyPostController replyController) { this.replyController = replyController; }
-
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;
     }
@@ -489,14 +388,5 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         if (controller != null) {
             controller.execute(postId);
         }
-    }
-
-    /**
-     * Sends a comment/reply
-     * @param content The content of the reply
-     * @param parentId The id of the reply's parent
-     */
-    public void sendReply(String content, long parentId) {
-        replyController.execute(content, parentId);
     }
 }

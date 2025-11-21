@@ -28,18 +28,33 @@ public class TranslationController {
     }
 
     /**
-     * The main entry point for the translation action.
-     *
-     * @param originalText The text content to be translated.
+     * The main entry point for the translation action for a main post.
+     * @param postId The id of the post.
      * @param targetLanguage The language code (e.g., "es", "fr") to translate into.
-     * @param sourceLanguage The original language of the original text.
      */
-    public void execute(String originalText, String targetLanguage, String sourceLanguage) {
-        // 1. Package the raw input data into the TranslationInputData DTO.
+    public void execute(long postId, String targetLanguage) {
+        // 1. Package the raw input data into the TranslationInputData DTO (using the post ID constructor).
         TranslationInputData inputData = new TranslationInputData(
-                originalText,
                 targetLanguage,
-                sourceLanguage
+                postId
+        );
+
+        // 2. Delegate the execution to the Use Case Interactor via the boundary interface.
+        translationUseCase.execute(inputData);
+    }
+
+    /**
+     * Overload for the translation action for raw text (e.g., a comment or reply).
+     * This method is used when the content is not a full post stored in the database.
+     * @param rawText The raw text content to be translated.
+     * @param targetLanguage The language code (e.g., "es", "fr") to translate into.
+     */
+    public void execute(String rawText, String targetLanguage) {
+        // 1. Package the raw input data into the TranslationInputData DTO (using the raw text constructor).
+        // The Interactor will know this is a raw text translation because postId will be null.
+        TranslationInputData inputData = new TranslationInputData(
+                targetLanguage,
+                rawText
         );
 
         // 2. Delegate the execution to the Use Case Interactor via the boundary interface.

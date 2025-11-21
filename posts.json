@@ -41,6 +41,17 @@
               0
             ],
             "replies": []
+          },
+          {
+            "id": 14,
+            "username": "SomeUsername",
+            "date": "11/21/2025",
+            "content": "2nd random response to the second comment",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
           }
         ]
       }
@@ -66,7 +77,19 @@
           4,
           2
         ],
-        "replies": []
+        "replies": [
+          {
+            "id": 15,
+            "username": "Clash Royale",
+            "date": "11/21/2025",
+            "content": "Nice comment",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
+          }
+        ]
       },
       {
         "id": 7,
@@ -87,7 +110,43 @@
               2,
               1
             ],
-            "replies": []
+            "replies": [
+              {
+                "id": 10,
+                "username": "Clash Royale",
+                "date": "11/21/2025",
+                "content": "Some random response to the reply of the second comment",
+                "votes": [
+                  0,
+                  0
+                ],
+                "replies": [
+                  {
+                    "id": 12,
+                    "username": "Clash Royale",
+                    "date": "11/21/2025",
+                    "content": "藍月なくる大好き",
+                    "votes": [
+                      0,
+                      0
+                    ],
+                    "replies": [
+                      {
+                        "id": 13,
+                        "username": "Clash Royale",
+                        "date": "11/21/2025",
+                        "content": "testing",
+                        "votes": [
+                          0,
+                          0
+                        ],
+                        "replies": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
@@ -100,7 +159,19 @@
           0,
           0
         ],
-        "replies": []
+        "replies": [
+          {
+            "id": 11,
+            "username": "Clash Royale",
+            "date": "11/21/2025",
+            "content": "Yeah I agree!",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
+          }
+        ]
       }
     ]
   }

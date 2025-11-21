@@ -6,7 +6,6 @@ import use_case.reply_post.ReplyPostOutputBoundary;
 import use_case.reply_post.ReplyPostOutputData;
 
 public class ReplyPostPresenter implements ReplyPostOutputBoundary {
-    // TODO: Implement the Presenter
     public static final String REPLY_SUCCESS = "Successful Reply";
 
     private final ReadPostViewModel readPostViewModel;

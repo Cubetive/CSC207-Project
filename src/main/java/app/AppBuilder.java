@@ -1,5 +1,10 @@
 package app;
 
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
+import use_case.reply_post.ReplyPostInputBoundary;
+import use_case.reply_post.ReplyPostInteractor;
+import use_case.reply_post.ReplyPostOutputBoundary;
 import view.BrowsePostsView;
 import view.PostReadingView;
 import view.SignupView;
@@ -173,6 +178,18 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addReplyPostUseCase() {
+        final ReplyPostOutputBoundary replyPostOutputBoundary =
+                new ReplyPostPresenter(readPostViewModel);
+        final ReplyPostInputBoundary replyPostInteractor =
+                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary);
+
+        final ReplyPostController replyController = new ReplyPostController(replyPostInteractor);
+        postReadingView.setReplyController(replyController);
+
+        return this;
+    }
+
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame
@@ -186,7 +203,7 @@ public class AppBuilder {
         application.setLocationRelativeTo(null);
 
         // Set initial view
-        viewManagerModel.setState(signupView.getViewName());
+        viewManagerModel.setState(browsePostsView.getViewName());
         viewManagerModel.firePropertyChanged();
 
         return application;

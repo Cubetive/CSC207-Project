@@ -3,6 +3,8 @@ package view;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
 import use_case.read_post.ReadPostOutputData;
 
 import javax.swing.*;
@@ -17,6 +19,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     private final ReadPostViewModel viewModel;
     private ReadPostController controller;
+    private ReplyPostController replyController;
     private Runnable onBackAction;
 
     private final JButton backButton;
@@ -174,6 +177,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        commentButton.addActionListener(e -> {
+            final ReadPostState readPostState = viewModel.getState();
+            // TODO: Fred or someone please add a functionality which allows me to set with the current logged in username.
+            final String username = readPostState.getUsername();
+            final String content = commentField.getText();
+            final long parentId = readPostState.getId();
+            replyController.execute(username, content, parentId);
+        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
@@ -211,6 +222,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         if ("state".equals(evt.getPropertyName())) {
             final ReadPostState state = (ReadPostState) evt.getNewValue();
             updateView(state);
+        }
+        else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
+            // Clear comment field
+            commentField.setText("");
+            // "Refresh" page
+            loadPost(viewModel.getState().getId());
         }
     }
 
@@ -375,6 +392,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     public void setController(ReadPostController controller) {
         this.controller = controller;
     }
+
+    public void setReplyController(ReplyPostController replyController) { this.replyController = replyController; }
 
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;

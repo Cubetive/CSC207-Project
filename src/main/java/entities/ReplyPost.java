@@ -7,7 +7,7 @@ public class ReplyPost extends Post {
 
     private final List<ReplyPost> replies = new ArrayList<>();
 
-    public ReplyPost(int id, String username, String content, Date creation_date, int upvotes, int downvotes) {
+    public ReplyPost(long id, String username, String content, Date creation_date, int upvotes, int downvotes) {
         super(id, username, content, creation_date, upvotes, downvotes);
     }
 

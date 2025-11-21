@@ -230,6 +230,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
      * Interface for handling post clicks.
      */
     public interface PostClickListener {
-        void onPostClicked(int postId);
+        void onPostClicked(long postId);
     }
 }

@@ -46,7 +46,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
                 for (JsonElement element : jsonArray) {
                     final JsonObject postObj = element.getAsJsonObject();
 
-                    final int id = postObj.get("id").getAsInt();
+                    final long id = postObj.get("id").getAsLong();
                     final String title = postObj.get("title").getAsString();
                     final String username = postObj.get("username").getAsString();
                     final String content = postObj.get("content").getAsString();
@@ -83,7 +83,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
         for (JsonElement replyElement : repliesArray) {
             final JsonObject replyObj = replyElement.getAsJsonObject();
 
-            final int id = replyObj.get("id").getAsInt();
+            final long id = replyObj.get("id").getAsLong();
             final String username = replyObj.get("username").getAsString();
             final String content = replyObj.get("content").getAsString();
             final Date creationDate = dateFormat.parse(replyObj.get("date").getAsString());
@@ -104,20 +104,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
     }
 
     @Override
-    public OriginalPost getPostByTitle(String title) {
-        final List<OriginalPost> allPosts = getAllPosts();
-
-        for (OriginalPost post : allPosts) {
-            if (post.getTitle().equals(title)) {
-                return post;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public OriginalPost getPostById(int id) {
+    public OriginalPost getPostById(long id) {
         final List<OriginalPost> allPosts = getAllPosts();
 
         for (OriginalPost post : allPosts) {

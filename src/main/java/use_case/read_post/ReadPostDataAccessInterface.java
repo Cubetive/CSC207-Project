@@ -12,5 +12,5 @@ public interface ReadPostDataAccessInterface {
      * @param id the unique identifier of the post to retrieve
      * @return the post with the given ID, or null if not found
      */
-    OriginalPost getPostById(int id);
+    OriginalPost getPostById(long id);
 }

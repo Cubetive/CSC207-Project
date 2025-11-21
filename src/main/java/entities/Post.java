@@ -3,8 +3,8 @@ import java.util.Date;
 
 public abstract class Post {
 
-    private static int nextId = 1;
-    private int id;
+    private static long nextId = 1;
+    private long id;
     private Date creation_date;
     private String creator_username;
     private String content;
@@ -19,7 +19,7 @@ public abstract class Post {
      * @param upvotes the number of upvotes
      * @param downvotes the number of downvotes
      */
-    protected Post(int id, String creator_username, String content, Date creation_date, int upvotes, int downvotes) {
+    protected Post(long id, String creator_username, String content, Date creation_date, int upvotes, int downvotes) {
         this.id = id;
         this.creator_username = creator_username;
         this.content = content;
@@ -41,7 +41,7 @@ public abstract class Post {
         this(nextId++, creator_username, content, new Date(), 0, 0);
     }
 
-    public int getId() {
+    public long getId() {
         return this.id;
     }
 

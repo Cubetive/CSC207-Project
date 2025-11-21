@@ -8,7 +8,7 @@ public class OriginalPost extends Post {
     private final List<ReplyPost> replies = new ArrayList<>();
 
 
-    public OriginalPost(int id, String title, String content, String username, Date creation_date, int upvotes, int downvotes) {
+    public OriginalPost(long id, String title, String content, String username, Date creation_date, int upvotes, int downvotes) {
         super(id, username, content, creation_date, upvotes, downvotes);
         this.title = title;
     }

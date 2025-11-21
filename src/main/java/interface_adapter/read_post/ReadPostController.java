@@ -18,7 +18,7 @@ public class ReadPostController {
      * Executes the read post use case for the given post ID.
      * @param postId the unique identifier of the post to read
      */
-    public void execute(int postId) {
+    public void execute(long postId) {
         final ReadPostInputData inputData = new ReadPostInputData(postId);
         interactor.execute(inputData);
     }

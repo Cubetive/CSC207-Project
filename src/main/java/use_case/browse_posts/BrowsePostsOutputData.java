@@ -22,7 +22,7 @@ public class BrowsePostsOutputData {
      * Simple data holder for post information.
      */
     public static class PostData {
-        private final int id;
+        private final long id;
         private final String title;
         private final String content;
         private final String username;
@@ -30,7 +30,7 @@ public class BrowsePostsOutputData {
         private final int upvotes;
         private final int downvotes;
 
-        public PostData(int id, String title, String content, String username,
+        public PostData(long id, String title, String content, String username,
                        Date creationDate, int upvotes, int downvotes) {
             this.id = id;
             this.title = title;
@@ -41,7 +41,7 @@ public class BrowsePostsOutputData {
             this.downvotes = downvotes;
         }
 
-        public int getId() {
+        public long getId() {
             return id;
         }
 

@@ -1,4 +1,5 @@
 package use_case.translate;
+
 import java.util.HashMap;
 import java.util.Map;
 

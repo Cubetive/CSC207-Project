@@ -21,7 +21,7 @@ import java.util.Map;
 public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     private final ReadPostViewModel viewModel;
-    private final TranslationViewModel translationViewModel; // NEW: Translation ViewModel
+    private TranslationViewModel translationViewModel = new TranslationViewModel(); // NEW: Translation ViewModel
     private ReadPostController controller;
     private TranslationController translationController; // FIX: Added missing declaration
     private Runnable onBackAction;
@@ -64,6 +64,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
         this.translationViewModel = translationViewModel;
+
+        // FIX: Register the view as a listener for Translation updates
+        this.translationViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
@@ -331,6 +334,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 //            updateView(state);
 //        }
 //    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == viewModel) {
@@ -449,6 +453,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // NEW: If a new post loaded, set the currentPostId.
+        // Assuming getPostId() returns a String ID.
+        this.currentPostId = state.getId();
 
         // NEW Clear previous translation when a new post is loaded
         clearTranslationDisplay();
@@ -682,22 +690,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
-    public String getViewName() {
-        return viewModel.getViewName();
-    }
-
-    public void setController(ReadPostController controller) {
-        this.controller = controller;
-    }
-
-    // NEW: Setter for the TranslationController
-    public void setTranslationController(TranslationController controller) {
-        this.translationController = controller;
-    }
-
-    public void setOnBackAction(Runnable onBackAction) {
-        this.onBackAction = onBackAction;
-    }
 
     /**
      * Loads a post by its ID.
@@ -713,4 +705,26 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             controller.execute(postId);
         }
     }
+
+    public String getViewName() {
+        return viewModel.getViewName();
+    }
+
+    public void setController(ReadPostController controller) {
+        this.controller = controller;
+    }
+
+    // --- Controller Setters (FIX: Added these missing setters) ---
+    public void setReadPostController(ReadPostController controller) {
+        this.controller = controller;
+    }
+    // NEW: Setter for the TranslationController
+    public void setTranslationController(TranslationController controller) {
+        this.translationController = controller;
+    }
+
+    public void setOnBackAction(Runnable onBackAction) {
+        this.onBackAction = onBackAction;
+    }
+
 }

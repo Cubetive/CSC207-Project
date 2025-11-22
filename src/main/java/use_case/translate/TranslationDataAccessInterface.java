@@ -1,22 +1,25 @@
 package use_case.translate;
 
-/**
- * The interface for the Data Access component, providing the contract
- * for any service that can perform text translation.
- *
- * This interface isolates the core business logic (TranslationInteractor)
- * from the external API details (GoogleTranslateDataAccess).
- */
 public interface TranslationDataAccessInterface {
-    /**
-     * Retrieves the translated text from the external service.
-     *
-     * @param text The source text content to translate.
-     * @param targetLangCode The target language code (e.g., "es", "fr").
-     * @return The translated text string.
-     * @throws Exception if the network request or API call fails.
-     */
-    String translate(String text, String targetLangCode) throws Exception;
 
-    public boolean isLanguageSupported(String targetLangCode);
+    /**
+     * Attempts to retrieve a cached translation for a given post ID and target language.
+     * This replaces the need for post.getTranslation().
+     *
+     * @param text               The original text.
+     * @param targetLanguageCode The language code for the desired translation.
+     * @return The translated content if cached, otherwise null.
+     */
+    String getTranslation(String text, String targetLanguageCode);
+
+    /**
+     * Saves a newly generated translation into the persistent cache.
+     * This replaces the need for post.addTranslation().
+     *
+     * @param postId             The ID of the post.
+     * @param targetLanguageCode The language code of the translation.
+     * @param translatedText     The translated content to save.
+     */
+    void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText);
 }
+

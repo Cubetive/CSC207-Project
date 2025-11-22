@@ -37,7 +37,7 @@ public class TranslationPresenter implements TranslationOutputBoundary {
         // 2. Update the state with new data
         // We use contentId to tell the view which specific content block (post or reply) to update.
         translationState.setTranslatedText(outputData.getTranslatedText());
-        translationState.setSourceLanguage(outputData.getSourceLanguage());
+//        translationState.setSourceLanguage(outputData.getSourceLanguage());
         translationState.setTargetLanguage(outputData.getTargetLanguage());
         translationState.setTranslationError(null); // Clear any previous error
 

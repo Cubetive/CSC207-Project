@@ -6,6 +6,7 @@ import view.SignupView;
 import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
+import data_access.TranslationDataAccessObject;
 import entities.CommonUserFactory;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
@@ -18,6 +19,8 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.translate.TranslationController; // NEW IMPORT
+import interface_adapter.translate.TranslationPresenter; // NEW IMPORT
 import interface_adapter.translate.TranslationViewModel; // NEW
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
@@ -25,9 +28,14 @@ import use_case.browse_posts.BrowsePostsOutputBoundary;
 import use_case.read_post.ReadPostInputBoundary;
 import use_case.read_post.ReadPostInteractor;
 import use_case.read_post.ReadPostOutputBoundary;
+import use_case.read_post.ReadPostDataAccessInterface; //NEW for setting up TranslationInteractor
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.translate.TranslationInputBoundary; // NEW IMPORT
+import use_case.translate.TranslationInteractor; // NEW IMPORT
+import use_case.translate.TranslationOutputBoundary; // NEW IMPORT
+import use_case.translate.TranslationDataAccessInterface; // NEW IMPORT
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,8 +70,17 @@ public class AppBuilder {
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
 
+    // Translation Controller (needed for post reading view)
+    private TranslationController translationController; // NEW
+
+    // For setting up TranslationInteractor
+    private ReadPostDataAccessInterface readPostDataAccessInterface;
+
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+
+        // --- NEW (FIX): Initialize ViewModel in constructor to guarantee it's not null ---
+        this.translationViewModel = new TranslationViewModel();
 
         // Add property change listener to load posts when browse posts view becomes active
         viewManagerModel.addPropertyChangeListener(new PropertyChangeListener() {
@@ -110,6 +127,36 @@ public class AppBuilder {
         readPostViewModel = new ReadPostViewModel();
         postReadingView = new PostReadingView(readPostViewModel, translationViewModel); // NEW added new param
         cardPanel.add(postReadingView, postReadingView.getViewName());
+        return this;
+    }
+
+    // NEW: for translation.
+    /**
+     * Adds the Translation Use Case to the application.
+     * This is where the real TranslationDataAccessObject is instantiated and injected.
+     * @return this builder
+     */
+    public AppBuilder addTranslationUseCase() {
+        // --- CRITICAL DEPENDENCY INJECTION STEP ---
+        // --- FIX: Instantiates the TranslationViewModel to prevent NullPointerException ---
+        this.translationViewModel = new TranslationViewModel();
+        // 1. Instantiate the REAL Data Access Object (using the Generative Language API)
+        final TranslationDataAccessInterface translationDataAccessObject = new TranslationDataAccessObject();
+
+        // 2. Setup the Output Boundary (Presenter)
+        final TranslationOutputBoundary translationOutputBoundary =
+                new TranslationPresenter(translationViewModel, viewManagerModel);
+
+        // 3. Setup the Interactor (Use Case)
+        final TranslationInputBoundary translationInteractor =
+                new TranslationInteractor(readPostDataAccessInterface, translationDataAccessObject,
+                        translationOutputBoundary);
+
+        // 4. Create the Controller
+        translationController = new TranslationController(translationInteractor);
+
+        // The controller is stored and will be passed to PostReadingView in addReadPostView().
+
         return this;
     }
 

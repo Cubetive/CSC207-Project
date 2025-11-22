@@ -1,0 +1,23 @@
+package use_case.create_post_use_case;
+
+import entities.Post;
+
+import java.util.ArrayList;
+
+public interface CreatePostDataAccessInterface {
+
+    // Checks for existence of posts with the name indicated in their title.
+    //Boolean existsWithName(String name);
+
+    // Saves a post to database.
+    void save(Post post);
+
+    // Fetches a specific post.
+    Post getPost(String title);
+
+    //Get all viewable Posts.
+    ArrayList<Post> getAllPosts();
+
+    //Get all Posts with keyword in title
+    ArrayList<Post> getSelectPosts(String keyword);
+}

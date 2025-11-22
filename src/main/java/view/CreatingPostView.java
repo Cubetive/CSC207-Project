@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import interface_adapter.create_post.CreatePostController;
 import interface_adapter.create_post.CreatePostState;

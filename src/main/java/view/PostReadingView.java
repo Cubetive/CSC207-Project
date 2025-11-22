@@ -16,6 +16,8 @@ import java.beans.PropertyChangeListener;
  * The View for reading a post and its replies.
  */
 public class PostReadingView extends JPanel implements PropertyChangeListener {
+    public static final String CONFIRM_CANCEL_TITLE = "Cancel Reply";
+    public static final String CONFIRM_CANCEL_MESSAGE = "Are you sure? This draft will not be saved.";
 
     private final ReadPostViewModel viewModel;
     private ReadPostController controller;
@@ -426,6 +428,15 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         });
 
         replyCancelButton.addActionListener(e -> {
+            if (!replyTextField.getText().isEmpty()) {
+                // Prompt a confirmation message if there's a draft.
+                int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
+                        CONFIRM_CANCEL_TITLE, JOptionPane.YES_NO_OPTION);
+
+                // Return if the user does not choose yes.
+                if (userAnswer != JOptionPane.YES_OPTION) return;
+            }
+
             replyPanel.setVisible(false);
             replyTextField.setText("");
         });

@@ -10,7 +10,7 @@ public class TranslationInputData {
 
     private final String targetLanguage;
     private final Long postId; // Nullable: only set when translating a main post
-    private final String rawText; // Nullable: only set when translating a comment/raw string
+    private final String textContent; // Nullable: only set when translating a comment/raw string
 
     /**
      * Constructor for translating a main post.
@@ -20,18 +20,18 @@ public class TranslationInputData {
     public TranslationInputData(String targetLanguage, long postId) {
         this.targetLanguage = targetLanguage;
         this.postId = postId;
-        this.rawText = null;
+        this.textContent = null;
     }
 
     /**
      * Constructor for translating raw text (e.g., a comment).
      * @param targetLanguage The language code to translate into.
-     * @param rawText The raw text content to translate.
+     * @param textContent The raw text content to translate.
      */
-    public TranslationInputData(String targetLanguage, String rawText) {
+    public TranslationInputData(String targetLanguage, String textContent) {
         this.targetLanguage = targetLanguage;
         this.postId = null;
-        this.rawText = rawText;
+        this.textContent = textContent;
     }
 
     public String getTargetLanguage() {
@@ -42,8 +42,8 @@ public class TranslationInputData {
         return postId;
     }
 
-    public String getRawText() {
-        return rawText;
+    public String getTextContent() {
+        return textContent;
     }
 
     /**

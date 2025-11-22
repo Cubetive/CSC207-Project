@@ -2,6 +2,7 @@ package interface_adapter.translate;
 
 import use_case.translate.TranslationInputBoundary;
 import use_case.translate.TranslationInputData;
+import use_case.translate.TranslationInteractor;
 
 /**
  * Controller for the Translation Use Case.
@@ -14,17 +15,17 @@ import use_case.translate.TranslationInputData;
  */
 public class TranslationController {
 
-    private final TranslationInputBoundary translationUseCase;
+    private final TranslationInputBoundary translationInputBoundary;
 
     /**
      * Constructs the TranslationController, injecting the Input Boundary dependency.
      * This adheres to the Dependency Inversion Principle (DIP).
      *
-     * @param translationUseCase The Input Boundary interface (the 'port') that the
+     * @param translationInputBoundary The Input Boundary interface (the 'port') that the
      * Controller uses to trigger the business logic.
      */
-    public TranslationController(TranslationInputBoundary translationUseCase) {
-        this.translationUseCase = translationUseCase;
+    public TranslationController(TranslationInputBoundary translationInputBoundary) {
+        this.translationInputBoundary = translationInputBoundary;
     }
 
     /**
@@ -40,7 +41,7 @@ public class TranslationController {
         );
 
         // 2. Delegate the execution to the Use Case Interactor via the boundary interface.
-        translationUseCase.execute(inputData);
+        translationInputBoundary.execute(inputData);
     }
 
     /**
@@ -58,6 +59,6 @@ public class TranslationController {
         );
 
         // 2. Delegate the execution to the Use Case Interactor via the boundary interface.
-        translationUseCase.execute(inputData);
+        translationInputBoundary.execute(inputData);
     }
 }

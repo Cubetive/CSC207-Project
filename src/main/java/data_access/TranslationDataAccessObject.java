@@ -3,14 +3,24 @@ package data_access;
 import use_case.translate.TranslationDataAccessInterface; // Import the interface
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface.
@@ -27,7 +37,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     // NOTE: In a real environment, load this from environment variables.
     private static final String apiKeyName = "GOOGLE_API_KEY";
     private static final String API_KEY = System.getenv(apiKeyName); // Use the provided empty string
-    private static final String GOOGLE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + API_KEY;
+    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";;
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
     // Simple set of supported language codes for demonstration purposes
@@ -39,12 +49,271 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     }
 
     /**
-     * 1. Retrieves a cached translation. Implements the method required by the interface.
+     * The core function, now using a custom, self-contained JSON utility for reliable parsing.
+     *
+     * @param text The text content to translate.
+     * @param targetLang The target language code (e.g., "es" for Spanish).
+     * @return The translated text, or an error message if translation fails.
      */
-    @Override
-    public String getTranslatedContent(long postId, String targetLanguageCode) {
-        String key = createCacheKey(postId, targetLanguageCode);
-        return translationCache.get(key); // Returns null if not found
+    public  String getTranslation(String text, String targetLang) {
+        if (text == null || text.trim().isEmpty()) {
+            return "Error: Cannot translate empty text.";
+        }
+        if (targetLang == null || !SUPPORTED_LANGUAGES.contains(targetLang)) {
+            return "Error: Invalid or unsupported target language code provided: " + targetLang;
+        }
+
+        try {
+            // URL Encode the text content
+            String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
+
+            // Build the full URL using GET query parameters
+            String fullApiUrl = String.format(
+                    "%s?target=%s&key=%s&q=%s",
+                    TRANSLATE_API_BASE_URL,
+                    targetLang,
+                    API_KEY,
+                    encodedText
+            );
+
+            // Setup Connection
+            URL url = new URL(fullApiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+
+            // Read the response stream (either success or error stream)
+            BufferedReader br;
+            if (responseCode >= 200 && responseCode < 300) {
+                br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            } else {
+                br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+            }
+
+            StringBuilder response = new StringBuilder();
+            String responseLine;
+            // Read lines and join them, removing newline characters
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            br.close();
+
+            String apiResponse = response.toString();
+
+            if (responseCode != 200) {
+                return String.format("Translation API Error (%d): %s", responseCode, apiResponse);
+            }
+
+            // Parse the JSON response using the custom utility
+            // Response structure: {"data": {"translations": [{"translatedText": "..."}]}}
+
+            try {
+                Map<String, Object> root = SimpleJsonParser.parse(apiResponse);
+
+                // Navigate the structure: root -> data -> translations (List)
+                if (root.containsKey("data")) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> data = (Map<String, Object>) root.get("data");
+
+                    if (data.containsKey("translations")) {
+                        @SuppressWarnings("unchecked")
+                        List<Object> translations = (List<Object>) data.get("translations");
+
+                        if (!translations.isEmpty()) {
+                            @SuppressWarnings("unchecked")
+                            Map<String, Object> firstTranslation = (Map<String, Object>) translations.get(0);
+
+                            // Extract the text
+                            String translatedText = (String) firstTranslation.get("translatedText");
+
+                            // Unescape common JSON characters that might be returned in the text value
+                            return translatedText.replace("\\\"", "\"").replace("\\n",
+                                    "\n").replace("\\/", "/");
+                        }
+                    }
+                }
+
+                return "Translation Failed: JSON response was successful but could not find the translation text.";
+
+            } catch (Exception jsonEx) {
+                return "Translation Failed: Failed to parse JSON response with utility. Raw Response: " + apiResponse +
+                        "\nParsing Error: " + jsonEx.getMessage();
+            }
+
+        } catch (Exception e) {
+            return "Translation Failed (Network/IO): " + e.getMessage();
+        }
+    }
+
+    /**
+     * A JSON parser to avoid external dependencies.
+     * It parses the JSON string into standard Java Map and List objects.
+     */
+    private static class SimpleJsonParser {
+        public static Map<String, Object> parse(String json) throws Exception {
+            // Trim and check for object start/end
+            String trimmed = json.trim();
+            if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+                throw new Exception("Invalid JSON object format.");
+            }
+            // Remove outer braces and split into key-value pairs
+            String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+
+            // Use a simple state machine/tokenizing approach for robustness
+            return parseObject(inner);
+        }
+
+        @SuppressWarnings("unchecked")
+        private static Map<String, Object> parseObject(String content) throws Exception {
+            Map<String, Object> map = new HashMap<>();
+
+            int i = 0;
+            while (i < content.length()) {
+                // Skip non-significant whitespace
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+
+                // Parse Key
+                if (content.charAt(i) != '"') throw new Exception("Expected start of key quote at: " + i);
+                int keyStart = ++i;
+                int keyEnd = content.indexOf('"', keyStart);
+                if (keyEnd == -1) throw new Exception("Missing closing quote for key at: " + keyStart);
+                String key = content.substring(keyStart, keyEnd);
+                i = keyEnd + 1;
+
+                // Skip whitespace and find colon
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                if (content.charAt(i) != ':') throw new Exception("Expected colon after key at: " + i);
+                i++; // Skip colon
+
+                // Skip whitespace before value
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+
+                // Parse Value
+                Object value;
+                char startChar = content.charAt(i);
+
+                if (startChar == '"') {
+                    // String value
+                    int valStart = ++i;
+                    StringBuilder val = new StringBuilder();
+                    while(i < content.length()) {
+                        char c = content.charAt(i);
+                        if (c == '"' && content.charAt(i-1) != '\\') { // Simple unescaped quote check
+                            break;
+                        }
+                        val.append(c);
+                        i++;
+                    }
+                    if (i == content.length()) throw new Exception("Unclosed string value at: " + valStart);
+                    value = val.toString().replace("\\\"", "\"").replace("\\n", "\n"); // Unescape
+                    i++; // Skip closing quote
+                } else if (startChar == '{') {
+                    // Nested object
+                    int objectEnd = findMatchingBrace(content, i);
+                    value = parseObject(content.substring(i + 1, objectEnd));
+                    i = objectEnd + 1;
+                } else if (startChar == '[') {
+                    // Array (List)
+                    int arrayEnd = findMatchingBracket(content, i);
+                    value = parseArray(content.substring(i + 1, arrayEnd));
+                    i = arrayEnd + 1;
+                } else {
+                    // Simple value (number, boolean, null) - not strictly needed for this API response, but good practice
+                    int valueEnd = content.indexOf(',', i);
+                    if (valueEnd == -1) valueEnd = content.length();
+                    String simpleValue = content.substring(i, valueEnd).trim();
+                    value = simpleValue; // Return as String for simplicity
+                    i = valueEnd;
+                }
+
+                map.put(key, value);
+
+                // Skip whitespace and look for comma or end
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+
+                if (i < content.length() && content.charAt(i) == ',') {
+                    i++; // Skip comma and continue loop
+                } else if (i < content.length()) {
+                    // Unexpected characters remaining
+                    throw new Exception("Unexpected character after value at: " + i);
+                }
+            }
+            return map;
+        }
+
+        private static List<Object> parseArray(String content) throws Exception {
+            List<Object> list = new java.util.ArrayList<>();
+            int i = 0;
+
+            while (i < content.length()) {
+                // Skip whitespace
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                if (i >= content.length()) break; // End of array content
+
+                // Determine value type
+                char startChar = content.charAt(i);
+                Object value;
+
+                if (startChar == '{') {
+                    // Nested object
+                    int objectEnd = findMatchingBrace(content, i);
+                    value = parseObject(content.substring(i + 1, objectEnd));
+                    i = objectEnd + 1;
+                } else {
+                    // Handle strings/numbers for safety.
+                    throw new Exception("Unsupported value type in array at: " + i);
+                }
+
+                list.add(value);
+
+                // Skip whitespace and look for comma or end
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+
+                if (i < content.length() && content.charAt(i) == ',') {
+                    i++; // Skip comma and continue loop
+                }
+            }
+            return list;
+        }
+
+        // Helper to find the matching closing brace for nested structures
+        private static int findMatchingBrace(String json, int start) throws Exception {
+            int count = 0;
+            boolean inString = false;
+            for (int i = start; i < json.length(); i++) {
+                char c = json.charAt(i);
+                if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
+                    inString = !inString;
+                }
+                if (!inString) {
+                    if (c == '{') count++;
+                    else if (c == '}') count--;
+                }
+                if (count == 0 && i > start) return i;
+            }
+            throw new Exception("Unmatched brace starting at: " + start);
+        }
+
+        // Helper to find the matching closing bracket for arrays
+        private static int findMatchingBracket(String json, int start) throws Exception {
+            int count = 0;
+            boolean inString = false;
+            for (int i = start; i < json.length(); i++) {
+                char c = json.charAt(i);
+                if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
+                    inString = !inString;
+                }
+                if (!inString) {
+                    if (c == '[') count++;
+                    else if (c == ']') count--;
+                }
+                if (count == 0 && i > start) return i;
+            }
+            throw new Exception("Unmatched bracket starting at: " + start);
+        }
     }
 
     /**
@@ -55,126 +324,5 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
         String key = createCacheKey(postId, targetLanguageCode);
         translationCache.put(key, translatedText);
         System.out.println("DEBUG: Translation for Post ID " + postId + " saved to cache.");
-    }
-
-    /**
-     * 3. Detects the source language of the provided text using the Gemini API. Implements the method required by the interface.
-     */
-    @Override
-    public String detectLanguage(String sourceText) {
-        if (sourceText == null || sourceText.trim().isEmpty()) {
-            return "unknown";
-        }
-
-        // System instruction guides the model to only output the language code.
-        String systemPrompt = "You are a language detection service. Analyze the provided text and respond ONLY with the ISO 639-1 two-letter language code (e.g., 'en', 'fr', 'ja'). Do not include any other text, explanation, or punctuation.";
-        String userQuery = "Detect the language of the following text: \"" + sourceText + "\"";
-
-        try {
-            String responseText = callApi(userQuery, systemPrompt, false);
-            // Clean up the response (trim whitespace/quotes) before returning
-            return responseText.trim().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "");
-        } catch (IOException | InterruptedException e) {
-            System.err.println("ERROR: Failed to detect language using Gemini API: " + e.getMessage());
-            return "unknown"; // Default fallback
-        }
-    }
-
-    /**
-     * 4. Calls the external translation service (Gemini) to translate the text. Implements the method required by the interface.
-     */
-    @Override
-    public String translate(String sourceText, String sourceLanguageCode, String targetLanguageCode) {
-        if (sourceText == null || sourceText.trim().isEmpty() || !isLanguageSupported(targetLanguageCode)) {
-            return sourceText;
-        }
-
-        String systemPrompt = "You are a highly accurate, professional translator. Translate the user's text from " + sourceLanguageCode.toUpperCase(Locale.ROOT) + " to " + targetLanguageCode.toUpperCase(Locale.ROOT) + ". Respond ONLY with the direct translation text. Do not add any conversational text, explanations, or formatting.";
-        String userQuery = "Please translate this text: \"" + sourceText + "\"";
-
-        try {
-            return callApi(userQuery, systemPrompt, false).trim();
-        } catch (IOException | InterruptedException e) {
-            System.err.println("ERROR: Failed to translate content using Gemini API: " + e.getMessage());
-            return "Translation failed: Service unavailable.";
-        }
-    }
-
-    /**
-     * 5. Checks if the target language is supported. Implements the method required by the interface.
-     */
-    @Override
-    public boolean isLanguageSupported(String languageCode) {
-        return SUPPORTED_LANGUAGES.contains(languageCode.toLowerCase(Locale.ROOT));
-    }
-
-
-    /**
-     * Private helper method to handle the actual HTTP request to the Gemini API.
-     * Implements exponential backoff for robustness.
-     */
-    private String callApi(String userQuery, String systemPrompt, boolean useSearchGrounding)
-            throws IOException, InterruptedException {
-        String payloadTemplate = "{"
-                + "\"contents\": [{ \"parts\": [{ \"text\": \"%s\" }] }],"
-                + "\"systemInstruction\": { \"parts\": [{ \"text\": \"%s\" }] } %s"
-                + "}";
-
-        String toolsBlock = useSearchGrounding ? ", \"tools\": [{ \"google_search\": {} }]" : "";
-        String escapedUserQuery = userQuery.replace("\"", "\\\"");
-        String escapedSystemPrompt = systemPrompt.replace("\"", "\\\"");
-
-        String jsonPayload = String.format(payloadTemplate, escapedUserQuery, escapedSystemPrompt, toolsBlock);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(GOOGLE_API_URL))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .build();
-
-        int maxRetries = 3;
-        long delay = 1000; // 1 second
-
-        for (int i = 0; i < maxRetries; i++) {
-            try {
-                HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() == 200) {
-                    // Simple JSON parsing to extract the text content
-                    // Finds the first "text" field in the response.
-                    String body = response.body();
-                    int textStartIndex = body.indexOf("\"text\"");
-                    if (textStartIndex != -1) {
-                        int valueStartIndex = body.indexOf(':', textStartIndex) + 1;
-                        int valueEndIndex = body.indexOf('"', valueStartIndex);
-                        // Find the second quote after the colon for the start of the actual text
-                        if (valueEndIndex != -1) {
-                            int actualTextStart = body.indexOf('"', valueEndIndex + 1);
-                            if (actualTextStart != -1) {
-                                int actualTextEnd = body.indexOf('"', actualTextStart + 1);
-                                if (actualTextEnd != -1) {
-                                    return body.substring(actualTextStart + 1, actualTextEnd);
-                                }
-                            }
-                        }
-                    }
-                    return "ERROR: Could not parse API response.";
-                } else if (response.statusCode() == 429 && i < maxRetries - 1) {
-                    // 429 Too Many Requests -> Wait and retry
-                    Thread.sleep(delay);
-                    delay *= 2; // Exponential backoff
-                } else {
-                    throw new IOException("API request failed with status code: " + response.statusCode());
-                }
-            } catch (IOException e) {
-                if (i < maxRetries - 1) {
-                    Thread.sleep(delay);
-                    delay *= 2;
-                } else {
-                    throw e; // Re-throw if last attempt failed
-                }
-            }
-        }
-        throw new IOException("API request failed after " + maxRetries + " retries.");
     }
 }

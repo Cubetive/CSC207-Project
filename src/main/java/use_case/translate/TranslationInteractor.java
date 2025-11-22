@@ -37,38 +37,16 @@ public class TranslationInteractor implements TranslationInputBoundary {
     @Override
     public void execute(TranslationInputData inputData) {
         final long postId = inputData.getPostId();
+        final String textContent = inputData.getTextContent();
         final String targetLanguageCode = inputData.getTargetLanguage(); // Using inputData.getTargetLanguage()
 
         executor.submit(() -> {
             OriginalPost post = postDataAccessObject.getPostById(postId);
 
-            if (post == null) {
-                outputBoundary.presentFailure("Error: Post with ID " + postId + " was not found.");
-                return;
-            }
-
-            final String sourceText = post.getContent();
-            String sourceLanguageCode; // Determined via detection, since OriginalPost doesn't store it
-
             try {
                 // 1. VALIDATION & LANGUAGE DETECTION:
-                if (sourceText.trim().isEmpty()) {
+                if (textContent.trim().isEmpty()) {
                     outputBoundary.presentFailure("Cannot translate empty text.");
-                    return;
-                }
-
-                if (!translationDataAccessObject.isLanguageSupported(targetLanguageCode)) {
-                    outputBoundary.presentFailure("Target language is not supported.");
-                    return;
-                }
-
-                // Determine the source language code first (required for Output Data and translation call)
-                sourceLanguageCode = translationDataAccessObject.detectLanguage(sourceText);
-
-                // Check if the detected language is the same as the target language
-                if (sourceLanguageCode.equalsIgnoreCase(targetLanguageCode)) {
-                    // We don't need a full TranslationOutputData object if no translation is attempted.
-                    outputBoundary.presentFailure("Source and target languages are the same (" + targetLanguageCode + "). No translation needed.");
                     return;
                 }
 
@@ -81,7 +59,6 @@ public class TranslationInteractor implements TranslationInputBoundary {
                     TranslationOutputData outputData = new TranslationOutputData(
                             cachedTranslation,
                             targetLanguageCode,
-                            sourceLanguageCode,
                             postId,
                             true // <-- CACHE HIT: Set to true
                     );
@@ -90,9 +67,8 @@ public class TranslationInteractor implements TranslationInputBoundary {
                 }
 
                 // 3. DATA ACCESS CALL: Cache Miss - Perform API translation
-                String translatedText = translationDataAccessObject.translate(
-                        sourceText,
-                        sourceLanguageCode, // Use the detected code
+                String translatedText = translationDataAccessObject.getTranslation(
+                        textContent,
                         targetLanguageCode
                 );
 
@@ -107,7 +83,6 @@ public class TranslationInteractor implements TranslationInputBoundary {
                     TranslationOutputData outputData = new TranslationOutputData(
                             translatedText,
                             targetLanguageCode,
-                            sourceLanguageCode,
                             postId,
                             false // <-- CACHE MISS: Set to false
                     );

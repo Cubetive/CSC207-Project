@@ -17,6 +17,7 @@ public class Main {
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
+                .addTranslationUseCase()
                 .build();
 
         application.pack();

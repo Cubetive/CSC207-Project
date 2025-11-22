@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class ReadPostState {
 
+    private long id = 0;
     private String title = "";
     private String content = "";
     private String username = "";
@@ -17,6 +18,14 @@ public class ReadPostState {
     private int downvotes = 0;
     private List<ReadPostOutputData.ReplyData> replies = new ArrayList<>();
     private String errorMessage;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

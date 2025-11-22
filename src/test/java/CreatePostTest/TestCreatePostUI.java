@@ -1,6 +1,6 @@
 package CreatePostTest;
 
-import View.CreatingPostView;
+import view.CreatingPostView;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_post.CreatePostController;
 import interface_adapter.create_post.CreatePostPresenter;

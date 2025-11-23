@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
 import java.util.Map;
+// NEW
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Properties;
 
 /**
  * A Java Swing application for demonstrating Google Cloud Text Translation.
@@ -20,9 +25,7 @@ import java.util.Map;
 public class TranslatorUI extends JFrame {
 
     // Configuration for Google Cloud Translation API
-
-    private static final String apiKeyName = "GOOGLE_API_KEY";
-    private static final String apiKey = System.getenv(apiKeyName);
+    private static final String apiKey;
     private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
 
     public static final List<String> SUPPORTED_LANGUAGES = List.of(
@@ -32,6 +35,24 @@ public class TranslatorUI extends JFrame {
             "de", // German
             "zh"  // Chinese (Simplified)
     );
+
+    // FIX: Static initializer block to load the API key from the local, uncommitted file
+    static {
+        String key = null;
+        try (InputStream input = new FileInputStream("secrets.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            key = prop.getProperty("GOOGLE_API_KEY");
+            if (key == null || key.trim().isEmpty()) {
+                System.err.println("FATAL ERROR: GOOGLE_API_KEY not found in secrets.properties.");
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println("FATAL ERROR: secrets.properties file not found. Have you created it and added your API key?");
+        } catch (Exception ex) {
+            System.err.println("FATAL ERROR: Could not read secrets.properties: " + ex.getMessage());
+        }
+        apiKey = key;
+    }
 
     // UI components
     private JTextArea inputArea;

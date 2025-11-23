@@ -8,6 +8,7 @@ import entities.OriginalPost;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
+import use_case.upvote_downvote.VoteOutputData; //NEW
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -102,6 +103,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
             repliesList.add(reply);
         }
     }
+
 
     @Override
     public OriginalPost getPostById(long id) {

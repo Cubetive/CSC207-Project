@@ -104,6 +104,151 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
         }
     }
 
+    // =========================================================================
+    // VOTE USE CASE IMPLEMENTATION (NEW METHODS)
+    // =========================================================================
+
+    /**
+     * Helper to find a Post or Reply and its parent, since only the parent post's
+     * replies list needs to be re-sorted.
+     * @param targetId The ID of the content (Post or Reply) to find.
+     * @param allPosts The list of all posts to search.
+     * @return A ContentWrapper containing the found content and its parent ID.
+     */
+    private ContentWrapper findTargetContent(long targetId, List<OriginalPost> allPosts) {
+        for (OriginalPost post : allPosts) {
+            if (post.getId() == targetId) {
+                // Target is the main post itself
+                return new ContentWrapper(post, targetId);
+            }
+
+            // Search through replies recursively
+            ReplyPost targetReply = findReplyRecursively(post.getReplies(), targetId);
+            if (targetReply != null) {
+                // Target is a reply; the parent ID is the main post's ID
+                return new ContentWrapper(targetReply, post.getId());
+            }
+        }
+        return null; // Content not found
+    }
+
+    /**
+     * Recursively searches for a ReplyPost by its ID.
+     */
+    private ReplyPost findReplyRecursively(List<ReplyPost> replies, long targetId) {
+        if (replies == null) return null;
+
+        for (ReplyPost reply : replies) {
+            if (reply.getId() == targetId) {
+                return reply;
+            }
+            // Check nested replies
+            ReplyPost foundInNested = findReplyRecursively(reply.getReplies(), targetId);
+            if (foundInNested != null) {
+                return foundInNested;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Implements the core logic for upvoting or downvoting content.
+     * This method loads the data, modifies the entity, and persists the change.
+     *
+     * @param id The unique ID of the post or reply.
+     * @param isUpvote True for an upvote, false for a downvote.
+     * @return VoteOutputData containing the new score and the parent post ID.
+     * @throws RuntimeException if the content is not found.
+     */
+    @Override
+    public VoteOutputData updateVoteCount(long id, boolean isUpvote) {
+        // 1. Load all posts (to get a mutable list to update)
+        List<OriginalPost> allPosts = getAllPosts();
+
+        // 2. Find the target Post/Reply and its parent ID
+        ContentWrapper wrapper = findTargetContent(id, allPosts);
+
+        if (wrapper == null) {
+            throw new RuntimeException("Content with ID " + id + " not found.");
+        }
+
+        // 3. Update the votes directly on the entity
+        int newUpvotes;
+        int newDownvotes;
+
+        // Assuming OriginalPost/ReplyPost has standard getters/setters for votes
+        if (wrapper.getContent() instanceof OriginalPost post) {
+            ArrayList<Integer> newVote =  new ArrayList<>();
+            newUpvotes = post.getVotes()[0] + (isUpvote ? 1 : 0);
+            newDownvotes = post.getVotes()[1] + (isUpvote ? 0 : 1);
+            newVote.add(newUpvotes);
+            newVote.add(newDownvotes);
+            // post.votes = newVote; -- TODO: Need to fix this
+        } else if (wrapper.getContent() instanceof ReplyPost reply) {
+            ArrayList<Integer> newVote =  new ArrayList<>();
+            newUpvotes = reply.getVotes()[0] + (isUpvote ? 1 : 0);
+            newDownvotes = reply.getVotes()[1] + (isUpvote ? 0 : 1);
+            newVote.add(newUpvotes);
+            newVote.add(newDownvotes);
+            // reply.votes = newVote; -- TODO: need to fix this
+        } else {
+            // Should not happen based on logic, but for safety
+            throw new RuntimeException("Content type not supported for voting.");
+        }
+
+        // 4. Persist the change by writing the updated list back to the file
+        saveAllPosts(allPosts);
+
+        // 5. Calculate new score and return output data
+        int newScore = newUpvotes - newDownvotes;
+        return new VoteOutputData(id, newScore, wrapper.getParentPostId());
+    }
+
+    /**
+     * Private helper class to hold the mutable content entity and its parent post ID.
+     * This wrapper allows us to return the content object (OriginalPost or ReplyPost)
+     * along with the ID of the main post, which is needed to trigger a re-read/sort.
+     */
+    private static class ContentWrapper {
+        private final Object content; // Can be OriginalPost or ReplyPost
+        private final long parentPostId;
+
+        public ContentWrapper(Object content, long parentPostId) {
+            this.content = content;
+            this.parentPostId = parentPostId;
+        }
+
+        public Object getContent() {
+            return content;
+        }
+
+        public long getParentPostId() {
+            return parentPostId;
+        }
+    }
+    /**
+     * Recursively sorts a list of replies based on their vote score (Upvotes - Downvotes),
+     * ensuring the highest-scoring replies appear first.
+     */
+    private void sortRepliesRecursively(List<ReplyPost> replies) {
+        if (replies == null || replies.isEmpty()) {
+            return;
+        }
+
+        // Sort the current level of replies in DESCENDING order of score
+        replies.sort(Comparator.comparingInt(reply -> {
+            // Score = Upvotes - Downvotes
+            return reply.getUpvotes() - reply.getDownvotes();
+        }).reversed()); // .reversed() ensures highest score is first
+
+        // Recurse into nested replies
+        for (ReplyPost reply : replies) {
+            if (reply.getReplies() != null) {
+                sortRepliesRecursively(reply.getReplies());
+            }
+        }
+    }
+
 
     @Override
     public OriginalPost getPostById(long id) {

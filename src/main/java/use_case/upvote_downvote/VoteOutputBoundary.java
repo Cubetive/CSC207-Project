@@ -1,4 +1,6 @@
 package use_case.upvote_downvote;
 
-public class VoteOutputBoundary {
+public interface VoteOutputBoundary {
+    void presentSuccess(VoteOutputData outputData);
+    void presentFailure(String errorMessage);
 }

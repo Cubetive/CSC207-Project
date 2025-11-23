@@ -1,24 +1,17 @@
 package use_case.upvote_downvote;
 
 public class VoteInputData {
-    private final int upvotes;
-    private final int downvotes;
+    private final boolean isUpvote;
     private final long postId;
 
-    public VoteInputData(int upvotes, int downvotes, long postId) {
-        this.upvotes = upvotes;
-        this.downvotes = downvotes;
+    public VoteInputData(boolean isUpvote, long postId) {
+        this.isUpvote = isUpvote;
         this.postId = postId;
     }
 
-    public int getUpvotes() {
-        return upvotes;
+    public boolean isUpvote() {
+        return isUpvote;
     }
-
-    public int getDownvotes() {
-        return downvotes;
-    }
-
     public long getPostId() {
         return postId;
     }

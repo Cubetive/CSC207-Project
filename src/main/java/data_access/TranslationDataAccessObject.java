@@ -2,7 +2,7 @@ package data_access;
 
 import use_case.translate.TranslationDataAccessInterface; // Import the interface
 
-import java.io.IOException; // FIX: Added old import
+import java.io.*;
 import java.net.HttpURLConnection; // FIX: Added old import
 import java.net.URI;
 import java.net.URLEncoder;
@@ -14,8 +14,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader; // FIX: Added old import
-import java.io.InputStreamReader; // FIX: Added old import
 import java.net.URL; // FIX: Added old import
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -34,8 +32,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     private final Map<String, String> translationCache = new HashMap<>();
 
     // NOTE: In a real environment, load this from environment variables.
-    private static final String apiKeyName = "GOOGLE_API_KEY";
-    private static final String API_KEY = System.getenv(apiKeyName); // Use the provided empty string
+    private static final String API_KEY; // Use the provided empty string
     private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
     // FIX: HTTP_CLIENT is no longer used, but kept for completeness in the file structure
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
@@ -46,6 +43,24 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     // Helper function for creating the unique cache key
     private String createCacheKey(long postId, String languageCode) {
         return postId + "_" + languageCode.toLowerCase(Locale.ROOT);
+    }
+
+    // FIX: Static initializer block to load the API key from the local, uncommitted file
+    static {
+        String key = null;
+        try (InputStream input = new FileInputStream("secrets.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            key = prop.getProperty("GOOGLE_API_KEY");
+            if (key == null || key.trim().isEmpty()) {
+                System.err.println("FATAL ERROR: GOOGLE_API_KEY not found in secrets.properties.");
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println("FATAL ERROR: secrets.properties file not found. Have you created it and added your API key?");
+        } catch (Exception ex) {
+            System.err.println("FATAL ERROR: Could not read secrets.properties: " + ex.getMessage());
+        }
+        API_KEY = key;
     }
 
     /**

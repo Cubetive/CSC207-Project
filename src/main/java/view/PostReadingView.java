@@ -27,6 +27,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private Runnable onBackAction;
     private long currentPostId = -1; // FIX: Added missing declaration. Stores the current post ID for translation.
 
+    private String textContent = ""; // NEW to keep track of current text.
+
     // Fields to track translation UI elements for COMMENTS
     private final Map<String, JTextArea> commentTranslationAreas = new HashMap<>();
     private final Map<String, JLabel> commentTranslationStatusLabels = new HashMap<>();
@@ -174,7 +176,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Inline ActionListener for the translate button
         translateButton.addActionListener(e -> {
-            if (translationController == null || currentPostId == -1) {
+            if (textContent.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Cannot translate. Controller or Post ID is missing.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -185,9 +187,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             translatedContentArea.setText("Loading translation...");
 
             String targetLanguage = (String) languageDropdown.getSelectedItem();
-            if (targetLanguage != null) {
+            if (!textContent.trim().isEmpty()) { //Original: targetLanguage != null
                 // Call the translation controller
-                translationController.execute(currentPostId, targetLanguage);
+                translationController.execute(textContent, targetLanguage);
             }
         });
 
@@ -457,10 +459,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         // NEW: If a new post loaded, set the currentPostId.
         // Assuming getPostId() returns a String ID.
         this.currentPostId = state.getId();
+        textContent = state.getContent();
 
         // NEW Clear previous translation when a new post is loaded
         clearTranslationDisplay();
         clearCommentTranslationDisplays();
+
+        setTranslationController(translationController);
 
         // FIX: Update currentPostId when a post is successfully loaded
         // Assuming ReadPostState has a getPostId() method:
@@ -579,7 +584,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Action Listener for Comment Translation
         commentTranslateButton.addActionListener(e -> {
-            if (translationController == null) {
+            if (textContent.isEmpty()) {
                 commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
                 return;
             }
@@ -592,7 +597,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             lastTextTranslatedKey = commentKey;
 
             String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
-            if (targetLanguage != null) {
+            if (!textContent.trim().isEmpty()) { // Originally targetLanguage != null
                 // Call the translation controller with the comment's raw text
                 // Assumption: TranslationController has an overload for (String text, String targetLang)
                 translationController.execute(reply.getContent(), targetLanguage);

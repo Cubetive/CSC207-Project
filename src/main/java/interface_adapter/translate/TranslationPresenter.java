@@ -3,6 +3,7 @@ package interface_adapter.translate;
 import use_case.translate.TranslationOutputBoundary;
 import use_case.translate.TranslationOutputData;
 import interface_adapter.ViewManagerModel;
+import javax.swing.SwingUtilities; // FIX: Import SwingUtilities
 
 /**
  * Implements the TranslationOutputBoundary. It receives the Use Case result,
@@ -31,19 +32,21 @@ public class TranslationPresenter implements TranslationOutputBoundary {
      */
     @Override
     public void presentSuccess(TranslationOutputData outputData) {
-        // 1. Get the current state
-        TranslationState translationState = translationViewModel.getState();
+        // FIX: MUST execute ViewModel update on the Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> {
+            // 1. Get the current state
+            TranslationState translationState = translationViewModel.getState();
 
-        // 2. Update the state with new data
-        // We use contentId to tell the view which specific content block (post or reply) to update.
-        translationState.setTranslatedText(outputData.getTranslatedText());
-//        translationState.setSourceLanguage(outputData.getSourceLanguage());
-        translationState.setTargetLanguage(outputData.getTargetLanguage());
-        translationState.setTranslationError(null); // Clear any previous error
+            // 2. Update the state with new data
+            translationState.setTranslatedText(outputData.getTranslatedText());
+            // translationState.setSourceLanguage(outputData.getSourceLanguage()); // FIX: Commented out as source language isn't in OutputData
+            translationState.setTargetLanguage(outputData.getTargetLanguage());
+            translationState.setTranslationError(null); // Clear any previous error
 
-        // 3. Fire the property change event to notify the View
-        this.translationViewModel.setState(translationState);
-        this.translationViewModel.firePropertyChanged();
+            // 3. Fire the property change event to notify the View
+            this.translationViewModel.setState(translationState);
+            this.translationViewModel.firePropertyChanged();
+        });
     }
 
     /**
@@ -53,15 +56,18 @@ public class TranslationPresenter implements TranslationOutputBoundary {
      */
     @Override
     public void presentFailure(String errorMessage) {
-        // 1. Get the current state
-        TranslationState translationState = translationViewModel.getState();
+        // FIX: MUST execute ViewModel update on the Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> {
+            // 1. Get the current state
+            TranslationState translationState = translationViewModel.getState();
 
-        // 2. Update the state with the error
-        translationState.setTranslationError("Error translating: " + errorMessage);
-        translationState.setTranslatedText(null); // Clear previous successful translation
+            // 2. Update the state with the error
+            translationState.setTranslationError("Error translating: " + errorMessage);
+            translationState.setTranslatedText(null); // Clear previous successful translation
 
-        // 3. Fire the property change event to notify the View
-        this.translationViewModel.setState(translationState);
-        this.translationViewModel.firePropertyChanged();
+            // 3. Fire the property change event to notify the View
+            this.translationViewModel.setState(translationState);
+            this.translationViewModel.firePropertyChanged();
+        });
     }
 }

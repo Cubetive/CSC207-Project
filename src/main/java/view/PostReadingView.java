@@ -390,6 +390,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             if (translatedContentArea != null) {
                 translatedContentArea.revalidate();
                 translatedContentArea.repaint();
+
+                // CRITICAL FIX: Repaint the Scroll Pane that contains the text area
+                translatedContentScrollPane.revalidate(); // Add this line
+                translatedContentScrollPane.repaint();   // Add this line
             }
         } else {
             // --- UPDATE COMMENT TRANSLATION UI ---
@@ -422,7 +426,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 commentArea.revalidate();
                 commentArea.repaint();
             }
-
+            // FIX: Ensure the main scroll pane updates its size/layout if necessary
+            scrollPane.revalidate();
+            scrollPane.repaint();
+            repliesPanel.revalidate();
+            repliesPanel.repaint();
             // Reset the comment tracker after receiving a result
             lastTextTranslatedKey = null;
         }

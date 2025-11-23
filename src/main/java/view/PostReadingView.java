@@ -176,8 +176,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Inline ActionListener for the translate button
         translateButton.addActionListener(e -> {
-            if (textContent.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Cannot translate. Controller or Post ID is missing.",
+            if (translationController == null) { // 💡 NEW: Check for controller existence
+                JOptionPane.showMessageDialog(this, "Translation service is not configured.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -187,10 +187,19 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             translatedContentArea.setText("Loading translation...");
 
             String targetLanguage = (String) languageDropdown.getSelectedItem();
-            if (!textContent.trim().isEmpty()) { //Original: targetLanguage != null
-                // Call the translation controller
-                translationController.execute(textContent, targetLanguage);
-            }
+            final long postId = currentPostId;
+            final String content = textContent;
+            // FIX: Use SwingWorker to execute the blocking controller call in the background
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // This runs on a worker thread (non-EDT)
+                    // FIX: Calls the synchronous Interactor via the Controller
+                    translationController.execute(postId, content, targetLanguage);
+                    return null;
+                }
+                // The result is handled by the ViewModel/Presenter updating the UI via propertyChange
+            }.execute();
         });
 
         controlPanel.add(translateLabel);
@@ -584,7 +593,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Action Listener for Comment Translation
         commentTranslateButton.addActionListener(e -> {
-            if (textContent.isEmpty()) {
+            if (translationController == null) {
                 commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
                 return;
             }
@@ -596,12 +605,19 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             // Set the tracking key to this comment's content
             lastTextTranslatedKey = commentKey;
 
-            String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
-            if (!textContent.trim().isEmpty()) { // Originally targetLanguage != null
-                // Call the translation controller with the comment's raw text
-                // Assumption: TranslationController has an overload for (String text, String targetLang)
-                translationController.execute(reply.getContent(), targetLanguage);
-            }
+            final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
+            final String replyContentText = reply.getContent();
+
+            // FIX: Use SwingWorker to execute the blocking controller call in the background
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // This runs on a worker thread (non-EDT)
+                    // FIX: Calls the synchronous Interactor via the Controller
+                    translationController.execute(replyContentText, targetLanguage);
+                    return null;
+                }
+            }.execute();
         });
 
         final JPanel commentControlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));

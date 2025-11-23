@@ -1,9 +1,7 @@
 package data_access;
 
-import use_case.translate.TranslationDataAccessInterface; // Import the interface
+import use_case.translate.TranslationDataAccessInterface;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -11,63 +9,59 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit; // Import for TimeUnit
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture; // Import for CompletableFuture
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface.
- * It handles both external API calls (Gemini for detection/translation)
- * and simulated internal caching/persistence for performance.
+ * Fix: Uses the robust HttpClient with the working GET method and includes a critical timeout mechanism
+ * to prevent indefinite thread blocking.
  */
 public class TranslationDataAccessObject implements TranslationDataAccessInterface {
 
-    // --- Simulated Cache (Replaces a real database/Firestore collection) ---
-    // Key format: "postId_languageCode" (e.g., "123_fr")
+    // --- Simulated Cache ---
     private final Map<String, String> translationCache = new HashMap<>();
 
-    // --- Gemini API Configuration ---
-    // NOTE: In a real environment, load this from environment variables.
+    // --- Google Translation API Configuration ---
     private static final String apiKeyName = "GOOGLE_API_KEY";
-    private static final String API_KEY = System.getenv(apiKeyName); // Use the provided empty string
-    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";;
+    private static final String API_KEY = System.getenv(apiKeyName);
+    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
-    // Simple set of supported language codes for demonstration purposes
     private static final Set<String> SUPPORTED_LANGUAGES = Set.of("en", "es", "fr", "de", "ja", "ko");
+    private static final long API_TIMEOUT_SECONDS = 15;
 
-    // Helper function for creating the unique cache key
     private String createCacheKey(long postId, String languageCode) {
         return postId + "_" + languageCode.toLowerCase(Locale.ROOT);
     }
 
     /**
-     * The core function, now using a custom, self-contained JSON utility for reliable parsing.
+     * The core function, using the modern, non-blocking HttpClient with a guaranteed timeout.
      *
      * @param text The text content to translate.
      * @param targetLang The target language code (e.g., "es" for Spanish).
-     * @return The translated text, or an error message if translation fails.
+     * @return The translated text, or an error message prefixed with "ERROR:" if translation fails.
      */
-    public  String getTranslation(String text, String targetLang) {
+    public String getTranslation(String text, String targetLang) {
         if (text == null || text.trim().isEmpty()) {
-            return "Error: Cannot translate empty text.";
+            return "ERROR: Cannot translate empty text.";
         }
         if (targetLang == null || !SUPPORTED_LANGUAGES.contains(targetLang)) {
-            return "Error: Invalid or unsupported target language code provided: " + targetLang;
+            return "ERROR: Invalid or unsupported target language code provided: " + targetLang;
+        }
+
+        if (API_KEY == null || API_KEY.trim().isEmpty()) {
+            return "ERROR: Missing API Key. Please set the GOOGLE_API_KEY environment variable.";
         }
 
         try {
-            // URL Encode the text content
+            // 1. URL Encode the text content
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
 
-            // Build the full URL using GET query parameters
+            // 2. Build the full URL using GET query parameters (Proven working pattern)
             String fullApiUrl = String.format(
                     "%s?target=%s&key=%s&q=%s",
                     TRANSLATE_API_BASE_URL,
@@ -76,44 +70,44 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                     encodedText
             );
 
-            // Setup Connection
-            URL url = new URL(fullApiUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
+            // 3. Build the HTTP Request (GET method)
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(fullApiUrl))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
 
-            // Get the response code
-            int responseCode = connection.getResponseCode();
+            // 4. Send the request ASYNCHRONOUSLY and apply a timeout.
+            CompletableFuture<HttpResponse<String>> responseFuture = HTTP_CLIENT
+                    .sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
-            // Read the response stream (either success or error stream)
-            BufferedReader br;
-            if (responseCode >= 200 && responseCode < 300) {
-                br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            } else {
-                br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+            HttpResponse<String> response = responseFuture
+                    .completeOnTimeout(
+                            null,
+                            API_TIMEOUT_SECONDS,
+                            TimeUnit.SECONDS
+                    )
+                    .join(); // Block the background thread for the result (or the timeout)
+
+            if (response == null) {
+                return "ERROR: Translation Request Timed Out after " + API_TIMEOUT_SECONDS + " seconds.";
             }
 
-            StringBuilder response = new StringBuilder();
-            String responseLine;
-            // Read lines and join them, removing newline characters
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            br.close();
+            String apiResponse = response.body();
+            int responseCode = response.statusCode();
 
-            String apiResponse = response.toString();
+            System.out.println("DEBUG: API Response Code: " + responseCode);
+            System.out.println("DEBUG: API Response Body (Partial): " + apiResponse.substring(0, Math.min(200, apiResponse.length())));
+
 
             if (responseCode != 200) {
-                return String.format("Translation API Error (%d): %s", responseCode, apiResponse);
+                return String.format("ERROR: Translation API Error (%d): %s", responseCode, apiResponse);
             }
 
-            // Parse the JSON response using the custom utility
-            // Response structure: {"data": {"translations": [{"translatedText": "..."}]}}
-
+            // 5. Parse the JSON response
             try {
                 Map<String, Object> root = SimpleJsonParser.parse(apiResponse);
 
-                // Navigate the structure: root -> data -> translations (List)
                 if (root.containsKey("data")) {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> data = (Map<String, Object>) root.get("data");
@@ -126,31 +120,29 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                             @SuppressWarnings("unchecked")
                             Map<String, Object> firstTranslation = (Map<String, Object>) translations.get(0);
 
-                            // Extract the text
                             String translatedText = (String) firstTranslation.get("translatedText");
 
-                            // Unescape common JSON characters that might be returned in the text value
                             return translatedText.replace("\\\"", "\"").replace("\\n",
                                     "\n").replace("\\/", "/");
                         }
                     }
                 }
 
-                return "Translation Failed: JSON response was successful but could not find the translation text.";
+                return "ERROR: Translation Failed: JSON response was successful but could not find the translation text.";
 
             } catch (Exception jsonEx) {
-                return "Translation Failed: Failed to parse JSON response with utility. Raw Response: " + apiResponse +
-                        "\nParsing Error: " + jsonEx.getMessage();
+                return "ERROR: Translation Failed: Failed to parse JSON response. Parsing Error: " + jsonEx.getMessage();
             }
 
         } catch (Exception e) {
-            return "Translation Failed (Network/IO): " + e.getMessage();
+            System.err.println("FATAL NETWORK/IO ERROR: " + e.getMessage());
+            return "ERROR: Translation Failed (Network/IO): " + e.getMessage();
         }
     }
 
+
     /**
      * A JSON parser to avoid external dependencies.
-     * It parses the JSON string into standard Java Map and List objects.
      */
     private static class SimpleJsonParser {
         public static Map<String, Object> parse(String json) throws Exception {
@@ -317,7 +309,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     }
 
     /**
-     * 2. Saves a newly generated translation into the in-memory cache. Implements the method required by the interface.
+     * Saves a newly generated translation into the in-memory cache.
      */
     @Override
     public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {

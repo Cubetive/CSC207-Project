@@ -10,21 +10,22 @@ public class TranslationInputData {
 
     private final String targetLanguage;
     private final Long postId; // Nullable: only set when translating a main post
-    private final String textContent; // Nullable: only set when translating a comment/raw string
+    private final String textContent;
 
     /**
-     * Constructor for translating a main post.
+     * Constructor for translating a main post. (NEW - takes all 3 parameters)
      * @param targetLanguage The language code to translate into.
      * @param postId The ID of the post to translate.
+     * @param textContent The raw text content of the post to translate.
      */
-    public TranslationInputData(String targetLanguage, long postId) {
+    public TranslationInputData(String targetLanguage, long postId, String textContent) {
         this.targetLanguage = targetLanguage;
         this.postId = postId;
-        this.textContent = null;
+        this.textContent = textContent; // <-- Store the content
     }
 
     /**
-     * Constructor for translating raw text (e.g., a comment).
+     * Constructor for translating raw text (e.g., a comment). (Original raw text constructor)
      * @param targetLanguage The language code to translate into.
      * @param textContent The raw text content to translate.
      */
@@ -33,6 +34,9 @@ public class TranslationInputData {
         this.postId = null;
         this.textContent = textContent;
     }
+
+    // NOTE: The previous constructor with only (targetLanguage, postId) is removed
+    // because it was incomplete and bypassed caching logic in the interactor.
 
     public String getTargetLanguage() {
         return targetLanguage;

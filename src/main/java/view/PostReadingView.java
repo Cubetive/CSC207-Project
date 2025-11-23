@@ -395,6 +395,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     translationStatusLabel.setText(state.getStatusMessage());
                 }
             }
+            // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
+            if (translatedContentArea != null) {
+                translatedContentArea.revalidate();
+                translatedContentArea.repaint();
+            }
         } else {
             // --- UPDATE COMMENT TRANSLATION UI ---
 
@@ -422,6 +427,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     commentArea.setText("Translation unavailable.");
                     commentStatus.setText(state.getStatusMessage());
                 }
+                // FIX: MANDATORY REPAINT CALLS (Add this block here for the comment area)
+                commentArea.revalidate();
+                commentArea.repaint();
             }
 
             // Reset the comment tracker after receiving a result

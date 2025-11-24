@@ -410,14 +410,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     statusLabel.setText(state.getStatusMessage());
                 }
 
-                // CRITICAL FIX: Repaint the area and its immediate container
-                targetArea.revalidate();
-                targetArea.repaint();
-                // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
-                if (translatedContentArea != null) {
-                    translatedContentArea.revalidate();
-                    translatedContentArea.repaint();
-                }
+//                // CRITICAL FIX: Repaint the area and its immediate container
+//                targetArea.revalidate();
+//                targetArea.repaint();
+//                // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
+//                if (translatedContentArea != null) {
+//                    translatedContentArea.revalidate();
+//                    translatedContentArea.repaint();
+//                }
                 // CRITICAL FIX: Repaint the scroll pane that wraps the main post translation
                 if (translatedContentScrollPane != null) {
                     translatedContentScrollPane.revalidate();
@@ -432,9 +432,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             // 🔥 NORMALIZE KEY FOR RETRIEVAL
             String lookupKey = lastTextTranslatedKey.trim();
 
-            JTextArea commentArea = commentTranslationAreas.get(lastTextTranslatedKey.trim());
-            JLabel commentStatus = commentTranslationStatusLabels.get(lastTextTranslatedKey.trim());
-            JButton commentButton = commentTranslationButtons.get(lastTextTranslatedKey.trim());
+            JTextArea commentArea = commentTranslationAreas.get(lookupKey);
+            JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
+            JButton commentButton = commentTranslationButtons.get(lookupKey);
 
             // ADD THESE LINES
             System.out.println("DEBUG: Key used: " + lastTextTranslatedKey);
@@ -481,6 +481,16 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             scrollPane.revalidate();
             scrollPane.repaint();
         }
+        // 🔥 FINAL FIX: Ensure the entire view container is repainted
+        // This tells the main scroll pane to recalculate its content size, eliminating the hang.
+        if (this.getParent() != null) {
+            this.getParent().revalidate();
+            this.getParent().repaint();
+        }
+        // 🔥 ULTIMATE SAFETY CALL: Invalidate the view itself to force parent redrawing
+        this.invalidate();
+        this.revalidate();
+        this.repaint();
     }
 
     /**

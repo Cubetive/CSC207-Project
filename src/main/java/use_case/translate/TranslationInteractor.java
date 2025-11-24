@@ -72,6 +72,7 @@ public class TranslationInteractor implements TranslationInputBoundary {
                     // FIX: Diagnostic log to confirm thread reached the DAO boundary
                     System.out.println("DIAGNOSTIC: Interactor is calling DAO for translation now...");
 
+                    assert translationDataAccessObject != null;
                     translatedText = translationDataAccessObject.getTranslation(
                             textContent,
                             targetLanguageCode
@@ -91,6 +92,10 @@ public class TranslationInteractor implements TranslationInputBoundary {
                         textContent,
                         targetLanguageCode
                 );
+                // 🔥 CRITICAL FIX: Ensure translatedText is not null here too
+                if (translatedText == null) {
+                    translatedText = "ERROR: Translation result returned null from DAO.";
+                }
             }
 
             // 2. PRESENT RESULT

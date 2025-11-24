@@ -64,7 +64,7 @@ public class SignupPresenter implements SignupOutputBoundary {
 
     @Override
     public void switchToLoginView() {
-        viewManagerModel.setState("browse posts");
+        viewManagerModel.setState("login");
         viewManagerModel.firePropertyChanged();
     }
 }

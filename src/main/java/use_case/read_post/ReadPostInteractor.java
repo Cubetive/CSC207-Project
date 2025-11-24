@@ -35,6 +35,7 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(post.getReplies());
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
+                    post.getId(), //NEW
                     post.getTitle(),
                     post.getContent(),
                     post.getCreatorUsername(),

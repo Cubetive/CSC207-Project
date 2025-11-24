@@ -14,10 +14,10 @@ public class Main {
                 .addSignupView()
                 .addBrowsePostsView()
                 .addReadPostView()
+                .addTranslationUseCase()
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
-                .addTranslationUseCase()
                 .build();
 
         application.pack();

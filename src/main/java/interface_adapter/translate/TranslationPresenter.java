@@ -45,7 +45,6 @@ public class TranslationPresenter implements TranslationOutputBoundary {
 
             // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);
-            this.translationViewModel.firePropertyChanged();
         });
     }
 
@@ -67,7 +66,6 @@ public class TranslationPresenter implements TranslationOutputBoundary {
 
             // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);
-            this.translationViewModel.firePropertyChanged();
         });
     }
 }

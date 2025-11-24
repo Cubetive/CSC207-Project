@@ -100,7 +100,6 @@ public class TranslationState {
         this.translationError = translationError;
     }
 
-    // FIX: Added Setter for postId
     public void setPostId(long postId) {
         this.postId = postId;
     }

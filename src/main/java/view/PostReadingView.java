@@ -13,7 +13,9 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The View for reading a post and its replies.
@@ -36,6 +38,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final Map<String, JButton> commentTranslationButtons = new HashMap<>();
     // This key (original text content) is used to map the result back to the correct comment UI
     private String lastTextTranslatedKey = null;
+    private final Set<String> translationsInProgress = new HashSet<>();
+    private static final String MAIN_POST_KEY = "MAIN_POST";
 
 
     private final JButton backButton;
@@ -186,6 +190,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 translateButton.setEnabled(false);
                 translationStatusLabel.setText("Translating...");
                 translatedContentArea.setText("Loading translation...");
+
+                // 🔥 SET LOCK FOR MAIN POST
+                translationsInProgress.add(MAIN_POST_KEY);
 
                 String targetLanguage = (String) languageDropdown.getSelectedItem();
                 final long postId = currentPostId;
@@ -416,12 +423,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     translatedContentScrollPane.revalidate();
                     translatedContentScrollPane.repaint();
                 }
+                // 🔥 CLEAR LOCK FOR MAIN POST
+                translationsInProgress.remove(MAIN_POST_KEY);
             }
         } else {
             // --- UPDATE COMMENT TRANSLATION UI ---
-            JTextArea commentArea = commentTranslationAreas.get(lastTextTranslatedKey);
-            JLabel commentStatus = commentTranslationStatusLabels.get(lastTextTranslatedKey);
-            JButton commentButton = commentTranslationButtons.get(lastTextTranslatedKey);
+
+            // 🔥 NORMALIZE KEY FOR RETRIEVAL
+            String lookupKey = lastTextTranslatedKey.trim();
+
+            JTextArea commentArea = commentTranslationAreas.get(lastTextTranslatedKey.trim());
+            JLabel commentStatus = commentTranslationStatusLabels.get(lastTextTranslatedKey.trim());
+            JButton commentButton = commentTranslationButtons.get(lastTextTranslatedKey.trim());
 
             // ADD THESE LINES
             System.out.println("DEBUG: Key used: " + lastTextTranslatedKey);
@@ -456,6 +469,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 repliesPanel.revalidate();
                 repliesPanel.repaint();
             }
+            // 🔥 CLEAR LOCK FOR COMMENT
+            translationsInProgress.remove(lookupKey);
 
             // Reset the comment tracker after receiving a result
             lastTextTranslatedKey = null;
@@ -509,6 +524,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.currentPostId = state.getId();
         textContent = state.getContent();
 
+        if (!translationsInProgress.isEmpty()) {
+            System.out.println("DEBUG: Skipping view update because translation is in progress.");
+            return;
+        }
         // NEW Clear previous translation when a new post is loaded
         clearTranslationDisplay();
         clearCommentTranslationDisplays();
@@ -564,7 +583,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // --- Unique Key for this comment (original content) ---
         // Used to map the translation result back to this specific JTextArea
-        final String commentKey = reply.getContent();
+        final String commentKey = reply.getContent().trim();
 
         // Reply header
         final JPanel headerPanel = new JPanel(new BorderLayout());
@@ -643,6 +662,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
             // Set the tracking key to this comment's content
             lastTextTranslatedKey = commentKey;
+
+            // 🔥 SET LOCK FOR COMMENT
+            translationsInProgress.add(commentKey);
 
             final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
             final String replyContentText = reply.getContent();

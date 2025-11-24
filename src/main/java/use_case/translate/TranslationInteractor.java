@@ -35,6 +35,11 @@ public class TranslationInteractor implements TranslationInputBoundary {
         final String textContent = inputData.getTextContent();
         final String targetLanguageCode = inputData.getTargetLanguage();
 
+        // Check key dependencies needed for the main post logic
+        System.out.println("INTERACTOR DEBUG: Main Post Interactor entered. Post ID: " + postId);
+        System.out.println("INTERACTOR DEBUG: Checking PostDAO is null: " + (postDataAccessObject == null));
+        System.out.println("INTERACTOR DEBUG: Checking TranslationDAO is null: " + (translationDataAccessObject == null));
+
         try {
             if (textContent == null || textContent.trim().isEmpty()) {
                 outputBoundary.presentFailure("Cannot translate empty text.");

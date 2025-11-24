@@ -18,7 +18,7 @@ public class TranslationInputData {
      * @param postId The ID of the post to translate.
      * @param textContent The raw text content of the post to translate.
      */
-    public TranslationInputData(String targetLanguage, long postId, String textContent) {
+    public TranslationInputData(String targetLanguage, Long postId, String textContent) {
         this.targetLanguage = targetLanguage;
         this.postId = postId;
         this.textContent = textContent; // <-- Store the content

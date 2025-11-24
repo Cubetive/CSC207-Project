@@ -28,12 +28,12 @@ public class TranslationViewModel extends ViewModel {
         super("translate");
     }
 
-    /**
-     * Notifies listeners (the View) that the state has changed.
-     */
-    public void firePropertyChanged() {
-        support.firePropertyChange(STATE_PROPERTY_NAME, null, this.state);
-    }
+//    /**
+//     * Notifies listeners (the View) that the state has changed.
+//     */
+//    public void firePropertyChanged() {
+//        support.firePropertyChange(STATE_PROPERTY_NAME, null, this.state);
+//    }
 
     /**
      * Adds a listener to observe state changes.
@@ -47,7 +47,18 @@ public class TranslationViewModel extends ViewModel {
         return state;
     }
 
-    public void setState(TranslationState state) {
-        this.state = state;
+    /**
+     * Setter for the current state.
+     * CRITICAL FIX: This now fires the property change event to notify listeners (the View).
+     */
+    public void setState(TranslationState newState) {
+        // 1. Store the old state reference before overwriting it
+        TranslationState oldState = this.state;
+
+        // 2. Update the internal state with the new value from the Presenter
+        this.state = newState;
+
+        // 3. Fire the property change event to notify the PostReadingView
+        support.firePropertyChange(STATE_PROPERTY_NAME, oldState, this.state);
     }
 }

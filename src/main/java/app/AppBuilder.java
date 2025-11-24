@@ -139,7 +139,6 @@ public class AppBuilder {
     public AppBuilder addTranslationUseCase() {
         // --- CRITICAL DEPENDENCY INJECTION STEP ---
         // --- FIX: Instantiates the TranslationViewModel to prevent NullPointerException ---
-        this.translationViewModel = new TranslationViewModel();
         // 1. Instantiate the REAL Data Access Object (using the Generative Language API)
         final TranslationDataAccessInterface translationDataAccessObject = new TranslationDataAccessObject();
 

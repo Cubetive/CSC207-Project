@@ -1,26 +1,30 @@
 [
   {
+    "id": 1,
     "title": "SomeTitle",
     "username": "SomeUsername",
     "date": "11/17/2025",
     "content": "Some random description and extra words",
     "Replies": [
       {
+        "id": 101,
         "username": "Commenter1",
         "date":"11/17/2025",
         "content": "Some random first comment.",
         "replies": []
       },
       {
+        "id": 102,
         "username": "Commenter2",
         "date":"11/17/2025",
         "content": "Some random second comment.",
         "replies": [
           {
-          "username": "Responder_To_Commenter2",
-          "date": "11/17/2025",
-          "content": "Some random response to the second comment",
-          "replies": []
+            "id": 103,
+            "username": "Responder_To_Commenter2",
+            "date": "11/17/2025",
+            "content": "Some random response to the second comment",
+            "replies": []
           }
         ]
       }

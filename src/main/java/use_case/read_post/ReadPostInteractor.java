@@ -1,6 +1,5 @@
 package use_case.read_post;
 
-import entities.Post;
 import entities.OriginalPost;
 import entities.ReplyPost;
 
@@ -24,30 +23,21 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
     @Override
     public void execute(ReadPostInputData inputData) {
         try {
-            final Post post = postDataAccess.getPostById(inputData.getPostId());
+            final OriginalPost post = postDataAccess.getPostById(inputData.getPostId());
 
             if (post == null) {
                 outputBoundary.prepareFailView("Post not found with ID: " + inputData.getPostId());
                 return;
             }
 
-            // Only OriginalPosts can be read directly (replies are nested within posts)
-            if (!(post instanceof OriginalPost)) {
-                outputBoundary.prepareFailView("The selected item is a reply, not a post. Please select an original post.");
-                return;
-            }
-
-            final OriginalPost originalPost = (OriginalPost) post;
-
             // Convert entity to output data
-            final int[] votes = originalPost.getVotes();
-            final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(originalPost.getReplies());
+            final int[] votes = post.getVotes();
+            final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(post.getReplies());
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
-                    originalPost.getId(),
-                    originalPost.getTitle(),
-                    originalPost.getContent(),
-                    originalPost.getCreatorUsername(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatorUsername(),
                     votes[0],  // upvotes
                     votes[1],  // downvotes
                     replyDataList
@@ -55,8 +45,6 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
 
             outputBoundary.prepareSuccessView(outputData);
 
-        } catch (ClassCastException e) {
-            outputBoundary.prepareFailView("Failed to load post: The selected item is not a valid post.");
         } catch (Exception e) {
             outputBoundary.prepareFailView("Failed to load post: " + e.getMessage());
         }
@@ -73,7 +61,6 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             final List<ReadPostOutputData.ReplyData> nestedReplies = convertReplies(reply.getReplies());
 
             final ReadPostOutputData.ReplyData replyData = new ReadPostOutputData.ReplyData(
-                    reply.getId(),
                     reply.getCreatorUsername(),
                     reply.getContent(),
                     votes[0],  // upvotes

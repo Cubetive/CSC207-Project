@@ -182,24 +182,31 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 return;
             }
 
-            translateButton.setEnabled(false);
-            translationStatusLabel.setText("Translating...");
-            translatedContentArea.setText("Loading translation...");
+            try { // <-- START try block here
+                translateButton.setEnabled(false);
+                translationStatusLabel.setText("Translating...");
+                translatedContentArea.setText("Loading translation...");
 
-            String targetLanguage = (String) languageDropdown.getSelectedItem();
-            final long postId = currentPostId;
-            final String content = textContent;
-            // FIX: Use SwingWorker to execute the blocking controller call in the background
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    // This runs on a worker thread (non-EDT)
-                    // FIX: Calls the synchronous Interactor via the Controller
-                    translationController.execute(postId, content, targetLanguage);
-                    return null;
-                }
-                // The result is handled by the ViewModel/Presenter updating the UI via propertyChange
-            }.execute();
+                String targetLanguage = (String) languageDropdown.getSelectedItem();
+                final long postId = currentPostId;
+                final String content = textContent;
+
+                // NEW DEBUG LINE
+                System.out.println("DEBUG: Main Post Translation attempting to start with PostID: " + postId + " and Content length: " + content.length());
+
+                // FIX: Use SwingWorker to execute the blocking controller call in the background
+                new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        translationController.execute(postId, content, targetLanguage);
+                        return null;
+                    }
+                }.execute();
+            } catch (Exception ex) {
+                // CATCH ANY EXCEPTION ON THE EDT BEFORE THE WORKER STARTS
+                System.err.println("CRASH: Main Post Translation failed on EDT!");
+                ex.printStackTrace();
+            }
         });
 
         controlPanel.add(translateLabel);
@@ -356,62 +363,69 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         } else if (evt.getSource() == translationViewModel) {
             if ("state".equals(evt.getPropertyName())) {
                 final TranslationState state = (TranslationState) evt.getNewValue();
-                handleTranslationChange(state);
+                // CRITICAL FIX: Ensure UI updates happen on the EDT
+                SwingUtilities.invokeLater(() -> {
+                    handleTranslationChange(state);
+                    System.out.println("DEBUG: handleTranslationChange EXECUTED on EDT for comment/reply.");
+                });
+                // ************************************************
             }
         }
     }
-
 
     /**
      * Handles updates from the TranslationViewModel.
      */
     private void handleTranslationChange(TranslationState state) {
-        // Find which component to update: Main Post or a Comment
+        System.out.println("DEBUG: handleTranslationChange called. Success: " + state.isTranslationSuccessful()); //For Debugging
         if (lastTextTranslatedKey == null) {
             // --- UPDATE MAIN POST TRANSLATION UI ---
             if (translateButton != null) {
-                translateButton.setEnabled(true); // Re-enable button
+                translateButton.setEnabled(true);
             }
 
-            if (state.isTranslationSuccessful()) {
-                if (translatedContentArea != null) {
-                    translatedContentArea.setText(state.getTranslatedText());
-                }
-                if (translationStatusLabel != null) {
+            JTextArea targetArea = translatedContentArea;
+            JLabel statusLabel = translationStatusLabel;
+
+            if (targetArea != null && statusLabel != null) {
+                if (state.isTranslationSuccessful()) {
+                    targetArea.setText(state.getTranslatedText());
                     String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
-                    translationStatusLabel.setText(
+                    statusLabel.setText(
                             String.format("Translated to %s%s. %s",
                                     state.getTargetLanguage().toUpperCase(),
                                     cacheIndicator,
                                     state.getStatusMessage()
                             )
                     );
+                } else {
+                    targetArea.setText("Translation unavailable.");
+                    statusLabel.setText(state.getStatusMessage());
                 }
-            } else {
-                if (translatedContentArea != null) {
-                    translatedContentArea.setText("Translation unavailable.");
-                }
-                if (translationStatusLabel != null) {
-                    translationStatusLabel.setText(state.getStatusMessage());
-                }
-            }
-            // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
-            if (translatedContentArea != null) {
-                translatedContentArea.revalidate();
-                translatedContentArea.repaint();
 
-                // CRITICAL FIX: Repaint the Scroll Pane that contains the text area
-                translatedContentScrollPane.revalidate(); // Add this line
-                translatedContentScrollPane.repaint();   // Add this line
+                // CRITICAL FIX: Repaint the area and its immediate container
+                targetArea.revalidate();
+                targetArea.repaint();
+                // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
+                if (translatedContentArea != null) {
+                    translatedContentArea.revalidate();
+                    translatedContentArea.repaint();
+                }
+                // CRITICAL FIX: Repaint the scroll pane that wraps the main post translation
+                if (translatedContentScrollPane != null) {
+                    translatedContentScrollPane.revalidate();
+                    translatedContentScrollPane.repaint();
+                }
             }
         } else {
             // --- UPDATE COMMENT TRANSLATION UI ---
-
-            // Get the specific components for the last requested comment
             JTextArea commentArea = commentTranslationAreas.get(lastTextTranslatedKey);
             JLabel commentStatus = commentTranslationStatusLabels.get(lastTextTranslatedKey);
-            // FIX 2: Retrieve the button reference
             JButton commentButton = commentTranslationButtons.get(lastTextTranslatedKey);
+
+            // ADD THESE LINES
+            System.out.println("DEBUG: Key used: " + lastTextTranslatedKey);
+            System.out.println("DEBUG: commentArea reference is null? " + (commentArea == null));
 
             if (commentArea != null && commentStatus != null) {
                 if (commentButton != null) {
@@ -431,17 +445,26 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     commentArea.setText("Translation unavailable.");
                     commentStatus.setText(state.getStatusMessage());
                 }
-                // FIX: MANDATORY REPAINT CALLS (Add this block here for the comment area)
+
+                // CRITICAL FIX: Repaint the area and its immediate container
                 commentArea.revalidate();
                 commentArea.repaint();
             }
-            // FIX: Ensure the main scroll pane updates its size/layout if necessary
-            scrollPane.revalidate();
-            scrollPane.repaint();
-            repliesPanel.revalidate();
-            repliesPanel.repaint();
+
+            // CRITICAL FIX: Force the layout of the entire replies panel to update
+            if (repliesPanel != null) {
+                repliesPanel.revalidate();
+                repliesPanel.repaint();
+            }
+
             // Reset the comment tracker after receiving a result
             lastTextTranslatedKey = null;
+        }
+
+        // Final safety repaint for the main post scroll pane
+        if (scrollPane != null) {
+            scrollPane.revalidate();
+            scrollPane.repaint();
         }
     }
 
@@ -763,5 +786,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;
     }
+
+
 
 }

@@ -28,12 +28,12 @@ public class TranslationViewModel extends ViewModel {
         super("translate");
     }
 
-//    /**
-//     * Notifies listeners (the View) that the state has changed.
-//     */
-//    public void firePropertyChanged() {
-//        support.firePropertyChange(STATE_PROPERTY_NAME, null, this.state);
-//    }
+    /**
+     * Notifies listeners (the View) that the state has changed.
+     */
+    public void firePropertyChanged() {
+        support.firePropertyChange(STATE_PROPERTY_NAME, null, this.state);
+    }
 
     /**
      * Adds a listener to observe state changes.

@@ -156,6 +156,9 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                             // Extract the text
                             String translatedText = (String) firstTranslation.get("translatedText");
 
+                            // 🔥 CRITICAL DEBUG ADDITION
+                            System.out.println("DAO DEBUG: Successfully Parsed Text: [" + translatedText + "]");
+
                             // Unescape common JSON characters that might be returned in the text value
                             return translatedText.replace("\\\"", "\"").replace("\\n",
                                     "\n").replace("\\/", "/");

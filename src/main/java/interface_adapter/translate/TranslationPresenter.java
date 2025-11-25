@@ -43,6 +43,9 @@ public class TranslationPresenter implements TranslationOutputBoundary {
             translationState.setTargetLanguage(outputData.getTargetLanguage());
             translationState.setTranslationError(null); // Clear any previous error
 
+            // 🔥 CRITICAL FIX: Explicitly set the success flag to TRUE
+            translationState.setTranslationSuccessful(true);
+
             // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);
         });
@@ -63,6 +66,9 @@ public class TranslationPresenter implements TranslationOutputBoundary {
             // 2. Update the state with the error
             translationState.setTranslationError("Error translating: " + errorMessage);
             translationState.setTranslatedText(null); // Clear previous successful translation
+
+            // 🔥 CRITICAL FIX: Explicitly set the success flag to FALSE
+            translationState.setTranslationSuccessful(false);
 
             // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);

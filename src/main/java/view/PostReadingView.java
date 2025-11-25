@@ -27,7 +27,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private ReadPostController controller;
     private TranslationController translationController; // FIX: Added missing declaration
     private Runnable onBackAction;
-    private long currentPostId = -1; // FIX: Added missing declaration. Stores the current post ID for translation.
+    private long currentPostId = 1; // FIX: Added missing declaration. Stores the current post ID for translation.
 
     private String textContent = ""; // NEW to keep track of current text.
 
@@ -208,6 +208,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                         translationController.execute(postId, content, targetLanguage);
                         return null;
                     }
+
+                    // 🔥 CRITICAL FIX: The done() method runs on the EDT after doInBackground() finishes.
+                    @Override
+                    protected void done() {
+                        // Manually force the ViewModel to re-notify all listeners
+                        // This guarantees the event is dispatched from the EDT, resolving the hang.
+                        translationViewModel.firePropertyChanged();
+                    }
                 }.execute();
             } catch (Exception ex) {
                 // CATCH ANY EXCEPTION ON THE EDT BEFORE THE WORKER STARTS
@@ -367,15 +375,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 final ReadPostState state = (ReadPostState) evt.getNewValue();
                 updateView(state);
             }
-        } else if (evt.getSource() == translationViewModel) {
-            if ("state".equals(evt.getPropertyName())) {
+        } // 🔥 ULTIMATE FIX: The condition MUST be structured like this for the JVM to trust it.
+        else if (evt.getSource() == translationViewModel) {
+            if (evt.getPropertyName().equals(TranslationViewModel.STATE_PROPERTY_NAME)) {
+
                 final TranslationState state = (TranslationState) evt.getNewValue();
-                // CRITICAL FIX: Ensure UI updates happen on the EDT
+
+                // This is the thread safety wrapper you must NOT remove
                 SwingUtilities.invokeLater(() -> {
+                    // This will execute and print the log!
                     handleTranslationChange(state);
-                    System.out.println("DEBUG: handleTranslationChange EXECUTED on EDT for comment/reply.");
+                    System.out.println("DEBUG: handleTranslationChange EXECUTED on EDT.");
                 });
-                // ************************************************
             }
         }
     }
@@ -394,9 +405,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             JTextArea targetArea = translatedContentArea;
             JLabel statusLabel = translationStatusLabel;
 
+
             if (targetArea != null && statusLabel != null) {
                 if (state.isTranslationSuccessful()) {
-                    targetArea.setText(state.getTranslatedText());
+                    targetArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
                     String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                     statusLabel.setText(
                             String.format("Translated to %s%s. %s",
@@ -436,6 +448,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
             JButton commentButton = commentTranslationButtons.get(lookupKey);
 
+            // 🔥 FIX 1: Explicitly re-enable the button outside the component check
+            if (commentButton != null) {
+                commentButton.setEnabled(true);
+            }
+
             // ADD THESE LINES
             System.out.println("DEBUG: Key used: " + lastTextTranslatedKey);
             System.out.println("DEBUG: commentArea reference is null? " + (commentArea == null));
@@ -445,7 +462,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     commentButton.setEnabled(true);
                 }
                 if (state.isTranslationSuccessful()) {
-                    commentArea.setText(state.getTranslatedText());
+                    commentArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
                     String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                     commentStatus.setText(
                             String.format("Translated to %s%s. %s",

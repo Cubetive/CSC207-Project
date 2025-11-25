@@ -29,7 +29,39 @@
         ]
       }
     ]
+  },
+  {
+    "id": 2,
+    "title": "SomeTitle2",
+    "username": "SomeUsername",
+    "date": "11/17/2025",
+    "content": "Some random description and extra words 1 2 3 4.",
+    "Replies": [
+      {
+        "id": 201,
+        "username": "Commenter1",
+        "date":"11/17/2025",
+        "content": "Some random first comment. yay",
+        "replies": []
+      },
+      {
+        "id": 202,
+        "username": "Commenter2",
+        "date":"11/17/2025",
+        "content": "Some random second comment. haha",
+        "replies": [
+          {
+            "id": 203,
+            "username": "Responder_To_Commenter2",
+            "date": "11/17/2025",
+            "content": "Some random response to the second comment nah",
+            "replies": []
+          }
+        ]
+      }
+    ]
   }
+
 
 
 

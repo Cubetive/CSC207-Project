@@ -1,6 +1,7 @@
 package use_case.login;
 
 import entities.User;
+import use_case.session.SessionRepository;
 
 /**
  * The Login Interactor.
@@ -8,11 +9,14 @@ import entities.User;
 public class LoginInteractor implements LoginInputBoundary {
     private final LoginDataAccessInterface userDataAccessObject;
     private final LoginOutputBoundary loginPresenter;
+    private final SessionRepository sessionRepository;
 
     public LoginInteractor(LoginDataAccessInterface loginDataAccessInterface,
-                          LoginOutputBoundary loginOutputBoundary) {
+                          LoginOutputBoundary loginOutputBoundary,
+                          SessionRepository sessionRepository) {
         this.userDataAccessObject = loginDataAccessInterface;
         this.loginPresenter = loginOutputBoundary;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -47,6 +51,8 @@ public class LoginInteractor implements LoginInputBoundary {
         }
 
         // Login successful
+        sessionRepository.setCurrentUser(user);
+
         final LoginOutputData loginOutputData = new LoginOutputData(
             user.getUsername(),
             user.getFullName(),

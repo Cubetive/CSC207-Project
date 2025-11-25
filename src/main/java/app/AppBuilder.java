@@ -7,8 +7,10 @@ import view.SignupView;
 import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
+import data_access.InMemorySessionRepository;
 import entities.CommonUserFactory;
 import entities.UserFactory;
+import use_case.session.SessionRepository;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsPresenter;
@@ -56,6 +58,7 @@ public class AppBuilder {
             new FileUserDataAccessObject("users.csv");
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
+    final SessionRepository sessionRepository = new InMemorySessionRepository();
 
     // View models
     private SignupViewModel signupViewModel;
@@ -139,7 +142,7 @@ public class AppBuilder {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
                 signupViewModel, viewManagerModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory);
+                userDataAccessObject, signupOutputBoundary, userFactory, sessionRepository);
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);
@@ -154,7 +157,7 @@ public class AppBuilder {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(
                 loginViewModel, viewManagerModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
-                userDataAccessObject, loginOutputBoundary);
+                userDataAccessObject, loginOutputBoundary, sessionRepository);
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);
@@ -206,6 +209,14 @@ public class AppBuilder {
         });
 
         return this;
+    }
+
+    /**
+     * Gets the session repository for use cases that need to access session state.
+     * @return the session repository
+     */
+    public SessionRepository getSessionRepository() {
+        return sessionRepository;
     }
 
     /**

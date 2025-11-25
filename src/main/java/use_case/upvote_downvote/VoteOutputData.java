@@ -4,7 +4,7 @@ public class VoteOutputData {
     private final int newScore;
     private final long postId;
 
-    VoteOutputData(int newScore, long postId) {
+    public VoteOutputData(int newScore, long postId) {
         this.newScore = newScore;
         this.postId = postId;
     }

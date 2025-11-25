@@ -6,7 +6,7 @@ import java.util.List;
  * Output Data for the Read Post use case.
  */
 public class ReadPostOutputData {
-
+    private final long id; //NEW
     private final String title;
     private final String content;
     private final String username;
@@ -14,14 +14,19 @@ public class ReadPostOutputData {
     private final int downvotes;
     private final List<ReplyData> replies;
 
-    public ReadPostOutputData(String title, String content, String username,
+    public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.username = username;
         this.upvotes = upvotes;
         this.downvotes = downvotes;
         this.replies = replies;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -52,19 +57,25 @@ public class ReadPostOutputData {
      * Data holder for reply information.
      */
     public static class ReplyData {
+        private final long id; //NEW
         private final String username;
         private final String content;
         private final int upvotes;
         private final int downvotes;
         private final List<ReplyData> nestedReplies;
 
-        public ReplyData(String username, String content, int upvotes, int downvotes,
+        public ReplyData(long id, String username, String content, int upvotes, int downvotes,
                         List<ReplyData> nestedReplies) {
+            this.id = id;
             this.username = username;
             this.content = content;
             this.upvotes = upvotes;
             this.downvotes = downvotes;
             this.nestedReplies = nestedReplies;
+        }
+
+        public long getId() {
+            return id;
         }
 
         public String getUsername() {

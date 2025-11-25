@@ -3,12 +3,16 @@ package view;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.upvote_downvote.VoteController;
+import interface_adapter.upvote_downvote.VoteState;
 import use_case.read_post.ReadPostOutputData;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The View for reading a post and its replies.
@@ -17,7 +21,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     private final ReadPostViewModel viewModel;
     private ReadPostController controller;
+    private VoteController voteController; // NEW: Controller for voting logic
     private Runnable onBackAction;
+
+    private long currentPostId = -1;
 
     private final JButton backButton;
     private final JLabel titleLabel;
@@ -30,6 +37,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
+
+    // NEW: Map to hold the vote count labels for replies, keyed by reply ID.
+    private final Map<Long, JLabel> replyVoteLabels = new HashMap<>();
 
     public PostReadingView(ReadPostViewModel viewModel) {
         this.viewModel = viewModel;
@@ -122,6 +132,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         upvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        // NEW: Action Listener for main post upvote
+        upvoteButton.addActionListener(e -> {
+            if (currentPostId != -1 && voteController != null) {
+                // Execute vote with ID of the main post and isUpvote=true
+                voteController.execute(true, currentPostId);
+            }
+        });
+
         downvoteButton = new JButton("\u25BC");  // Down triangle
         downvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         downvoteButton.setFocusPainted(false);
@@ -134,6 +152,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(5, 12, 5, 12)
         ));
         downvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // NEW: Action Listener for main post downvote
+        downvoteButton.addActionListener(e -> {
+            if (currentPostId != -1 && voteController != null) {
+                // Execute vote with ID of the main post and isUpvote=false
+                voteController.execute(false, currentPostId);
+            }
+        });
 
         voteCountLabel = new JLabel("0");
         voteCountLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -211,6 +237,38 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         if ("state".equals(evt.getPropertyName())) {
             final ReadPostState state = (ReadPostState) evt.getNewValue();
             updateView(state);
+        }
+        // NEW: Handle changes from a VoteViewModel (if you implement one)
+        // This is necessary to update the vote count without reloading the entire post.
+        else if (evt.getNewValue() instanceof VoteState) {
+            final VoteState voteState = (VoteState) evt.getNewValue();
+            handleVoteUpdate(voteState);
+        }
+    }
+
+    /**
+     * Handles the update of a single vote count after a successful vote.
+     * @param state The VoteState containing the updated ID and score.
+     */
+    private void handleVoteUpdate(VoteState state) {
+        // FIX: Use getVoteError()
+        if (state.getVoteError() != null) {
+            JOptionPane.showMessageDialog(this, state.getVoteError(),
+                    "Voting Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // FIX: Use getUpdatedId()
+        long updatedId = state.getUpdatedId();
+        // FIX: Use getNewVoteScore()
+        int newScore = state.getNewVoteScore();
+
+        if (updatedId == currentPostId) {
+            // Update the main post's vote count
+            voteCountLabel.setText(String.valueOf(newScore));
+        } else if (replyVoteLabels.containsKey(updatedId)) {
+            // Update a reply's vote count
+            replyVoteLabels.get(updatedId).setText(String.valueOf(newScore));
         }
     }
 
@@ -310,6 +368,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         replyUpvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        // NEW: Action Listener for reply upvote
+        replyUpvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                // Execute vote with ID of the reply and isUpvote=true
+                voteController.execute(true, reply.getId());
+            }
+        });
+
         final JButton replyDownvoteButton = new JButton("\u25BC");
         replyDownvoteButton.setFont(new Font("Arial", Font.PLAIN, 12));
         replyDownvoteButton.setFocusPainted(false);
@@ -323,10 +389,21 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         replyDownvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        // NEW: Action Listener for reply downvote
+        replyDownvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                // Execute vote with ID of the reply and isUpvote=false
+                voteController.execute(false, reply.getId());
+            }
+        });
+
         final JLabel replyVoteCount = new JLabel(String.valueOf(
                 reply.getUpvotes() - reply.getDownvotes()));
         replyVoteCount.setFont(new Font("Arial", Font.BOLD, 13));
         replyVoteCount.setForeground(new Color(100, 100, 100));
+
+        // NEW: Store the vote count label so it can be updated on vote success
+        replyVoteLabels.put(reply.getId(), replyVoteCount);
 
         final JButton replyButton = new JButton(ReadPostViewModel.REPLY_BUTTON_LABEL);
         replyButton.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -374,6 +451,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     public void setController(ReadPostController controller) {
         this.controller = controller;
+    }
+
+    /**
+     * Setter for the VoteController.
+     * @param voteController the VoteController instance.
+     */
+    public void setVoteController(VoteController voteController) {
+        this.voteController = voteController;
     }
 
     public void setOnBackAction(Runnable onBackAction) {

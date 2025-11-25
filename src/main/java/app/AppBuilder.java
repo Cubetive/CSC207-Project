@@ -18,6 +18,9 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.upvote_downvote.VoteController; // NEW
+import interface_adapter.upvote_downvote.VotePresenter; // NEW
+import interface_adapter.upvote_downvote.VoteViewModel; // NEW
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
@@ -27,6 +30,10 @@ import use_case.read_post.ReadPostOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.upvote_downvote.VoteDataAccessInterface; // NEW
+import use_case.upvote_downvote.VoteInputBoundary; // NEW
+import use_case.upvote_downvote.VoteInteractor; // NEW
+import use_case.upvote_downvote.VoteOutputBoundary; // NEW
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,6 +61,7 @@ public class AppBuilder {
     private SignupViewModel signupViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
+    private VoteViewModel voteViewModel; // NEW: Vote ViewModel
 
     // Views
     private SignupView signupView;
@@ -169,6 +177,33 @@ public class AppBuilder {
             viewManagerModel.setState(browsePostsView.getViewName());
             viewManagerModel.firePropertyChanged();
         });
+
+        return this;
+    }
+
+    /**
+     * Adds the Vote Use Case (Upvote/Downvote) to the application.
+     * NOTE: This assumes FilePostDataAccessObject implements VoteDataAccessInterface.
+     * @return this builder
+     */
+    public AppBuilder addVoteUseCase() {
+        voteViewModel = new VoteViewModel();
+
+        final VoteOutputBoundary voteOutputBoundary =
+                new VotePresenter(voteViewModel, viewManagerModel);
+
+        final VoteInputBoundary voteInteractor = new VoteInteractor(
+                (VoteDataAccessInterface) postDataAccessObject, // Cast is required
+                voteOutputBoundary
+        );
+
+        final VoteController voteController = new VoteController(voteInteractor);
+
+        // PostReadingView needs to listen to the VoteViewModel's changes
+        voteViewModel.addPropertyChangeListener(postReadingView);
+
+        // PostReadingView needs the VoteController to handle button clicks
+        postReadingView.setVoteController(voteController);
 
         return this;
     }

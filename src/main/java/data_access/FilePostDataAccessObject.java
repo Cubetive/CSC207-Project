@@ -9,19 +9,22 @@ import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
 import use_case.upvote_downvote.VoteOutputData; //NEW
+import use_case.upvote_downvote.VoteDataAccessInterface;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 /**
  * File-based implementation of the DAO for reading post data from JSON.
  */
-public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface, ReadPostDataAccessInterface {
+public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface, ReadPostDataAccessInterface, VoteDataAccessInterface{
 
     private final String filePath;
     private final Gson gson;
@@ -103,7 +106,6 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
             repliesList.add(reply);
         }
     }
-
     // =========================================================================
     // VOTE USE CASE IMPLEMENTATION (NEW METHODS)
     // =========================================================================
@@ -177,20 +179,20 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
         int newDownvotes;
 
         // Assuming OriginalPost/ReplyPost has standard getters/setters for votes
-        if (wrapper.getContent() instanceof OriginalPost post) {
-            ArrayList<Integer> newVote =  new ArrayList<>();
+        if (wrapper.getContent() instanceof OriginalPost) {
+            // Assuming post.getVotes() returns a structure where index 0 is upvotes and 1 is downvotes,
+            // but the entity is built with separate getUpvotes/getDownvotes. Using the individual methods.
+            OriginalPost post = (OriginalPost) wrapper.getContent();
             newUpvotes = post.getVotes()[0] + (isUpvote ? 1 : 0);
             newDownvotes = post.getVotes()[1] + (isUpvote ? 0 : 1);
-            newVote.add(newUpvotes);
-            newVote.add(newDownvotes);
-            // post.votes = newVote; -- TODO: Need to fix this
-        } else if (wrapper.getContent() instanceof ReplyPost reply) {
-            ArrayList<Integer> newVote =  new ArrayList<>();
+//            post.setUpvotes(newUpvotes); // ASSUMING setUpvotes/setDownvotes exist TODO: FIX
+//            post.setDownvotes(newDownvotes);
+        } else if (wrapper.getContent() instanceof ReplyPost) {
+            ReplyPost reply = (ReplyPost) wrapper.getContent();
             newUpvotes = reply.getVotes()[0] + (isUpvote ? 1 : 0);
             newDownvotes = reply.getVotes()[1] + (isUpvote ? 0 : 1);
-            newVote.add(newUpvotes);
-            newVote.add(newDownvotes);
-            // reply.votes = newVote; -- TODO: need to fix this
+//            reply.setUpvotes(newUpvotes); // ASSUMING setUpvotes/setDownvotes exist TODO: FIX
+//            reply.setDownvotes(newDownvotes);
         } else {
             // Should not happen based on logic, but for safety
             throw new RuntimeException("Content type not supported for voting.");
@@ -201,7 +203,49 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
 
         // 5. Calculate new score and return output data
         int newScore = newUpvotes - newDownvotes;
-        return new VoteOutputData(id, newScore, wrapper.getParentPostId());
+        // Corrected VoteOutputData constructor call
+        return new VoteOutputData(newScore, wrapper.getParentPostId());
+    }
+
+    /**
+     * Writes the entire list of posts back to the JSON file.
+     * @param posts The list of posts to save.
+     */
+    private void saveAllPosts(List<OriginalPost> posts) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            // Write the entire posts list as a JSON array
+            gson.toJson(posts, writer);
+        } catch (IOException e) {
+            System.err.println("Error writing posts to file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Recursively sorts a list of replies based on their vote score (Upvotes - Downvotes),
+     * ensuring the highest-scoring replies appear first.
+     */
+    private void sortRepliesRecursively(List<ReplyPost> replies) {
+        if (replies == null || replies.isEmpty()) {
+            return;
+        }
+
+        // Sort the current level of replies in DESCENDING order of score
+        replies.sort(Comparator.comparingInt(reply -> {
+            // Score = Upvotes - Downvotes
+            int[] votes = ((ReplyPost) reply).getVotes();
+            if (votes != null && votes.length >= 2) {
+                // Accessing array elements using [0] and [1]
+                return votes[0] - votes[1];
+            }
+            return 0; // Default to zero score if vote data is incomplete
+        }).reversed()); // .reversed() ensures highest score is first
+
+        // Recurse into nested replies
+        for (ReplyPost reply : replies) {
+            if (reply.getReplies() != null) {
+                sortRepliesRecursively(reply.getReplies());
+            }
+        }
     }
 
     /**
@@ -224,28 +268,6 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
 
         public long getParentPostId() {
             return parentPostId;
-        }
-    }
-    /**
-     * Recursively sorts a list of replies based on their vote score (Upvotes - Downvotes),
-     * ensuring the highest-scoring replies appear first.
-     */
-    private void sortRepliesRecursively(List<ReplyPost> replies) {
-        if (replies == null || replies.isEmpty()) {
-            return;
-        }
-
-        // Sort the current level of replies in DESCENDING order of score
-        replies.sort(Comparator.comparingInt(reply -> {
-            // Score = Upvotes - Downvotes
-            return reply.getUpvotes() - reply.getDownvotes();
-        }).reversed()); // .reversed() ensures highest score is first
-
-        // Recurse into nested replies
-        for (ReplyPost reply : replies) {
-            if (reply.getReplies() != null) {
-                sortRepliesRecursively(reply.getReplies());
-            }
         }
     }
 

@@ -58,7 +58,7 @@ public class AppBuilder {
             new FileUserDataAccessObject("users.csv");
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
-
+    final TranslationDataAccessObject translationDataAccessObject = new TranslationDataAccessObject();
     // View models
     private SignupViewModel signupViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
@@ -140,22 +140,24 @@ public class AppBuilder {
         // --- CRITICAL DEPENDENCY INJECTION STEP ---
         // --- FIX: Instantiates the TranslationViewModel to prevent NullPointerException ---
         // 1. Instantiate the REAL Data Access Object (using the Generative Language API)
-        final TranslationDataAccessInterface translationDataAccessObject = new TranslationDataAccessObject();
 
         // 2. Setup the Output Boundary (Presenter)
         final TranslationOutputBoundary translationOutputBoundary =
                 new TranslationPresenter(translationViewModel, viewManagerModel);
 
-        // 3. Setup the Interactor (Use Case)
+        // 3. Setup the Interactor (Use Case) //FIX: changed from readPostDataAccessInterface to postDataAccessObject
         final TranslationInputBoundary translationInteractor =
-                new TranslationInteractor(readPostDataAccessInterface, translationDataAccessObject,
+                new TranslationInteractor(postDataAccessObject, this.translationDataAccessObject,
                         translationOutputBoundary);
 
         // 4. Create the Controller
         translationController = new TranslationController(translationInteractor);
 
         // The controller is stored and will be passed to PostReadingView in addReadPostView().
-
+        // FIX: Inject the Controller into the PostReadingView
+        if (postReadingView != null) {
+            postReadingView.setTranslationController(translationController);
+        }
         return this;
     }
 

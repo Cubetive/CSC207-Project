@@ -6,7 +6,7 @@ import java.util.List;
  * Output Data for the Read Post use case.
  */
 public class ReadPostOutputData {
-    private final long id; // 🔥 CRITICAL ADDITION
+    private final long id;
     private final String title;
     private final String content;
     private final String username;

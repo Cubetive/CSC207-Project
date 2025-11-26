@@ -27,25 +27,18 @@ import java.util.Map;
  */
 public class TranslationDataAccessObject implements TranslationDataAccessInterface {
 
-    // --- Simulated Cache (Replaces a real database/Firestore collection) ---
     // Key format: "postId_languageCode" (e.g., "123_fr")
     private final Map<String, String> translationCache = new HashMap<>();
 
-    // NOTE: In a real environment, load this from environment variables.
     private static final String API_KEY; // Use the provided empty string
     private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
-    // FIX: HTTP_CLIENT is no longer used, but kept for completeness in the file structure
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
-
-    // Simple set of supported language codes for demonstration purposes
-    private static final Set<String> SUPPORTED_LANGUAGES = Set.of("en", "es", "fr", "de", "ja", "ko");
+    private static final Set<String> SUPPORTED_LANGUAGES = Set.of( "ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru");
 
     // Helper function for creating the unique cache key
     private String createCacheKey(long postId, String languageCode) {
         return postId + "_" + languageCode.toLowerCase(Locale.ROOT);
     }
 
-    // FIX: Static initializer block to load the API key from the local, uncommitted file
     static {
         String key = null;
         try (InputStream input = new FileInputStream("secrets.properties")) {
@@ -71,7 +64,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
      * @return The translated text, or an error message if translation fails.
      */
     public String getTranslation(String text, String targetLang) {
-        HttpURLConnection connection = null; // FIX: Declare connection outside try block for finally access
+        HttpURLConnection connection = null;
 
         if (text == null || text.trim().isEmpty()) {
             return "ERROR: Cannot translate empty text.";
@@ -80,31 +73,27 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             return "ERROR: Invalid or unsupported target language code provided: " + targetLang;
         }
 
-        // FIX: Check for API Key
         if (API_KEY == null || API_KEY.trim().isEmpty()) {
             return "ERROR: Missing API Key. Please set the GOOGLE_API_KEY environment variable.";
         }
 
         try {
-            // FIX: Reverted to URL Encode the text content (for GET)
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
 
-            // FIX: Reverted to Build the full URL using GET query parameters (from demo)
             String fullApiUrl = String.format(
                     "%s?target=%s&key=%s&q=%s",
                     TRANSLATE_API_BASE_URL,
                     targetLang,
-                    API_KEY, // FIX: Use the class API_KEY field
+                    API_KEY,
                     encodedText
             );
 
-            // FIX: Reverted to Setup Connection
             URL url = new URL(fullApiUrl);
-            connection = (HttpURLConnection) url.openConnection(); // FIX: Assign connection variable
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
-            connection.setConnectTimeout(15000); // FIX: Add 15-second connect timeout
-            connection.setReadTimeout(15000);    // FIX: Add 15-second read timeout
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
 
             // Get the response code (Blocking call)
             int responseCode = connection.getResponseCode();
@@ -120,7 +109,6 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             StringBuilder response = new StringBuilder();
             String responseLine;
             // Read lines and join them, removing newline characters
-            // FIX: Ensure stream is read until end to prevent blocking/hanging connection
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
@@ -128,11 +116,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
 
             String apiResponse = response.toString();
 
-            // FIX: Add logging immediately after network I/O to diagnose where it stops
-            System.out.println("DEBUG: DAO Finished I/O. Response Code: " + responseCode);
-
             if (responseCode != 200) {
-                // FIX: Standardize error response
                 return String.format("ERROR: Translation API Error (%d): %s", responseCode, apiResponse);
             }
 
@@ -156,9 +140,6 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                             // Extract the text
                             String translatedText = (String) firstTranslation.get("translatedText");
 
-                            // 🔥 CRITICAL DEBUG ADDITION
-                            System.out.println("DAO DEBUG: Successfully Parsed Text: [" + translatedText + "]");
-
                             // Unescape common JSON characters that might be returned in the text value
                             return translatedText.replace("\\\"", "\"").replace("\\n",
                                     "\n").replace("\\/", "/");
@@ -177,15 +158,12 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             System.err.println("FATAL I/O/TIMEOUT ERROR: " + e.getMessage()); // FIX: Better error logging
             return "ERROR: Translation Failed (Network/IO): " + e.getMessage();
         } finally {
-            // FIX: CRITICAL: Ensure the connection is explicitly disconnected to free resources
             if (connection != null) {
                 connection.disconnect();
             }
         }
     }
 
-    // ... (SimpleJsonParser implementation remains the same) ...
-    // The rest of the SimpleJsonParser and saveTranslatedContent implementation follows below.
     /**
      * A JSON parser to avoid external dependencies.
      * It parses the JSON string into standard Java Map and List objects.
@@ -259,7 +237,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                     value = parseArray(content.substring(i + 1, arrayEnd));
                     i = arrayEnd + 1;
                 } else {
-                    // Simple value (number, boolean, null) - not strictly needed for this API response, but good practice
+                    // Simple value (number, boolean, null)
                     int valueEnd = content.indexOf(',', i);
                     if (valueEnd == -1) valueEnd = content.length();
                     String simpleValue = content.substring(i, valueEnd).trim();
@@ -361,6 +339,5 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {
         String key = createCacheKey(postId, targetLanguageCode);
         translationCache.put(key, translatedText);
-        System.out.println("DEBUG: Translation for Post ID " + postId + " saved to cache.");
     }
 }

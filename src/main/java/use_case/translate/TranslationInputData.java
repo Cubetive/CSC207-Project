@@ -35,9 +35,6 @@ public class TranslationInputData {
         this.textContent = textContent;
     }
 
-    // NOTE: The previous constructor with only (targetLanguage, postId) is removed
-    // because it was incomplete and bypassed caching logic in the interactor.
-
     public String getTargetLanguage() {
         return targetLanguage;
     }

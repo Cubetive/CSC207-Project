@@ -33,16 +33,12 @@ public class TranslationController {
      * @param postId The id of the post.
      * @param targetLanguage The language code (e.g., "es", "fr") to translate into.
      */
-// 💡 Add the textContent parameter here
     public void execute(long postId, String textContent, String targetLanguage) {
-        // 1. Package the raw input data into the TranslationInputData DTO (Post ID and textContent are needed).
         TranslationInputData inputData = new TranslationInputData(
                 targetLanguage,
-                postId, // 💡 Pass the postId
-                textContent // 💡 Pass the text content
+                postId,
+                textContent
         );
-
-        // 2. Delegate the execution to the Use Case Interactor via the boundary interface.
         translationInputBoundary.execute(inputData);
     }
 
@@ -53,14 +49,10 @@ public class TranslationController {
      * @param targetLanguage The language code (e.g., "es", "fr") to translate into.
      */
     public void execute(String rawText, String targetLanguage) {
-        // 1. Package the raw input data into the TranslationInputData DTO (using the raw text constructor).
-        // The Interactor will know this is a raw text translation because postId will be null.
         TranslationInputData inputData = new TranslationInputData(
                 targetLanguage,
                 rawText
         );
-
-        // 2. Delegate the execution to the Use Case Interactor via the boundary interface.
         translationInputBoundary.execute(inputData);
     }
 }

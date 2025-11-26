@@ -24,7 +24,6 @@ public class TranslationOutputData {
         this.isFromCache = isFromCache;
     }
 
-    // Getters
     public String getTranslatedText() {
         return translatedText;
     }

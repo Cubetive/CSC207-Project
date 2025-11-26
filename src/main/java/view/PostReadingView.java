@@ -23,20 +23,18 @@ import java.util.Set;
 public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     private final ReadPostViewModel viewModel;
-    private TranslationViewModel translationViewModel = new TranslationViewModel(); // NEW: Translation ViewModel
+    private TranslationViewModel translationViewModel = new TranslationViewModel();
     private ReadPostController controller;
-    private TranslationController translationController; // FIX: Added missing declaration
+    private TranslationController translationController;
     private Runnable onBackAction;
-    private long currentPostId = 1; // FIX: Added missing declaration. Stores the current post ID for translation.
+    private long currentPostId = 1;
 
-    private String textContent = ""; // NEW to keep track of current text.
+    private String textContent = "";
 
     // Fields to track translation UI elements for COMMENTS
     private final Map<String, JTextArea> commentTranslationAreas = new HashMap<>();
     private final Map<String, JLabel> commentTranslationStatusLabels = new HashMap<>();
-    // FIX 1B: New map to track the dynamically created buttons so they can be re-enabled.
     private final Map<String, JButton> commentTranslationButtons = new HashMap<>();
-    // This key (original text content) is used to map the result back to the correct comment UI
     private String lastTextTranslatedKey = null;
     private final Set<String> translationsInProgress = new HashSet<>();
     private static final String MAIN_POST_KEY = "MAIN_POST";
@@ -47,7 +45,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JLabel authorLabel;
     private final JTextArea contentArea;
 
-    // NEW: Translation UI Components
+    // Translation UI Components
     private final JLabel translateLabel;
     private final JComboBox<String> languageDropdown;
     private final JButton translateButton;
@@ -55,7 +53,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private JLabel translationStatusLabel;
     private final JScrollPane translatedContentScrollPane;
     // Supported languages for the dropdown
-    private static final String[] SUPPORTED_LANGUAGES = {"en", "es", "fr", "de", "ja"};
+    private static final String[] SUPPORTED_LANGUAGES = {"ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru"};
 
 
     private final JButton upvoteButton;
@@ -70,8 +68,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
         this.translationViewModel = translationViewModel;
-
-        // FIX: Register the view as a listener for Translation updates
         this.translationViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
@@ -144,8 +140,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         contentContainer.add(contentArea, BorderLayout.CENTER);
 
-        // --- NEW: Translation Controls and Display ---
-
+        // Translation Controls and Display
         final JPanel translationPanel = new JPanel();
         translationPanel.setLayout(new BoxLayout(translationPanel, BoxLayout.Y_AXIS));
         translationPanel.setBackground(new Color(245, 245, 245));
@@ -160,9 +155,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translateLabel = new JLabel("Translate to:");
         translateLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        // Hardcoding languages, assuming TranslationViewModel.SUPPORTED_LANGUAGES exists
-        final String[] languages = {"en", "es", "fr", "de", "ja"};
-        languageDropdown = new JComboBox<>(languages);
+        languageDropdown = new JComboBox<>(SUPPORTED_LANGUAGES);
         languageDropdown.setSelectedItem("es");
 
         translateButton = new JButton("Translate Post");
@@ -186,22 +179,17 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 return;
             }
 
-            try { // <-- START try block here
+            try {
                 translateButton.setEnabled(false);
                 translationStatusLabel.setText("Translating...");
                 translatedContentArea.setText("Loading translation...");
 
-                // 🔥 SET LOCK FOR MAIN POST
                 translationsInProgress.add(MAIN_POST_KEY);
 
                 String targetLanguage = (String) languageDropdown.getSelectedItem();
                 final long postId = currentPostId;
                 final String content = textContent;
 
-                // NEW DEBUG LINE
-                System.out.println("DEBUG: Main Post Translation attempting to start with PostID: " + postId + " and Content length: " + content.length());
-
-                // FIX: Use SwingWorker to execute the blocking controller call in the background
                 new SwingWorker<Void, Void>() {
                     @Override
                     protected Void doInBackground() throws Exception {
@@ -209,16 +197,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                         return null;
                     }
 
-                    // 🔥 CRITICAL FIX: The done() method runs on the EDT after doInBackground() finishes.
                     @Override
                     protected void done() {
-                        // Manually force the ViewModel to re-notify all listeners
-                        // This guarantees the event is dispatched from the EDT, resolving the hang.
                         translationViewModel.firePropertyChanged();
                     }
                 }.execute();
             } catch (Exception ex) {
-                // CATCH ANY EXCEPTION ON THE EDT BEFORE THE WORKER STARTS
                 System.err.println("CRASH: Main Post Translation failed on EDT!");
                 ex.printStackTrace();
             }
@@ -230,14 +214,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translationPanel.add(controlPanel);
 
         // Translation Status and Content Area
-        translationStatusLabel = new JLabel("Select a language and click Translate."); // Initialization
+        translationStatusLabel = new JLabel("Select a language and click Translate.");
         translationStatusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         translationStatusLabel.setForeground(new Color(150, 150, 150));
         translationStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         translationPanel.add(translationStatusLabel);
         translationPanel.add(Box.createVerticalStrut(5));
 
-        translatedContentArea = new JTextArea(4, 40); // Initialization
+        translatedContentArea = new JTextArea(4, 40);
         translatedContentArea.setEditable(false);
         translatedContentArea.setLineWrap(true);
         translatedContentArea.setWrapStyleWord(true);
@@ -253,8 +237,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translatedContentScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 
         translationPanel.add(translatedContentScrollPane);
-
-        // --- End Translation UI ---
 
         // Vote panel
         final JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -336,7 +318,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Add components to main panel
         mainPanel.add(contentContainer);
-        // INSERTING TRANSLATION PANEL HERE
+        // Add translation panel.
         mainPanel.add(translationPanel);
 
         mainPanel.add(Box.createVerticalStrut(15));
@@ -360,14 +342,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.add(scrollPane, BorderLayout.CENTER);
     }
 
-//    @Override
-//    public void propertyChange(PropertyChangeEvent evt) {
-//        if ("state".equals(evt.getPropertyName())) {
-//            final ReadPostState state = (ReadPostState) evt.getNewValue();
-//            updateView(state);
-//        }
-//    }
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == viewModel) {
@@ -375,17 +349,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 final ReadPostState state = (ReadPostState) evt.getNewValue();
                 updateView(state);
             }
-        } // 🔥 ULTIMATE FIX: The condition MUST be structured like this for the JVM to trust it.
+        }
         else if (evt.getSource() == translationViewModel) {
             if (evt.getPropertyName().equals(TranslationViewModel.STATE_PROPERTY_NAME)) {
 
                 final TranslationState state = (TranslationState) evt.getNewValue();
 
-                // This is the thread safety wrapper you must NOT remove
                 SwingUtilities.invokeLater(() -> {
-                    // This will execute and print the log!
                     handleTranslationChange(state);
-                    System.out.println("DEBUG: handleTranslationChange EXECUTED on EDT.");
                 });
             }
         }
@@ -395,16 +366,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
      * Handles updates from the TranslationViewModel.
      */
     private void handleTranslationChange(TranslationState state) {
-        System.out.println("DEBUG: handleTranslationChange called. Success: " + state.isTranslationSuccessful()); //For Debugging
         if (lastTextTranslatedKey == null) {
-            // --- UPDATE MAIN POST TRANSLATION UI ---
             if (translateButton != null) {
                 translateButton.setEnabled(true);
             }
 
             JTextArea targetArea = translatedContentArea;
             JLabel statusLabel = translationStatusLabel;
-
 
             if (targetArea != null && statusLabel != null) {
                 if (state.isTranslationSuccessful()) {
@@ -421,90 +389,81 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     targetArea.setText("Translation unavailable.");
                     statusLabel.setText(state.getStatusMessage());
                 }
-
-//                // CRITICAL FIX: Repaint the area and its immediate container
-//                targetArea.revalidate();
-//                targetArea.repaint();
-//                // FIX: MANDATORY REPAINT CALLS (Add this block here for the main post)
-//                if (translatedContentArea != null) {
-//                    translatedContentArea.revalidate();
-//                    translatedContentArea.repaint();
-//                }
-                // CRITICAL FIX: Repaint the scroll pane that wraps the main post translation
                 if (translatedContentScrollPane != null) {
                     translatedContentScrollPane.revalidate();
                     translatedContentScrollPane.repaint();
                 }
-                // 🔥 CLEAR LOCK FOR MAIN POST
                 translationsInProgress.remove(MAIN_POST_KEY);
             }
-        } else {
-            // --- UPDATE COMMENT TRANSLATION UI ---
-
-            // 🔥 NORMALIZE KEY FOR RETRIEVAL
+        }
+        else {
             String lookupKey = lastTextTranslatedKey.trim();
 
-            JTextArea commentArea = commentTranslationAreas.get(lookupKey);
-            JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
-            JButton commentButton = commentTranslationButtons.get(lookupKey);
+            try {
+                JTextArea commentArea = commentTranslationAreas.get(lookupKey);
+                JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
+                JButton commentButton = commentTranslationButtons.get(lookupKey);
 
-            // 🔥 FIX 1: Explicitly re-enable the button outside the component check
-            if (commentButton != null) {
-                commentButton.setEnabled(true);
-            }
-
-            // ADD THESE LINES
-            System.out.println("DEBUG: Key used: " + lastTextTranslatedKey);
-            System.out.println("DEBUG: commentArea reference is null? " + (commentArea == null));
-
-            if (commentArea != null && commentStatus != null) {
                 if (commentButton != null) {
                     commentButton.setEnabled(true);
                 }
-                if (state.isTranslationSuccessful()) {
-                    commentArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
-                    String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
-                    commentStatus.setText(
-                            String.format("Translated to %s%s. %s",
-                                    state.getTargetLanguage().toUpperCase(),
-                                    cacheIndicator,
-                                    state.getStatusMessage()
-                            )
-                    );
-                } else {
-                    commentArea.setText("Translation unavailable.");
-                    commentStatus.setText(state.getStatusMessage());
+
+                if (commentArea != null && commentStatus != null) {
+                    if (state.isTranslationSuccessful()) {
+                        // Ensure text is not null
+                        String text = state.getTranslatedText() != null ? state.getTranslatedText() : "";
+                        commentArea.setText(text);
+
+                        String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                        commentStatus.setText(
+                                String.format("Translated to %s%s. %s",
+                                        state.getTargetLanguage().toUpperCase(),
+                                        cacheIndicator,
+                                        state.getStatusMessage()
+                                )
+                        );
+                    } else {
+                        commentArea.setText("Translation unavailable.");
+                        commentStatus.setText(state.getStatusMessage());
+                    }
+
+                    try {
+                        commentArea.setPreferredSize(null);
+                        commentArea.setSize(commentArea.getPreferredSize());
+
+                        JScrollPane parentScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
+                        if (parentScrollPane != null) {
+                            parentScrollPane.setViewportView(commentArea);
+                            parentScrollPane.revalidate();
+                            parentScrollPane.repaint();
+                        }
+
+                        commentArea.revalidate();
+                        commentArea.repaint();
+                    } catch (Exception e) {
+                        System.err.println("ERROR: Failed during comment repaint/resize: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
 
-                // CRITICAL FIX: Repaint the area and its immediate container
-                commentArea.revalidate();
-                commentArea.repaint();
-            }
+                if (repliesPanel != null) {
+                    repliesPanel.revalidate();
+                    repliesPanel.repaint();
+                }
 
-            // CRITICAL FIX: Force the layout of the entire replies panel to update
-            if (repliesPanel != null) {
-                repliesPanel.revalidate();
-                repliesPanel.repaint();
+            } catch (Exception e) {
+                System.err.println("CRASH: Unhandled exception in Comment Translation logic!");
+                e.printStackTrace();
+            } finally {
+                translationsInProgress.remove(lookupKey);
+                lastTextTranslatedKey = null;
             }
-            // 🔥 CLEAR LOCK FOR COMMENT
-            translationsInProgress.remove(lookupKey);
-
-            // Reset the comment tracker after receiving a result
-            lastTextTranslatedKey = null;
         }
 
-        // Final safety repaint for the main post scroll pane
-        if (scrollPane != null) {
-            scrollPane.revalidate();
-            scrollPane.repaint();
-        }
-        // 🔥 FINAL FIX: Ensure the entire view container is repainted
-        // This tells the main scroll pane to recalculate its content size, eliminating the hang.
         if (this.getParent() != null) {
             this.getParent().revalidate();
             this.getParent().repaint();
         }
-        // 🔥 ULTIMATE SAFETY CALL: Invalidate the view itself to force parent redrawing
         this.invalidate();
         this.revalidate();
         this.repaint();
@@ -531,9 +490,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private void clearCommentTranslationDisplays() {
         commentTranslationAreas.clear();
         commentTranslationStatusLabels.clear();
-        // FIX 3: Clear the button map as well
         commentTranslationButtons.clear();
-        // The individual reply panels will be recreated and refreshed by updateView/repliesPanel.removeAll()
     }
 
     /**
@@ -545,24 +502,17 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        // NEW: If a new post loaded, set the currentPostId.
-        // Assuming getPostId() returns a String ID.
         this.currentPostId = state.getId();
         textContent = state.getContent();
 
         if (!translationsInProgress.isEmpty()) {
-            System.out.println("DEBUG: Skipping view update because translation is in progress.");
             return;
         }
-        // NEW Clear previous translation when a new post is loaded
         clearTranslationDisplay();
         clearCommentTranslationDisplays();
 
         setTranslationController(translationController);
 
-        // FIX: Update currentPostId when a post is successfully loaded
-        // Assuming ReadPostState has a getPostId() method:
         titleLabel.setText(state.getTitle());
         authorLabel.setText(state.getUsername());
         contentArea.setText(state.getContent());
@@ -634,7 +584,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyContent.setAlignmentX(Component.LEFT_ALIGNMENT);
         replyContent.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // --- NEW: Comment Translation Controls and Display ---
+        // --- Comment Translation Controls and Display ---
         final JPanel commentTranslationPanel = new JPanel();
         commentTranslationPanel.setLayout(new BoxLayout(commentTranslationPanel, BoxLayout.Y_AXIS));
         commentTranslationPanel.setBackground(Color.WHITE);
@@ -673,7 +623,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         // Store references for later updating in propertyChange
         commentTranslationAreas.put(commentKey, translatedReplyContentArea);
         commentTranslationStatusLabels.put(commentKey, commentTranslationStatusLabel);
-        // FIX 5: Store the button reference
+
         commentTranslationButtons.put(commentKey, commentTranslateButton);
 
         // Action Listener for Comment Translation
@@ -690,18 +640,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             // Set the tracking key to this comment's content
             lastTextTranslatedKey = commentKey;
 
-            // 🔥 SET LOCK FOR COMMENT
-            translationsInProgress.add(commentKey);
+            translationsInProgress.add(lastTextTranslatedKey);
 
             final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
             final String replyContentText = reply.getContent();
 
-            // FIX: Use SwingWorker to execute the blocking controller call in the background
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    // This runs on a worker thread (non-EDT)
-                    // FIX: Calls the synchronous Interactor via the Controller
                     translationController.execute(replyContentText, targetLanguage);
                     return null;
                 }
@@ -719,7 +665,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslationPanel.add(commentTranslationStatusLabel);
         commentTranslationPanel.add(Box.createVerticalStrut(5));
         commentTranslationPanel.add(translatedReplyContentScrollPane);
-        // --- End Comment Translation UI ---
 
         // Vote and reply buttons
         final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -783,7 +728,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(commentTranslationPanel); // The entire, grouped translation UI
+        panel.add(commentTranslationPanel);
         panel.add(actionsPanel);
 
         // Add nested replies directly to panel
@@ -807,7 +752,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
      * @param postId the unique identifier of the post to load
      */
     public void loadPost(long postId) {
-        // CORRECTED FIX: Store the postId here, as ReadPostState does not provide a getter for it.
         this.currentPostId = postId;
 
         if (controller != null) {
@@ -823,11 +767,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.controller = controller;
     }
 
-    // --- Controller Setters (FIX: Added these missing setters) ---
     public void setReadPostController(ReadPostController controller) {
         this.controller = controller;
     }
-    // NEW: Setter for the TranslationController
+
     public void setTranslationController(TranslationController controller) {
         this.translationController = controller;
     }

@@ -22,8 +22,6 @@ import java.util.Map;
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface.
- * FIX: Reverted to synchronous HttpURLConnection because the environment is blocking HttpClient.
- * FIX: Added final disconnect() call to prevent low-level I/O resource deadlock.
  */
 public class TranslationDataAccessObject implements TranslationDataAccessInterface {
 
@@ -57,7 +55,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     }
 
     /**
-     * The core function. FIX: Reverted to the synchronous HttpURLConnection method from the working demo.
+     * The core function.
      *
      * @param text The text content to translate.
      * @param targetLang The target language code (e.g., "es" for Spanish).

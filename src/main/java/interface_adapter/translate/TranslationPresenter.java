@@ -32,21 +32,14 @@ public class TranslationPresenter implements TranslationOutputBoundary {
      */
     @Override
     public void presentSuccess(TranslationOutputData outputData) {
-        // FIX: MUST execute ViewModel update on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
-            // 1. Get the current state
             TranslationState translationState = translationViewModel.getState();
-
-            // 2. Update the state with new data
             translationState.setTranslatedText(outputData.getTranslatedText());
-            // translationState.setSourceLanguage(outputData.getSourceLanguage()); // FIX: Commented out as source language isn't in OutputData
             translationState.setTargetLanguage(outputData.getTargetLanguage());
             translationState.setTranslationError(null); // Clear any previous error
 
-            // 🔥 CRITICAL FIX: Explicitly set the success flag to TRUE
             translationState.setTranslationSuccessful(true);
 
-            // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);
         });
     }
@@ -58,19 +51,14 @@ public class TranslationPresenter implements TranslationOutputBoundary {
      */
     @Override
     public void presentFailure(String errorMessage) {
-        // FIX: MUST execute ViewModel update on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
-            // 1. Get the current state
             TranslationState translationState = translationViewModel.getState();
 
-            // 2. Update the state with the error
             translationState.setTranslationError("Error translating: " + errorMessage);
             translationState.setTranslatedText(null); // Clear previous successful translation
 
-            // 🔥 CRITICAL FIX: Explicitly set the success flag to FALSE
             translationState.setTranslationSuccessful(false);
 
-            // 3. Fire the property change event to notify the View
             this.translationViewModel.setState(translationState);
         });
     }

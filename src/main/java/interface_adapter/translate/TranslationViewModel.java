@@ -14,7 +14,7 @@ import java.beans.PropertyChangeSupport;
 public class TranslationViewModel extends ViewModel {
 
     // Define the name of the state property to be observed by the View
-    public static final String STATE_PROPERTY_NAME = "state";
+    public static final String STATE_PROPERTY_NAME = "translationState";
 
     // The current state held by the ViewModel
     private TranslationState state = new TranslationState();
@@ -52,13 +52,7 @@ public class TranslationViewModel extends ViewModel {
      * CRITICAL FIX: This now fires the property change event to notify listeners (the View).
      */
     public void setState(TranslationState newState) {
-        // 1. Store the old state reference before overwriting it
-        TranslationState oldState = this.state;
-
-        // 2. Update the internal state with the new value from the Presenter
         this.state = newState;
-
-        // 3. Fire the property change event to notify the PostReadingView
-        support.firePropertyChange(STATE_PROPERTY_NAME, oldState, this.state);
+        support.firePropertyChange(STATE_PROPERTY_NAME, null, this.state);
     }
 }

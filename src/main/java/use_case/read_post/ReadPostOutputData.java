@@ -6,7 +6,7 @@ import java.util.List;
  * Output Data for the Read Post use case.
  */
 public class ReadPostOutputData {
-
+    private final long id; // 🔥 CRITICAL ADDITION
     private final String title;
     private final String content;
     private final String username;
@@ -14,8 +14,9 @@ public class ReadPostOutputData {
     private final int downvotes;
     private final List<ReplyData> replies;
 
-    public ReadPostOutputData(String title, String content, String username,
+    public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies) {
+        this.id = id; // NEW
         this.title = title;
         this.content = content;
         this.username = username;
@@ -23,7 +24,10 @@ public class ReadPostOutputData {
         this.downvotes = downvotes;
         this.replies = replies;
     }
-
+    //NEW
+    public long getId() {
+        return id;
+    }
     public String getTitle() {
         return title;
     }

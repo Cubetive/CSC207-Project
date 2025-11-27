@@ -12,12 +12,11 @@ public class ReplyPostController {
 
     /**
      * Executes the Reply Post Use Case
-     * @param username the username of the replier
      * @param content the content of the reply
      * @param parentId the "parent" id of the reply "node"
      */
-    public void execute(String username, String content, long parentId) {
-        final ReplyPostInputData replyPostInputData = new ReplyPostInputData(username, content, parentId);
+    public void execute(String content, long parentId) {
+        final ReplyPostInputData replyPostInputData = new ReplyPostInputData(content, parentId);
         replyPostUseCaseInteractor.execute(replyPostInputData);
     }
 }

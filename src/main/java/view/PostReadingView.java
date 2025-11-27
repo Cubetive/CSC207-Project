@@ -181,11 +181,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         commentButton.addActionListener(e -> {
             final ReadPostState readPostState = viewModel.getState();
-            // TODO: Fred or someone please add a functionality which allows me to set with the current logged in username.
-            final String username = readPostState.getUsername();
             final String content = commentField.getText();
             final long parentId = readPostState.getId();
-            sendReply(username, content, parentId);
+            sendReply(content, parentId);
         });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
@@ -442,12 +440,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         });
 
         sendReplyButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            // Dummy for now, will be changed later. Please refer to the comment on top
-            final String username = readPostState.getUsername();
             final String replyText = replyTextField.getText();
             final long parentId = reply.getId();
-            sendReply(username, replyText, parentId);
+            sendReply(replyText, parentId);
         });
 
         // Adding everything in
@@ -501,7 +496,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
      * @param content The content of the reply
      * @param parentId The id of the reply's parent
      */
-    public void sendReply(String username, String content, long parentId) {
-        replyController.execute(username, content, parentId);
+    public void sendReply(String content, long parentId) {
+        replyController.execute(content, parentId);
     }
 }

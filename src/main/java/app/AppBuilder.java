@@ -220,7 +220,7 @@ public class AppBuilder {
         final ReplyPostOutputBoundary replyPostOutputBoundary =
                 new ReplyPostPresenter(readPostViewModel);
         final ReplyPostInputBoundary replyPostInteractor =
-                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary);
+                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary, sessionRepository);
 
         final ReplyPostController replyController = new ReplyPostController(replyPostInteractor);
         postReadingView.setReplyController(replyController);

@@ -3,21 +3,33 @@ package use_case.reply_post;
 import entities.OriginalPost;
 import entities.Post;
 import entities.ReplyPost;
+import entities.User;
+import use_case.session.SessionRepository;
 
 public class ReplyPostInteractor implements ReplyPostInputBoundary {
     private final ReplyPostDataAccessInterface replyPostDataAccessObject;
     private final ReplyPostOutputBoundary replyPostPresenter;
+    private final SessionRepository sessionRepository;
 
     public ReplyPostInteractor(ReplyPostDataAccessInterface replyPostDataAccessObject,
-                               ReplyPostOutputBoundary replyPostPresenter) {
+                               ReplyPostOutputBoundary replyPostPresenter,
+                               SessionRepository sessionRepository) {
         this.replyPostDataAccessObject = replyPostDataAccessObject;
         this.replyPostPresenter = replyPostPresenter;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
     public void execute(ReplyPostInputData replyPostInputData) {
-        // The username should not be null
-        final String username = replyPostInputData.getUsername();
+        // Get the user object from current session
+        final User user = sessionRepository.getCurrentUser();
+        if (user == null) {
+            replyPostPresenter.prepareFailureView("User is not logged in! Please try again.");
+            return;
+        }
+
+        // Get the username from the current logged in user
+        final String username = user.getUsername();
         final String content = replyPostInputData.getContent();
         final long parentId = replyPostInputData.getParentId();
 

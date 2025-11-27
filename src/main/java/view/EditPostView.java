@@ -1,0 +1,99 @@
+package view;
+import javax.swing.*;
+
+import interface_adapter.edit_post.EditPostController;
+import use_case.edit_post.EditPostInputData;
+import entities.OriginalPost;
+import entities.Post;
+import entities.User;
+
+import java.awt.*;
+
+public class EditPostView {
+
+    private User exampleUser = new User("John", "user123", "user123@gmail.com", "abcdef"); // TODO: find way to get user requesting to edit
+
+    private Post examplePost = new OriginalPost(
+            "title",
+            "user123",
+            "This is the original post text. You may edit it."
+    ); // TODO: find way to get all types of post
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EditPostView().createMainUI());
+    }
+
+    private void createMainUI() {
+        JFrame frame = new JFrame("Forum Main UI");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+
+        JButton editButton = new JButton("Edit Post");
+        editButton.setPreferredSize(new Dimension(120, 40));
+
+        editButton.addActionListener(e -> openEditPostDialog(examplePost));
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        if (exampleUser.getUsername().equals(examplePost.getCreatorUsername())) {
+            panel.add(editButton);
+        }
+
+        frame.add(panel);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void openEditPostDialog(Post post) {
+        JDialog dialog = new JDialog((Frame) null, "Edit Post", true);
+        dialog.setSize(550, 450);
+        dialog.setLayout(new BorderLayout(10, 10));
+        dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // ---------- Body Section ----------
+        JPanel bodyPanel = new JPanel();
+        bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
+
+        JLabel bodyLabel = new JLabel("Post Text");
+        bodyLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        JTextArea bodyArea = new JTextArea(post.getContent(), 10, 40);
+        bodyArea.setLineWrap(true);
+        bodyArea.setWrapStyleWord(true);
+        bodyArea.setFont(new Font("Serif", Font.PLAIN, 14));
+
+        JScrollPane scrollPane = new JScrollPane(
+                bodyArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+
+        bodyPanel.add(bodyLabel);
+        bodyPanel.add(Box.createVerticalStrut(5));
+        bodyPanel.add(scrollPane);
+
+        // ---------- Submit Button ----------
+        JButton submitButton = new JButton("Submit");
+        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
+        submitButton.setPreferredSize(new Dimension(100, 35));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(submitButton);
+
+        submitButton.addActionListener(e -> {
+            String updatedText = bodyArea.getText();
+
+            // Controller call
+            EditPostController editPostController =
+                new EditPostController(new EditPostInputData(exampleUser.getUsername(), examplePost, updatedText, dialog));
+            editPostController.editPost();
+        });
+
+        // ---------- Add Components ----------
+        dialog.add(bodyPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+}

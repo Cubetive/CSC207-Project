@@ -4,6 +4,7 @@ import entities.User;
 import entities.CommonUserFactory;
 import use_case.signup.SignupDataAccessInterface;
 import use_case.edit_profile.EditProfileDataAccessInterface;
+import use_case.login.LoginDataAccessInterface;
 
 import java.io.*;
 import java.util.HashMap;
@@ -16,7 +17,8 @@ import java.util.Map;
  */
 public class FileUserDataAccessObject implements
         SignupDataAccessInterface,
-        EditProfileDataAccessInterface {
+        EditProfileDataAccessInterface,
+        LoginDataAccessInterface {
 
     private final Map<String, User> usersByUsername = new HashMap<>();
     private final Map<String, User> usersByEmail = new HashMap<>();

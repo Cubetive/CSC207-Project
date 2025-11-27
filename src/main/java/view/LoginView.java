@@ -1,8 +1,8 @@
 package view;
 
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupState;
-import interface_adapter.signup.SignupViewModel;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginState;
+import interface_adapter.login.LoginViewModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,78 +14,63 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * The View for the Signup Use Case.
+ * The View for the Login Use Case.
  */
-public class SignupView extends JPanel implements PropertyChangeListener {
+public class LoginView extends JPanel implements PropertyChangeListener {
 
-    private final SignupViewModel signupViewModel;
-    private SignupController signupController;
+    private final LoginViewModel loginViewModel;
+    private LoginController loginController;
 
-    private final JTextField fullNameInputField = new JTextField(20);
     private final JTextField usernameInputField = new JTextField(20);
-    private final JTextField emailInputField = new JTextField(20);
     private final JPasswordField passwordInputField = new JPasswordField(20);
-    private final JPasswordField repeatPasswordInputField = new JPasswordField(20);
 
-    private final JLabel fullNameErrorField = new JLabel();
     private final JLabel usernameErrorField = new JLabel();
-    private final JLabel emailErrorField = new JLabel();
     private final JLabel passwordErrorField = new JLabel();
-    private final JLabel repeatPasswordErrorField = new JLabel();
 
-    private final JButton signUpButton;
-    private final JButton toLoginButton;
+    private final JButton loginButton;
+    private final JButton toSignupButton;
     private boolean isUpdatingFromState = false;
 
-    public SignupView(SignupViewModel signupViewModel) {
-        this.signupViewModel = signupViewModel;
-        this.signupViewModel.addPropertyChangeListener(this);
+    public LoginView(LoginViewModel loginViewModel) {
+        this.loginViewModel = loginViewModel;
+        this.loginViewModel.addPropertyChangeListener(this);
 
         // Set up the view title
-        final JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
+        final JLabel title = new JLabel(LoginViewModel.TITLE_LABEL);
         title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Initialize buttons
-        signUpButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
-        toLoginButton = new JButton(SignupViewModel.TO_LOGIN_BUTTON_LABEL);
+        loginButton = new JButton(LoginViewModel.LOGIN_BUTTON_LABEL);
+        toSignupButton = new JButton(LoginViewModel.TO_SIGNUP_BUTTON_LABEL);
 
         // Set error labels to red
-        fullNameErrorField.setForeground(Color.RED);
         usernameErrorField.setForeground(Color.RED);
-        emailErrorField.setForeground(Color.RED);
         passwordErrorField.setForeground(Color.RED);
-        repeatPasswordErrorField.setForeground(Color.RED);
 
         // Set up the input fields with document listeners
-        addDocumentListener(fullNameInputField, this::updateFullName);
         addDocumentListener(usernameInputField, this::updateUsername);
-        addDocumentListener(emailInputField, this::updateEmail);
         addDocumentListener(passwordInputField, this::updatePassword);
-        addDocumentListener(repeatPasswordInputField, this::updateRepeatPassword);
 
         // Set up button actions
-        signUpButton.addActionListener(new ActionListener() {
+        loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (signupController != null) {
-                    final SignupState currentState = signupViewModel.getState();
-                    signupController.execute(
-                            currentState.getFullName(),
+                if (loginController != null) {
+                    final LoginState currentState = loginViewModel.getState();
+                    loginController.execute(
                             currentState.getUsername(),
-                            currentState.getEmail(),
-                            currentState.getPassword(),
-                            currentState.getRepeatPassword()
+                            currentState.getPassword()
                     );
                 }
             }
         });
 
-        toLoginButton.addActionListener(new ActionListener() {
+        toSignupButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (signupController != null) {
-                    signupController.switchToLoginView();
+                if (loginController != null) {
+                    loginController.switchToSignupView();
                 }
             }
         });
@@ -97,17 +82,14 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         this.add(Box.createVerticalStrut(20));
 
         // Add input fields with labels and error messages
-        addInputField(SignupViewModel.FULLNAME_LABEL, fullNameInputField, fullNameErrorField);
-        addInputField(SignupViewModel.USERNAME_LABEL, usernameInputField, usernameErrorField);
-        addInputField(SignupViewModel.EMAIL_LABEL, emailInputField, emailErrorField);
-        addInputField(SignupViewModel.PASSWORD_LABEL, passwordInputField, passwordErrorField);
-        addInputField(SignupViewModel.REPEAT_PASSWORD_LABEL, repeatPasswordInputField, repeatPasswordErrorField);
+        addInputField(LoginViewModel.USERNAME_LABEL, usernameInputField, usernameErrorField);
+        addInputField(LoginViewModel.PASSWORD_LABEL, passwordInputField, passwordErrorField);
 
         // Add buttons
         this.add(Box.createVerticalStrut(20));
         final JPanel buttons = new JPanel();
-        buttons.add(signUpButton);
-        buttons.add(toLoginButton);
+        buttons.add(loginButton);
+        buttons.add(toSignupButton);
         this.add(buttons);
         this.add(Box.createVerticalStrut(20));
     }
@@ -161,50 +143,26 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         });
     }
 
-    private void updateFullName() {
-        if (!isUpdatingFromState) {
-            final SignupState currentState = signupViewModel.getState();
-            currentState.setFullName(fullNameInputField.getText());
-            signupViewModel.setState(currentState);
-        }
-    }
-
     private void updateUsername() {
         if (!isUpdatingFromState) {
-            final SignupState currentState = signupViewModel.getState();
+            final LoginState currentState = loginViewModel.getState();
             currentState.setUsername(usernameInputField.getText());
-            signupViewModel.setState(currentState);
-        }
-    }
-
-    private void updateEmail() {
-        if (!isUpdatingFromState) {
-            final SignupState currentState = signupViewModel.getState();
-            currentState.setEmail(emailInputField.getText());
-            signupViewModel.setState(currentState);
+            loginViewModel.setState(currentState);
         }
     }
 
     private void updatePassword() {
         if (!isUpdatingFromState) {
-            final SignupState currentState = signupViewModel.getState();
+            final LoginState currentState = loginViewModel.getState();
             currentState.setPassword(new String(passwordInputField.getPassword()));
-            signupViewModel.setState(currentState);
-        }
-    }
-
-    private void updateRepeatPassword() {
-        if (!isUpdatingFromState) {
-            final SignupState currentState = signupViewModel.getState();
-            currentState.setRepeatPassword(new String(repeatPasswordInputField.getPassword()));
-            signupViewModel.setState(currentState);
+            loginViewModel.setState(currentState);
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("state".equals(evt.getPropertyName())) {
-            final SignupState state = (SignupState) evt.getNewValue();
+            final LoginState state = (LoginState) evt.getNewValue();
             updateViewFromState(state);
         }
     }
@@ -212,31 +170,25 @@ public class SignupView extends JPanel implements PropertyChangeListener {
     /**
      * Updates the view based on the current state.
      */
-    private void updateViewFromState(SignupState state) {
+    private void updateViewFromState(LoginState state) {
         isUpdatingFromState = true;
 
         // Update input fields
-        fullNameInputField.setText(state.getFullName());
         usernameInputField.setText(state.getUsername());
-        emailInputField.setText(state.getEmail());
         passwordInputField.setText(state.getPassword());
-        repeatPasswordInputField.setText(state.getRepeatPassword());
 
         // Update error fields
-        fullNameErrorField.setText(state.getFullNameError() != null ? state.getFullNameError() : "");
         usernameErrorField.setText(state.getUsernameError() != null ? state.getUsernameError() : "");
-        emailErrorField.setText(state.getEmailError() != null ? state.getEmailError() : "");
         passwordErrorField.setText(state.getPasswordError() != null ? state.getPasswordError() : "");
-        repeatPasswordErrorField.setText(state.getRepeatPasswordError() != null ? state.getRepeatPasswordError() : "");
 
         isUpdatingFromState = false;
     }
 
     public String getViewName() {
-        return signupViewModel.getViewName();
+        return loginViewModel.getViewName();
     }
 
-    public void setSignupController(SignupController signupController) {
-        this.signupController = signupController;
+    public void setLoginController(LoginController loginController) {
+        this.loginController = loginController;
     }
 }

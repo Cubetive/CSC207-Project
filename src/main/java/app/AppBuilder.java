@@ -1,5 +1,10 @@
 package app;
 
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
+import use_case.reply_post.ReplyPostInputBoundary;
+import use_case.reply_post.ReplyPostInteractor;
+import use_case.reply_post.ReplyPostOutputBoundary;
 import view.BrowsePostsView;
 import view.LoginView;
 import view.PostReadingView;
@@ -207,6 +212,18 @@ public class AppBuilder {
             viewManagerModel.setState(browsePostsView.getViewName());
             viewManagerModel.firePropertyChanged();
         });
+
+        return this;
+    }
+
+    public AppBuilder addReplyPostUseCase() {
+        final ReplyPostOutputBoundary replyPostOutputBoundary =
+                new ReplyPostPresenter(readPostViewModel);
+        final ReplyPostInputBoundary replyPostInteractor =
+                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary, sessionRepository);
+
+        final ReplyPostController replyController = new ReplyPostController(replyPostInteractor);
+        postReadingView.setReplyController(replyController);
 
         return this;
     }

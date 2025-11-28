@@ -1,19 +1,20 @@
 package use_case.upvote_downvote;
 
 public class VoteOutputData {
-    private final int newScore;
-    private final long postId;
+    private final long id;
+    private final int newUpvotes;
+    private final int newDownvotes;
+    private final boolean useCaseFailed;
 
-    VoteOutputData(int newScore, long postId) {
-        this.newScore = newScore;
-        this.postId = postId;
+    public VoteOutputData(long id, int newUpvotes, int newDownvotes, boolean useCaseFailed) {
+        this.id = id;
+        this.newUpvotes = newUpvotes;
+        this.newDownvotes = newDownvotes;
+        this.useCaseFailed = useCaseFailed;
     }
 
-    public int getNewScore() {
-        return newScore;
-    }
-    public long getPostId() {
-        return postId;
-    }
-
+    public long getId() { return id; }
+    public int getNewUpvotes() { return newUpvotes; }
+    public int getNewDownvotes() { return newDownvotes; }
+    public boolean isUseCaseFailed() { return useCaseFailed; }
 }

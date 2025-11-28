@@ -1,53 +1,70 @@
-package interface_adapter.upvote_downvote;
+package interface_adapter.upvote_downvote; // Ensure package matches your folder structure
 
+import interface_adapter.read_post.ReadPostState;
+import interface_adapter.read_post.ReadPostViewModel;
+import use_case.read_post.ReadPostOutputData;
 import use_case.upvote_downvote.VoteOutputBoundary;
 import use_case.upvote_downvote.VoteOutputData;
-import interface_adapter.ViewManagerModel;
 
-/**
- * Presenter for the Vote Use Case.
- * Updates the VoteViewModel and potentially the ViewManagerModel (e.g., to re-render the ReadPostView).
- */
+import java.util.List;
+
 public class VotePresenter implements VoteOutputBoundary {
+    private final ReadPostViewModel readPostViewModel;
 
-    private final VoteViewModel voteViewModel;
-    private final ViewManagerModel viewManagerModel;
+    public VotePresenter(ReadPostViewModel readPostViewModel) {
+        this.readPostViewModel = readPostViewModel;
+    }
 
-    public VotePresenter(VoteViewModel voteViewModel, ViewManagerModel viewManagerModel) {
-        this.voteViewModel = voteViewModel;
-        this.viewManagerModel = viewManagerModel;
+    @Override
+    public void prepareSuccessView(VoteOutputData outputData) {
+        ReadPostState state = readPostViewModel.getState();
+
+        // 1. Check if the vote was for the Main Post
+        if (state.getId() == outputData.getId()) {
+            state.setUpvotes(outputData.getNewUpvotes());
+            state.setDownvotes(outputData.getNewDownvotes());
+        }
+        // 2. Otherwise, search through replies recursively to find and update the voted comment
+        else {
+            updateReplyVote(state.getReplies(), outputData);
+        }
+
+        // 3. Fire the event to refresh the View
+        // The View listens to "state", so this triggers updateView() which repaints the numbers.
+        readPostViewModel.setState(state);
+        readPostViewModel.firePropertyChanged();
+    }
+
+    @Override
+    public void prepareFailView(String error) {
+        ReadPostState state = readPostViewModel.getState();
+        state.setErrorMessage(error);
+        readPostViewModel.firePropertyChanged();
     }
 
     /**
-     * Handles a successful vote.
-     * The key action here is to trigger the ReadPostView to re-read the post
-     * using the parentPostId so that replies are re-sorted and re-displayed.
-     *
-     * @param outputData The data object containing the new score and parent post ID.
+     * Recursive helper to find and update the specific reply in the view state.
+     * @return true if the reply was found and updated, false otherwise.
      */
-    @Override
-    public void presentSuccess(VoteOutputData outputData) {
-        // 1. Update the VoteState (primarily for the parentPostId)
-        VoteState voteState = voteViewModel.getState();
-        voteState.setNewVoteScore(outputData.getNewScore());
-        voteState.setParentPostId(outputData.getPostId());
-        voteState.setVoteError(null);
+    private boolean updateReplyVote(List<ReadPostOutputData.ReplyData> replies, VoteOutputData outputData) {
+        for (ReadPostOutputData.ReplyData reply : replies) {
 
-        // 2. Trigger the VoteViewModel to notify any listeners (like the PostReadingView)
-        this.voteViewModel.setState(voteState);
-        this.voteViewModel.firePropertyChanged();
-    }
+            // A. Check if this is the reply we are looking for
+            if (reply.getId() == outputData.getId()) {
+                // Update the state in memory using the setters we just added
+                reply.setUpvotes(outputData.getNewUpvotes());
+                reply.setDownvotes(outputData.getNewDownvotes());
+                return true; // Stop searching, we found it!
+            }
 
-    /**
-     * Handles a failed vote attempt.
-     * @param errorMessage A descriptive error message.
-     */
-    @Override
-    public void presentFailure(String errorMessage) {
-        VoteState voteState = voteViewModel.getState();
-        voteState.setVoteError(errorMessage);
-
-        this.voteViewModel.setState(voteState);
-        this.voteViewModel.firePropertyChanged();
+            // B. If not, search recursively in its nested replies
+            if (!reply.getNestedReplies().isEmpty()) {
+                boolean foundInNested = updateReplyVote(reply.getNestedReplies(), outputData);
+                if (foundInNested) {
+                    return true; // Found deeper in the tree, propagate true up
+                }
+            }
+        }
+        return false; // Not found in this branch
     }
 }

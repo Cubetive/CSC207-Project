@@ -1,13 +1,19 @@
 package use_case.upvote_downvote;
 
+import entities.Post; // Or a common 'Post' interface/class
+
 public interface VoteDataAccessInterface {
     /**
-     * Updates the vote count for a piece of content and returns its new score and parent post ID.
-     *
-     * @param contentId The ID of the post or reply.
-     * @param isUpvote True for an upvote, false for a downvote.
-     * @return VoteOutputData containing the new score and the parent post ID.
-     * @throws RuntimeException if the content is not found.
+     * Finds a post or reply by its ID.
+     * The Interactor needs this to get the *current* upvote/downvote count.
      */
-    VoteOutputData updateVoteCount(long contentId, boolean isUpvote);
+    Post getPostById(long contentId);
+
+    /**
+     * Persists the new vote counts to the storage (JSON file).
+     * @param contentId The ID of the item to update.
+     * @param newUpvotes The calculated new upvote total.
+     * @param newDownvotes The calculated new downvote total.
+     */
+    void saveVote(long contentId, int newUpvotes, int newDownvotes);
 }

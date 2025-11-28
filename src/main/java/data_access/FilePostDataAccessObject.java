@@ -7,10 +7,12 @@ import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
 import use_case.reply_post.ReplyPostDataAccessInterface;
+import use_case.upvote_downvote.VoteDataAccessInterface;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,7 +23,7 @@ import java.util.*;
 public class FilePostDataAccessObject implements
         BrowsePostsDataAccessInterface,
         ReadPostDataAccessInterface,
-        ReplyPostDataAccessInterface  {
+        ReplyPostDataAccessInterface, VoteDataAccessInterface {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
@@ -146,6 +148,49 @@ public class FilePostDataAccessObject implements
             gsonSaving.toJson(jsonArray, writer);
         } catch (IOException e) {
             throw new RuntimeException("Error writing file: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void saveVote(long id, int newUpvotes, int newDownvotes) {
+        // 1. Read all data
+        List<OriginalPost> allPosts = getAllPosts();
+
+        // 2. Find the object in this specific list instance and update it
+        // (We need to re-find it because getAllPosts() creates NEW objects from the file)
+        boolean found = updateVoteInList(allPosts, id, newUpvotes, newDownvotes);
+
+        // 3. Write the updated list back to the file
+        if (found) {
+            save(allPosts); // You need a method that writes the list to JSON
+        }
+    }
+
+    // Helper to update the vote in the list we are about to save
+    private boolean updateVoteInList(List<? extends Post> posts, long targetId, int up, int down) {
+        for (Post post : posts) {
+            if (post.getId() == targetId) {
+                post.setUpvotes(up);
+                post.setDownvotes(down);
+                return true;
+            }
+            // If this post has replies, search them (assuming getReplies() is available or cast needed)
+            // Note: You might need to cast 'post' to check for replies if 'Post' class doesn't have getReplies()
+            if (post instanceof OriginalPost) {
+                if (updateVoteInList(((OriginalPost) post).getReplies(), targetId, up, down)) return true;
+            } else if (post instanceof ReplyPost) {
+                if (updateVoteInList(((ReplyPost) post).getReplies(), targetId, up, down)) return true;
+            }
+        }
+        return false;
+    }
+
+    // You likely already have a save() method, but if not:
+    private void save(List<OriginalPost> posts) {
+        try (Writer writer = new FileWriter(filePath)) {
+            gson.toJson(posts, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

@@ -246,31 +246,32 @@ public class AppBuilder {
 
     /**
      * Adds the Vote Use Case (Upvote/Downvote) to the application.
-     * NOTE: This assumes FilePostDataAccessObject implements VoteDataAccessInterface.
      * @return this builder
      */
     public AppBuilder addVoteUseCase() {
-        voteViewModel = new VoteViewModel();
-
+        // 1. Create the Presenter (It updates the existing ReadPostViewModel)
+        // We don't need a separate VoteViewModel because the result (new numbers)
+        // is just an update to the post state.
         final VoteOutputBoundary voteOutputBoundary =
-                new VotePresenter(voteViewModel, viewManagerModel);
+                new VotePresenter(readPostViewModel);
 
+        // 2. Create the Interactor
+        // Casting postDataAccessObject because it implements VoteDataAccessInterface
         final VoteInputBoundary voteInteractor = new VoteInteractor(
-                (VoteDataAccessInterface) postDataAccessObject, // Cast is required
+                postDataAccessObject,
                 voteOutputBoundary
         );
 
+        // 3. Create the Controller
         final VoteController voteController = new VoteController(voteInteractor);
 
-        // PostReadingView needs to listen to the VoteViewModel's changes
-        voteViewModel.addPropertyChangeListener(postReadingView);
-
-        // PostReadingView needs the VoteController to handle button clicks
-        postReadingView.setVoteController(voteController);
+        // 4. Inject the Controller into the View
+        if (postReadingView != null) {
+            postReadingView.setVoteController(voteController);
+        }
 
         return this;
     }
-
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame

@@ -1,20 +1,11 @@
 package use_case.upvote_downvote;
 
-/**
- * The Interactor for the Vote use case.
- * Handles the business logic of updating a post or reply's vote count.
- */
-public class VoteInteractor implements VoteInputBoundary {
+import entities.Post;
 
+public class VoteInteractor implements VoteInputBoundary {
     final VoteDataAccessInterface voteDataAccessObject;
     final VoteOutputBoundary votePresenter;
 
-    /**
-     * Constructs a VoteInteractor.
-     *
-     * @param voteDataAccessObject The data access object for updating vote counts.
-     * @param votePresenter The presenter to handle the output result.
-     */
     public VoteInteractor(VoteDataAccessInterface voteDataAccessObject,
                           VoteOutputBoundary votePresenter) {
         this.voteDataAccessObject = voteDataAccessObject;
@@ -22,20 +13,37 @@ public class VoteInteractor implements VoteInputBoundary {
     }
 
     @Override
-    public void execute(VoteInputData inputData) {
-        try {
-            // 1. Call the DAO to update the vote count and get the result (new score and parent ID)
-            VoteOutputData outputData = voteDataAccessObject.updateVoteCount(
-                    inputData.getPostId(),
-                    inputData.isUpvote()
-            );
+    public void execute(VoteInputData voteInputData) {
+        long id = voteInputData.getPostId();
+        boolean isUpvote = voteInputData.isUpvote();
 
-            // 2. Present success
-            votePresenter.presentSuccess(outputData);
+        // 1. Fetch the post (Original, Reply, or Thread)
+        Post post = voteDataAccessObject.getPostById(id);
 
-        } catch (RuntimeException e) {
-            // 3. Present failure if the content is not found or other DAO error occurs
-            votePresenter.presentFailure("Could not record vote: " + e.getMessage());
+        if (post == null) {
+            votePresenter.prepareFailView("Content with ID " + id + " not found.");
+            return;
         }
+
+        // 2. Calculate new vote counts
+        int newUpvotes = post.getVotes()[0];
+        int newDownvotes = post.getVotes()[1];
+
+        if (isUpvote) {
+            newUpvotes++;
+        } else {
+            newDownvotes++;
+        }
+
+        // 3. Save to DB/File
+        voteDataAccessObject.saveVote(id, newUpvotes, newDownvotes);
+
+        // 4. Update the Entity in memory (for immediate UI consistency)
+        post.setUpvotes(newUpvotes);
+        post.setDownvotes(newDownvotes);
+
+        // 5. Output
+        VoteOutputData outputData = new VoteOutputData(id, newUpvotes, newDownvotes, false);
+        votePresenter.prepareSuccessView(outputData);
     }
 }

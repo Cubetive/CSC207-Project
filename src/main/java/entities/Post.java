@@ -70,6 +70,14 @@ public abstract class Post {
         return "";
     }
 
+    public void setUpvotes(int upvotes) {
+        this.votes[0] = upvotes;
+    }
+
+    public void setDownvotes(int downvotes) {
+        this.votes[1] = downvotes;
+    }
+
     public void upvote() {
         //TODO
     }

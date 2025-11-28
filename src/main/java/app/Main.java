@@ -19,6 +19,7 @@ public class Main {
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
+                .addBrowsePostsView()
                 .addReplyPostUseCase()
                 .build();
 

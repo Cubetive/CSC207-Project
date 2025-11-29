@@ -27,12 +27,32 @@ public class VotePresenter implements VoteOutputBoundary {
         // 2. Otherwise, search through replies recursively to find and update the voted comment
         else {
             updateReplyVote(state.getReplies(), outputData);
+            sortRepliesRecursive(state.getReplies());
         }
 
         // 3. Fire the event to refresh the View
         // The View listens to "state", so this triggers updateView() which repaints the numbers.
         readPostViewModel.setState(state);
         readPostViewModel.firePropertyChanged();
+    }
+
+    /**
+     * Recursively sorts replies by (Upvotes - Downvotes) in Descending order.
+     */
+    private void sortRepliesRecursive(List<ReadPostOutputData.ReplyData> replies) {
+        // 1. Sort the current list
+        replies.sort((r1, r2) -> {
+            int score1 = r1.getUpvotes() - r1.getDownvotes();
+            int score2 = r2.getUpvotes() - r2.getDownvotes();
+            return score2 - score1; // Descending (High -> Low)
+        });
+
+        // 2. Recursively sort nested replies
+        for (ReadPostOutputData.ReplyData reply : replies) {
+            if (!reply.getNestedReplies().isEmpty()) {
+                sortRepliesRecursive(reply.getNestedReplies());
+            }
+        }
     }
 
     @Override

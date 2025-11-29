@@ -1,12 +1,11 @@
 package interface_adapter.edit_profile;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import interface_adapter.ViewModel;
 
 /**
  * The View Model for the Edit Profile View.
  */
-public class EditProfileViewModel {
+public class EditProfileViewModel extends ViewModel<EditProfileState> {
 
     public static final String TITLE_LABEL = "Edit Profile";
     public static final String USERNAME_LABEL = "Username";
@@ -19,28 +18,8 @@ public class EditProfileViewModel {
     public static final String SAVE_BUTTON_LABEL = "Save Changes";
     public static final String CANCEL_BUTTON_LABEL = "Cancel";
 
-    private EditProfileState state = new EditProfileState();
-    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
-
     public EditProfileViewModel() {
-    }
-
-    public void setState(EditProfileState state) {
-        this.state = state;
-    }
-
-    public EditProfileState getState() {
-        return state;
-    }
-
-    /**
-     * Fires a property change event to notify observers.
-     */
-    public void firePropertyChanged() {
-        support.firePropertyChange("state", null, this.state);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        support.addPropertyChangeListener(listener);
+        super("edit profile");
+        setState(new EditProfileState());
     }
 }

@@ -44,7 +44,7 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
         editProfileState.setGeneralError(null);
 
         editProfileViewModel.setState(editProfileState);
-        editProfileViewModel.firePropertyChanged();
+        editProfileViewModel.firePropertyChange();
 
         // Optionally switch to profile view after successful edit
         // viewManagerModel.setState("profile");
@@ -71,6 +71,7 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
             editProfileState.setGeneralError(errorMessage);
         }
 
-        editProfileViewModel.firePropertyChanged();
+        editProfileViewModel.setState(editProfileState);
+        editProfileViewModel.firePropertyChange();
     }
 }

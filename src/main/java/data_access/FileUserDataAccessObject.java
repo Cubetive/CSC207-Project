@@ -147,17 +147,43 @@ public class FileUserDataAccessObject implements
 
     /**
      * Updates a user's profile information.
-     * @param username the username of the user to update
+     * @param currentUsername the current username of the user to update
+     * @param newUsername the new username (can be same as current if not changing)
      * @param fullName the new full name
      * @param bio the new bio
      * @param profilePicture the new profile picture URL
      */
-    public void updateUserProfile(String username, String fullName, String bio, String profilePicture) {
-        User user = usersByUsername.get(username);
+    @Override
+    public void updateUserProfile(String currentUsername, String newUsername, String fullName, 
+                                  String bio, String profilePicture) {
+        User user = usersByUsername.get(currentUsername);
         if (user != null) {
             user.setFullName(fullName);
             user.setBio(bio);
             user.setProfilePicture(profilePicture);
+            
+            // If username is changing, update the maps
+            if (!currentUsername.equals(newUsername)) {
+                user.setUsername(newUsername);
+                usersByUsername.remove(currentUsername);
+                usersByUsername.put(newUsername, user);
+                // Email map doesn't need updating since email didn't change
+            }
+            
+            saveUsers(); // Persist changes
+        }
+    }
+
+    /**
+     * Updates a user's password.
+     * @param username the username of the user
+     * @param newPassword the new password
+     */
+    @Override
+    public void updatePassword(String username, String newPassword) {
+        User user = usersByUsername.get(username);
+        if (user != null) {
+            user.setPassword(newPassword);
             saveUsers(); // Persist changes
         }
     }

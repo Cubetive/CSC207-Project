@@ -44,11 +44,11 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
         editProfileState.setGeneralError(null);
 
         editProfileViewModel.setState(editProfileState);
-        editProfileViewModel.firePropertyChanged();
+        editProfileViewModel.firePropertyChange();
 
-        // Optionally switch to profile view after successful edit
-        // viewManagerModel.setState("profile");
-        // viewManagerModel.firePropertyChanged();
+        // Switch back to browse posts view after successful edit
+        viewManagerModel.setState("browse posts");
+        viewManagerModel.firePropertyChanged();
     }
 
     @Override
@@ -71,6 +71,7 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
             editProfileState.setGeneralError(errorMessage);
         }
 
-        editProfileViewModel.firePropertyChanged();
+        editProfileViewModel.setState(editProfileState);
+        editProfileViewModel.firePropertyChange();
     }
 }

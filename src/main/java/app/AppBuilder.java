@@ -29,6 +29,9 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.upvote_downvote.VoteController; // NEW
+import interface_adapter.upvote_downvote.VotePresenter; // NEW
+import interface_adapter.upvote_downvote.VoteViewModel; // NEW
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
@@ -41,6 +44,9 @@ import use_case.read_post.ReadPostOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.upvote_downvote.VoteInputBoundary; // NEW
+import use_case.upvote_downvote.VoteInteractor; // NEW
+import use_case.upvote_downvote.VoteOutputBoundary; // NEW
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,8 +92,17 @@ public class AppBuilder {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("state".equals(evt.getPropertyName())) {
                     final String viewName = (String) evt.getNewValue();
+
+                    // 🔥 DEBUG LINE 1: See what view is actually being requested
+                    System.out.println("APP BUILDER DEBUG: View switching to: [" + viewName + "]");
+
                     // Load posts when browse posts view becomes active
                     if ("browse posts".equals(viewName) && browsePostsView != null) {
+                        browsePostsView.loadPosts();
+                    }
+
+                    if ("browse posts".equals(viewName) && browsePostsView != null) {
+                        System.out.println("APP BUILDER DEBUG: Triggering loadPosts()..."); // 🔥 DEBUG LINE 2
                         browsePostsView.loadPosts();
                     }
                 }
@@ -236,6 +251,34 @@ public class AppBuilder {
         return sessionRepository;
     }
 
+    /**
+     * Adds the Vote Use Case (Upvote/Downvote) to the application.
+     * @return this builder
+     */
+    public AppBuilder addVoteUseCase() {
+        // 1. Create the Presenter (It updates the existing ReadPostViewModel)
+        // We don't need a separate VoteViewModel because the result (new numbers)
+        // is just an update to the post state.
+        final VoteOutputBoundary voteOutputBoundary =
+                new VotePresenter(readPostViewModel);
+
+        // 2. Create the Interactor
+        // Casting postDataAccessObject because it implements VoteDataAccessInterface
+        final VoteInputBoundary voteInteractor = new VoteInteractor(
+                postDataAccessObject,
+                voteOutputBoundary
+        );
+
+        // 3. Create the Controller
+        final VoteController voteController = new VoteController(voteInteractor);
+
+        // 4. Inject the Controller into the View
+        if (postReadingView != null) {
+            postReadingView.setVoteController(voteController);
+        }
+
+        return this;
+    }
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame

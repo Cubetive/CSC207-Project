@@ -5,6 +5,8 @@ import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
+import interface_adapter.upvote_downvote.VoteController;
+import interface_adapter.upvote_downvote.VotePresenter;
 import use_case.read_post.ReadPostOutputData;
 
 import javax.swing.*;
@@ -22,6 +24,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final ReadPostViewModel viewModel;
     private ReadPostController controller;
     private ReplyPostController replyController;
+    private VoteController voteController;
     private Runnable onBackAction;
 
     private final JButton backButton;
@@ -35,6 +38,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
+
+    private long currentPostId; // Tracks the ID of the displayed post
 
     public PostReadingView(ReadPostViewModel viewModel) {
         this.viewModel = viewModel;
@@ -148,6 +153,20 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         votePanel.add(downvoteButton);
         votePanel.add(voteCountLabel);
 
+        upvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                // true = upvote
+                voteController.execute(true, currentPostId);
+            }
+        });
+
+        downvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                // false = downvote
+                voteController.execute(false, currentPostId);
+            }
+        });
+
         // Comments label
         final JLabel commentsLabel = new JLabel(ReadPostViewModel.COMMENTS_LABEL);
         commentsLabel.setFont(new Font("Arial", Font.BOLD, 18));
@@ -240,6 +259,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        this.currentPostId = state.getId();
 
         titleLabel.setText(state.getTitle());
         authorLabel.setText(state.getUsername());
@@ -365,6 +385,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         actionsPanel.add(Box.createHorizontalStrut(8));
         actionsPanel.add(replyButton);
 
+        replyUpvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(true, reply.getId());
+            }
+        });
+
+        replyDownvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(false, reply.getId());
+            }
+        });
+
         // Reply box
         final JPanel replyPanel = new JPanel(new BorderLayout());
         replyPanel.setOpaque(false);
@@ -476,6 +508,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     }
 
     public void setReplyController(ReplyPostController replyController) { this.replyController = replyController; }
+
+    public void setVoteController(VoteController voteController) {
+        this.voteController = voteController;
+    }
 
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;

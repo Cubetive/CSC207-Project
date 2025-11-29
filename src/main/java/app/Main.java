@@ -20,6 +20,7 @@ public class Main {
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
                 .addReplyPostUseCase()
+                .addVoteUseCase()        // Don't forget this!
                 .build();
 
         application.pack();

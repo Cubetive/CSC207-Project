@@ -2,6 +2,7 @@ package use_case.signup;
 
 import entities.User;
 import entities.UserFactory;
+import use_case.session.SessionRepository;
 
 /**
  * The Signup Interactor.
@@ -10,13 +11,16 @@ public class SignupInteractor implements SignupInputBoundary {
     private final SignupDataAccessInterface userDataAccessObject;
     private final SignupOutputBoundary userPresenter;
     private final UserFactory userFactory;
+    private final SessionRepository sessionRepository;
 
     public SignupInteractor(SignupDataAccessInterface signupDataAccessInterface,
                            SignupOutputBoundary signupOutputBoundary,
-                           UserFactory userFactory) {
+                           UserFactory userFactory,
+                           SessionRepository sessionRepository) {
         this.userDataAccessObject = signupDataAccessInterface;
         this.userPresenter = signupOutputBoundary;
         this.userFactory = userFactory;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -70,6 +74,9 @@ public class SignupInteractor implements SignupInputBoundary {
             signupInputData.getPassword()
         );
         userDataAccessObject.save(user);
+
+        // Set the session w/ logged-in user
+        sessionRepository.setCurrentUser(user);
 
         final SignupOutputData signupOutputData = new SignupOutputData(
             user.getUsername(),

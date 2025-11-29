@@ -1,14 +1,14 @@
-package use_case.reply_thread;
+package use_case.reply_post;
 
 /**
  * Output Boundary for Reply Thread use case.
  */
-public interface ReplyThreadOutputBoundary {
+public interface ReplyPostOutputBoundary {
     /**
      * Prepares the success view for the Reply Thread use case.
-     * @param replyThreadOutputData the output data
+     * @param replyPostOutputData the output data
      */
-    void prepareSuccessView(ReplyThreadOutputData replyThreadOutputData);
+    void prepareSuccessView(ReplyPostOutputData replyPostOutputData);
 
     /**
      * Prepares the failure view for the Reply Thread use case.

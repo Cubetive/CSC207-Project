@@ -3,13 +3,25 @@ import java.util.Date;
 
 public abstract class Post {
 
+    private static long nextId = 1;
+    private long id;
     private Date creation_date;
     private String creator_username;
     private String content;
     private int[] votes;
     private Post referencedPost;
 
-    public Post(String creator_username, String content) {
+    /**
+     * Constructor for loading posts from storage with existing creation date and votes.
+     * @param id the unique identifier of the post
+     * @param creator_username the username of the post creator
+     * @param content the content of the post
+     * @param creation_date the creation date of the post
+     * @param upvotes the number of upvotes
+     * @param downvotes the number of downvotes
+     */
+    protected Post(long id, String creator_username, String content, Date creation_date, int upvotes, int downvotes) {
+        this.id = id;
         this.creator_username = creator_username;
         this.content = content;
         this.creation_date = new Date();

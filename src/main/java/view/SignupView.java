@@ -1,6 +1,5 @@
-package View;
+package view;
 
-import interface_adapter.ViewManagerModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
 import interface_adapter.signup.SignupViewModel;
@@ -19,9 +18,7 @@ import java.beans.PropertyChangeListener;
  */
 public class SignupView extends JPanel implements PropertyChangeListener {
 
-    private final String viewName = "sign up";
     private final SignupViewModel signupViewModel;
-    private final ViewManagerModel viewManagerModel;
     private SignupController signupController;
 
     private final JTextField fullNameInputField = new JTextField(20);
@@ -40,11 +37,9 @@ public class SignupView extends JPanel implements PropertyChangeListener {
     private final JButton toLoginButton;
     private boolean isUpdatingFromState = false;
 
-    public SignupView(SignupViewModel signupViewModel, ViewManagerModel viewManagerModel) {
+    public SignupView(SignupViewModel signupViewModel) {
         this.signupViewModel = signupViewModel;
-        this.viewManagerModel = viewManagerModel;
         this.signupViewModel.addPropertyChangeListener(this);
-        this.viewManagerModel.addPropertyChangeListener(this);
 
         // Set up the view title
         final JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
@@ -89,12 +84,9 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         toLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(
-                    SignupView.this,
-                    "Login view not yet implemented.",
-                    "Info",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
+                if (signupController != null) {
+                    signupController.switchToLoginView();
+                }
             }
         });
 
@@ -212,21 +204,8 @@ public class SignupView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("state".equals(evt.getPropertyName())) {
-            if (evt.getSource() == signupViewModel) {
-                final SignupState state = (SignupState) evt.getNewValue();
-                updateViewFromState(state);
-            } else if (evt.getSource() == viewManagerModel) {
-                final String newView = (String) evt.getNewValue();
-                if ("login".equals(newView)) {
-                    // Signup was successful - show success dialog
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Account created successfully!\n(Login view not yet implemented)",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
-                }
-            }
+            final SignupState state = (SignupState) evt.getNewValue();
+            updateViewFromState(state);
         }
     }
 
@@ -254,7 +233,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
     }
 
     public String getViewName() {
-        return viewName;
+        return signupViewModel.getViewName();
     }
 
     public void setSignupController(SignupController signupController) {

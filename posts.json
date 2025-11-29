@@ -7,7 +7,7 @@
     "content": "Some random description and extra words",
     "votes": [
       5,
-      2
+      3
     ],
     "replies": [
       {
@@ -37,8 +37,8 @@
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
             "votes": [
-              2,
-              1
+              8,
+              5
             ],
             "replies": []
           },
@@ -48,8 +48,8 @@
             "date": "11/21/2025",
             "content": "2nd random response to the second comment",
             "votes": [
-              7,
-              5
+              15,
+              13
             ],
             "replies": []
           }
@@ -61,8 +61,8 @@
         "date": "11/26/2025",
         "content": "Testing",
         "votes": [
-          0,
-          0
+          3,
+          2
         ],
         "replies": []
       }

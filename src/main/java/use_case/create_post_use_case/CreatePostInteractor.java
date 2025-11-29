@@ -17,9 +17,12 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
 
     @Override
     public void execute(CreatePostInputData createPostInputData) {
+        // Get the next original post id.
+        long next_id = createPostUserDataAccessInterface;
         String content = createPostInputData.getContent();
         String title = createPostInputData.getTitle();
         String username = createPostInputData.getCreator_username();
+
         if (content.isEmpty() | title.isEmpty()) {
             createPostOutputBoundary.prepareMissingFieldView("Missing content or title.");
         }

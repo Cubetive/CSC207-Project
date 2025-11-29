@@ -99,6 +99,8 @@ public class AppBuilder {
                     // Load posts when browse posts view becomes active
                     if ("browse posts".equals(viewName) && browsePostsView != null) {
                         browsePostsView.loadPosts();
+                        // Update profile picture display
+                        updateProfilePictureDisplay();
                     }
                     // Load user data when edit profile view becomes active
                     if ("edit profile".equals(viewName) && editProfileView != null && sessionRepository.isLoggedIn()) {
@@ -232,6 +234,16 @@ public class AppBuilder {
             }
         });
 
+        // Set up profile picture update callback to refresh when profile is updated
+        browsePostsView.setOnProfilePictureUpdate(() -> {
+            if (sessionRepository.isLoggedIn()) {
+                final entities.User currentUser = sessionRepository.getCurrentUser();
+                if (currentUser != null) {
+                    browsePostsView.updateProfilePicture(currentUser.getProfilePicture());
+                }
+            }
+        });
+
         return this;
     }
 
@@ -291,6 +303,18 @@ public class AppBuilder {
         });
 
         return this;
+    }
+
+    /**
+     * Updates the profile picture display in the browse posts view.
+     */
+    private void updateProfilePictureDisplay() {
+        if (browsePostsView != null && sessionRepository.isLoggedIn()) {
+            final entities.User currentUser = sessionRepository.getCurrentUser();
+            if (currentUser != null) {
+                browsePostsView.updateProfilePicture(currentUser.getProfilePicture());
+            }
+        }
     }
 
     /**

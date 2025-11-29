@@ -90,12 +90,10 @@ public class EditProfileInteractor implements EditProfileInputBoundary {
             editProfileInputData.getProfilePicture()
         );
 
-        // Update session if username changed
-        if (editProfileInputData.isChangingUsername()) {
-            final User updatedUser = userDataAccess.getUserByUsername(editProfileInputData.getNewUsername());
-            if (updatedUser != null) {
-                sessionRepository.setCurrentUser(updatedUser);
-            }
+        // Update session with the updated user (to reflect profile picture and other changes)
+        final User updatedUser = userDataAccess.getUserByUsername(editProfileInputData.getNewUsername());
+        if (updatedUser != null) {
+            sessionRepository.setCurrentUser(updatedUser);
         }
 
         // Prepare success response with updated information

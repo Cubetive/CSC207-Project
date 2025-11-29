@@ -16,7 +16,7 @@ public class ReadPostOutputData {
 
     public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies) {
-        this.id = id; // NEW
+        this.id = id;
         this.title = title;
         this.content = content;
         this.username = username;
@@ -24,10 +24,11 @@ public class ReadPostOutputData {
         this.downvotes = downvotes;
         this.replies = replies;
     }
-    //NEW
+
     public long getId() {
         return id;
     }
+
     public String getTitle() {
         return title;
     }
@@ -56,19 +57,25 @@ public class ReadPostOutputData {
      * Data holder for reply information.
      */
     public static class ReplyData {
+        private final long id;
         private final String username;
         private final String content;
         private final int upvotes;
         private final int downvotes;
         private final List<ReplyData> nestedReplies;
 
-        public ReplyData(String username, String content, int upvotes, int downvotes,
+        public ReplyData(long id, String username, String content, int upvotes, int downvotes,
                         List<ReplyData> nestedReplies) {
+            this.id = id;
             this.username = username;
             this.content = content;
             this.upvotes = upvotes;
             this.downvotes = downvotes;
             this.nestedReplies = nestedReplies;
+        }
+
+        public long getId() {
+            return id;
         }
 
         public String getUsername() {

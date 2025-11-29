@@ -23,7 +23,7 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
     @Override
     public void execute(ReadPostInputData inputData) {
         try {
-            final OriginalPost post = postDataAccess.getPostById(inputData.getPostId());
+            final OriginalPost post = (OriginalPost)postDataAccess.getPostById(inputData.getPostId());
 
             if (post == null) {
                 outputBoundary.prepareFailView("Post not found with ID: " + inputData.getPostId());
@@ -35,7 +35,7 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(post.getReplies());
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
-                    post.getId(), //NEW
+                    post.getId(),
                     post.getTitle(),
                     post.getContent(),
                     post.getCreatorUsername(),
@@ -62,6 +62,7 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             final List<ReadPostOutputData.ReplyData> nestedReplies = convertReplies(reply.getReplies());
 
             final ReadPostOutputData.ReplyData replyData = new ReadPostOutputData.ReplyData(
+                    reply.getId(),
                     reply.getCreatorUsername(),
                     reply.getContent(),
                     votes[0],  // upvotes

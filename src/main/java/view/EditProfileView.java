@@ -20,6 +20,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     private final EditProfileViewModel editProfileViewModel;
     private EditProfileController editProfileController;
+    private Runnable onCancelAction;
 
     private final JTextField usernameInputField = new JTextField(20);
     private final JTextField fullNameInputField = new JTextField(20);
@@ -98,7 +99,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Clear the form and go back to browse posts view
+                // Clear the form
                 final EditProfileState state = editProfileViewModel.getState();
                 state.setNewUsername(state.getCurrentUsername());
                 state.setCurrentPassword("");
@@ -112,6 +113,11 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
                 state.setGeneralError(null);
                 editProfileViewModel.setState(state);
                 editProfileViewModel.firePropertyChange();
+                
+                // Navigate back to browse posts
+                if (onCancelAction != null) {
+                    onCancelAction.run();
+                }
             }
         });
 
@@ -379,6 +385,10 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     public void setEditProfileController(EditProfileController editProfileController) {
         this.editProfileController = editProfileController;
+    }
+
+    public void setOnCancelAction(Runnable onCancelAction) {
+        this.onCancelAction = onCancelAction;
     }
 }
 

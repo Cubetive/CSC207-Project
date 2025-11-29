@@ -224,6 +224,14 @@ public class AppBuilder {
             }
         });
 
+        // Set up edit profile button to navigate to edit profile view
+        browsePostsView.setOnEditProfileClick(() -> {
+            if (editProfileView != null && sessionRepository.isLoggedIn()) {
+                viewManagerModel.setState(editProfileView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
         return this;
     }
 
@@ -273,6 +281,14 @@ public class AppBuilder {
 
         final EditProfileController controller = new EditProfileController(editProfileInteractor);
         editProfileView.setEditProfileController(controller);
+
+        // Set up cancel button to navigate back to browse posts
+        editProfileView.setOnCancelAction(() -> {
+            if (browsePostsView != null) {
+                viewManagerModel.setState(browsePostsView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            }
+        });
 
         return this;
     }

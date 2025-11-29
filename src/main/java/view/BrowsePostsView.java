@@ -23,6 +23,8 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final JPanel postsPanel;
     private final JScrollPane scrollPane;
     private final JButton refreshButton;
+    private final JButton editProfileButton;
+    private Runnable onEditProfileClick;
 
     public BrowsePostsView(BrowsePostsViewModel viewModel) {
         this.viewModel = viewModel;
@@ -69,9 +71,25 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             }
         });
 
+        // Edit Profile button
+        editProfileButton = new JButton("Edit Profile");
+        editProfileButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        editProfileButton.setFocusPainted(false);
+        editProfileButton.setBackground(new Color(70, 130, 180));
+        editProfileButton.setForeground(Color.WHITE);
+        editProfileButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        editProfileButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        editProfileButton.addActionListener(e -> {
+            if (onEditProfileClick != null) {
+                onEditProfileClick.run();
+            }
+        });
+
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(245, 245, 245));
         buttonPanel.add(refreshButton);
+        buttonPanel.add(Box.createHorizontalStrut(10));
+        buttonPanel.add(editProfileButton);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
 
         // Add components to view
@@ -224,6 +242,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     public void setPostClickListener(PostClickListener listener) {
         this.postClickListener = listener;
+    }
+
+    public void setOnEditProfileClick(Runnable onEditProfileClick) {
+        this.onEditProfileClick = onEditProfileClick;
     }
 
     /**

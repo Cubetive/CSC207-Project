@@ -46,9 +46,9 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
         editProfileViewModel.setState(editProfileState);
         editProfileViewModel.firePropertyChange();
 
-        // Optionally switch to profile view after successful edit
-        // viewManagerModel.setState("profile");
-        // viewManagerModel.firePropertyChanged();
+        // Switch back to browse posts view after successful edit
+        viewManagerModel.setState("browse posts");
+        viewManagerModel.firePropertyChanged();
     }
 
     @Override

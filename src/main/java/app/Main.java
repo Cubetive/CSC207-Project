@@ -15,11 +15,13 @@ public class Main {
                 .addSignupView()
                 .addBrowsePostsView()
                 .addReadPostView()
+                .addEditProfileView()
                 .addLoginUseCase()
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
                 .addReplyPostUseCase()
+                .addEditProfileUseCase()
                 .build();
 
         application.pack();

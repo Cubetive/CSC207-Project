@@ -1,17 +1,28 @@
 package app;
 
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
+import use_case.reply_post.ReplyPostInputBoundary;
+import use_case.reply_post.ReplyPostInteractor;
+import use_case.reply_post.ReplyPostOutputBoundary;
 import view.BrowsePostsView;
+import view.LoginView;
 import view.PostReadingView;
 import view.SignupView;
 import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
+import data_access.InMemorySessionRepository;
 import entities.CommonUserFactory;
 import entities.UserFactory;
+import use_case.session.SessionRepository;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsPresenter;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginPresenter;
+import interface_adapter.login.LoginViewModel;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
@@ -21,6 +32,9 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
+import use_case.login.LoginInputBoundary;
+import use_case.login.LoginInteractor;
+import use_case.login.LoginOutputBoundary;
 import use_case.read_post.ReadPostInputBoundary;
 import use_case.read_post.ReadPostInteractor;
 import use_case.read_post.ReadPostOutputBoundary;
@@ -49,14 +63,17 @@ public class AppBuilder {
             new FileUserDataAccessObject("users.csv");
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
+    final SessionRepository sessionRepository = new InMemorySessionRepository();
 
     // View models
     private SignupViewModel signupViewModel;
+    private LoginViewModel loginViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
 
     // Views
     private SignupView signupView;
+    private LoginView loginView;
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
 
@@ -90,6 +107,17 @@ public class AppBuilder {
     }
 
     /**
+     * Adds the Login View to the application.
+     * @return this builder
+     */
+    public AppBuilder addLoginView() {
+        loginViewModel = new LoginViewModel();
+        loginView = new LoginView(loginViewModel);
+        cardPanel.add(loginView, loginView.getViewName());
+        return this;
+    }
+
+    /**
      * Adds the Browse Posts View to the application.
      * @return this builder
      */
@@ -119,10 +147,25 @@ public class AppBuilder {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
                 signupViewModel, viewManagerModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory);
+                userDataAccessObject, signupOutputBoundary, userFactory, sessionRepository);
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);
+        return this;
+    }
+
+    /**
+     * Adds the Login Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addLoginUseCase() {
+        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(
+                loginViewModel, viewManagerModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(
+                userDataAccessObject, loginOutputBoundary, sessionRepository);
+
+        final LoginController controller = new LoginController(loginInteractor);
+        loginView.setLoginController(controller);
         return this;
     }
 
@@ -173,6 +216,26 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addReplyPostUseCase() {
+        final ReplyPostOutputBoundary replyPostOutputBoundary =
+                new ReplyPostPresenter(readPostViewModel);
+        final ReplyPostInputBoundary replyPostInteractor =
+                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary, sessionRepository);
+
+        final ReplyPostController replyController = new ReplyPostController(replyPostInteractor);
+        postReadingView.setReplyController(replyController);
+
+        return this;
+    }
+
+    /**
+     * Gets the session repository for use cases that need to access session state.
+     * @return the session repository
+     */
+    public SessionRepository getSessionRepository() {
+        return sessionRepository;
+    }
+
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame
@@ -185,8 +248,8 @@ public class AppBuilder {
         application.setSize(800, 600);
         application.setLocationRelativeTo(null);
 
-        // Set initial view
-        viewManagerModel.setState(signupView.getViewName());
+        // Set initial view to login
+        viewManagerModel.setState(loginView.getViewName());
         viewManagerModel.firePropertyChanged();
 
         return application;

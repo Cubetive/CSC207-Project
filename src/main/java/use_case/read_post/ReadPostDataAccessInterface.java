@@ -1,6 +1,7 @@
 package use_case.read_post;
 
 import entities.OriginalPost;
+import entities.Post;
 
 /**
  * Data Access Interface for reading a specific post.
@@ -12,5 +13,5 @@ public interface ReadPostDataAccessInterface {
      * @param id the unique identifier of the post to retrieve
      * @return the post with the given ID, or null if not found
      */
-    OriginalPost getPostById(long id);
+    Post getPostById(long id);
 }

@@ -1,9 +1,11 @@
 package interface_adapter.create_post;
 
+import interface_adapter.ViewModel;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class CreatePostViewModel {
+public class CreatePostViewModel extends ViewModel<CreatePostState> {
     private final String viewName = "CreatePost";
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -16,30 +18,8 @@ public class CreatePostViewModel {
     private final String SEARCH_BUTTON_LABEL = "Search";
     private final String PROFILE_BUTTON_LABEL = "Profile";
 
-    private CreatePostState state = new CreatePostState();
-
-    public String getViewName() {
-        return viewName;
+    public CreatePostViewModel() {
+        super("Create Post");
+        setState(new CreatePostState());
     }
-
-    public CreatePostState getState() {
-        return state;
-    }
-
-    public void setState(CreatePostState state) {
-        this.state = state;
-    }
-
-    public void firePropertyChange() {
-        support.firePropertyChange("state", null, this.state);
-    }
-
-    public void firePropertyChange(String propertyName) {
-        this.support.firePropertyChange(propertyName, null, this.state);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        this.support.addPropertyChangeListener(listener);
-    }
-
 }

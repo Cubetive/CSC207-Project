@@ -17,6 +17,7 @@ public class CreatePostController {
      * @param password2 the password repeated
      */
     public void execute(String title, String content,  String creator_username) {
+        // TODO: need to obtain current user from inMemorySessionRepository
         final CreatePostInputData createPostInputData = new CreatePostInputData(title, content, creator_username);
 
         createPostInteractor.execute(createPostInputData);

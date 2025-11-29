@@ -61,8 +61,6 @@ public abstract class Post {
         return this.content;
     }
 
-    public long getId() {return this.id;}
-
     public String getCreatorUsername() {
         return this.creator_username;
     }

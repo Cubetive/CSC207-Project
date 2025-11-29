@@ -12,6 +12,7 @@ import view.SignupView;
 import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
+import data_access.TranslationDataAccessObject;
 import data_access.InMemorySessionRepository;
 import entities.CommonUserFactory;
 import entities.UserFactory;
@@ -29,6 +30,9 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationPresenter;
+import interface_adapter.translate.TranslationViewModel;
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
@@ -38,9 +42,13 @@ import use_case.login.LoginOutputBoundary;
 import use_case.read_post.ReadPostInputBoundary;
 import use_case.read_post.ReadPostInteractor;
 import use_case.read_post.ReadPostOutputBoundary;
+import use_case.read_post.ReadPostDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.translate.TranslationInputBoundary;
+import use_case.translate.TranslationInteractor;
+import use_case.translate.TranslationOutputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,6 +71,7 @@ public class AppBuilder {
             new FileUserDataAccessObject("users.csv");
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
+    final TranslationDataAccessObject translationDataAccessObject = new TranslationDataAccessObject();
     final SessionRepository sessionRepository = new InMemorySessionRepository();
 
     // View models
@@ -70,6 +79,7 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
+    private TranslationViewModel translationViewModel; // NEW
 
     // Views
     private SignupView signupView;
@@ -77,10 +87,17 @@ public class AppBuilder {
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
 
+    // Translation Controller (needed for post reading view)
+    private TranslationController translationController; // NEW
+
+    // For setting up TranslationInteractor
+    private ReadPostDataAccessInterface readPostDataAccessInterface;
+
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
 
-        // Add property change listener to load posts when browse posts view becomes active
+        this.translationViewModel = new TranslationViewModel();
+
         viewManagerModel.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -134,8 +151,28 @@ public class AppBuilder {
      */
     public AppBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        postReadingView = new PostReadingView(readPostViewModel);
+        postReadingView = new PostReadingView(readPostViewModel, translationViewModel); // NEW added new param
         cardPanel.add(postReadingView, postReadingView.getViewName());
+        return this;
+    }
+    /**
+     * Adds the Translation Use Case to the application.
+     * This is where the real TranslationDataAccessObject is instantiated and injected.
+     * @return this builder
+     */
+    public AppBuilder addTranslationUseCase() {
+        final TranslationOutputBoundary translationOutputBoundary =
+                new TranslationPresenter(translationViewModel, viewManagerModel);
+
+        final TranslationInputBoundary translationInteractor =
+                new TranslationInteractor(postDataAccessObject, this.translationDataAccessObject,
+                        translationOutputBoundary);
+
+        translationController = new TranslationController(translationInteractor);
+
+        if (postReadingView != null) {
+            postReadingView.setTranslationController(translationController);
+        }
         return this;
     }
 

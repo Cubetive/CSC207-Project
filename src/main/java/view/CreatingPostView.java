@@ -3,9 +3,12 @@ package view;
 import interface_adapter.create_post.CreatePostController;
 import interface_adapter.create_post.CreatePostState;
 import interface_adapter.create_post.CreatePostViewModel;
+import interface_adapter.login.LoginState;
 import interface_adapter.signup.SignupState;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +17,9 @@ import java.beans.PropertyChangeListener;
 
 public class CreatingPostView extends JPanel implements ActionListener, PropertyChangeListener {
     private final CreatePostViewModel createPostViewModel;
+
+    private final JTextArea contentTextField = new  JTextArea(10, 30);
+    private final JTextField titleTextField = new  JTextField(30);
 
     private CreatePostController createPostController;
 
@@ -42,6 +48,12 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
                 }
         );
+
+        //Document Listeners for input fields
+        addDocumentListener(titleTextField, this::updateTitle);
+        addDocumentListener(contentTextField, this::updateContent);
+
+
         //TODO: Add ActionListeners for other buttons.
 
         //Placeholder Labels for future buttons
@@ -58,14 +70,14 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
         //Content setup.
         final JPanel contentPanel = new JPanel();
-        final JTextArea contentTextField = new  JTextArea(10, 30);
+
         final  JLabel content = new JLabel("Content");
         contentPanel.add(content);
         contentPanel.add(contentTextField);
 
         //Title setup.
         final JPanel titlePanel = new JPanel();
-        final JTextField titleTextField = new  JTextField(30);
+
         final JLabel title = new JLabel("Title");
         titlePanel.add(title);
         titlePanel.add(titleTextField);
@@ -83,15 +95,69 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         this.createPostController = createPostController;
     }
 
+    private void addDocumentListener(JTextField textField, Runnable updateFunction) {
+        textField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+        });
+    }
+
+    private void addDocumentListener(JTextArea textArea, Runnable updateFunction) {
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateFunction.run();
+            }
+        });
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final CreatePostState state = (CreatePostState) evt.getNewValue();
-        if (state.getMissingError().isEmpty()) {
+        if (!state.getMissingError().isEmpty()) {
             JOptionPane.showMessageDialog(this, state.getMissingError());
         }
     }
 
     public void actionPerformed(ActionEvent evt) {
         JOptionPane.showMessageDialog(this, "Most things are not implemented");
+    }
+
+    private void updateTitle() {
+        final CreatePostState currentState = createPostViewModel.getState();
+        currentState.setTitle(new String(titleTextField.getText()));
+        createPostViewModel.setState(currentState);
+    }
+
+    private void updateContent() {
+        final CreatePostState currentState = createPostViewModel.getState();
+        currentState.setContent(new String(contentTextField.getText()));
+        createPostViewModel.setState(currentState);
+    }
+
+    public String getViewName() {
+        return this.createPostViewModel.getViewName();
     }
 }

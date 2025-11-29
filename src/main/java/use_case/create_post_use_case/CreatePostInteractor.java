@@ -30,16 +30,11 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         else {
             OriginalPost originalPost = new OriginalPost(next_id, title, content, username,
                     new Date(), 0, 0); // Create Post object.
-            // TODO: Update for OriginalPost Signature
 
             filePostAccess.save(originalPost); //saves the Post to Database.
 
-            CreatePostOutputData createPostOutputData = new CreatePostOutputData(
-                    originalPost.getTitle(),
-                    originalPost.getContent(),
-                    originalPost.getCreationDate(),
-                    originalPost.getVotes()
-            ); //Create the output object for display.
+            CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
+            //Create the output object for display.
             createPostPresenter.prepareCreatedView(createPostOutputData); //Send output to presenter.
 
         }

@@ -44,7 +44,6 @@ import use_case.read_post.ReadPostOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.upvote_downvote.VoteDataAccessInterface; // NEW
 import use_case.upvote_downvote.VoteInputBoundary; // NEW
 import use_case.upvote_downvote.VoteInteractor; // NEW
 import use_case.upvote_downvote.VoteOutputBoundary; // NEW
@@ -77,7 +76,6 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
-    private VoteViewModel voteViewModel; // NEW: Vote ViewModel
 
     // Views
     private SignupView signupView;
@@ -281,33 +279,6 @@ public class AppBuilder {
 
         return this;
     }
-    /**
-     * Adds the Vote Use Case (Upvote/Downvote) to the application.
-     * NOTE: This assumes FilePostDataAccessObject implements VoteDataAccessInterface.
-     * @return this builder
-     */
-    public AppBuilder addVoteUseCase() {
-        voteViewModel = new VoteViewModel();
-
-        final VoteOutputBoundary voteOutputBoundary =
-                new VotePresenter(voteViewModel, viewManagerModel);
-
-        final VoteInputBoundary voteInteractor = new VoteInteractor(
-                (VoteDataAccessInterface) postDataAccessObject, // Cast is required
-                voteOutputBoundary
-        );
-
-        final VoteController voteController = new VoteController(voteInteractor);
-
-        // PostReadingView needs to listen to the VoteViewModel's changes
-        voteViewModel.addPropertyChangeListener(postReadingView);
-
-        // PostReadingView needs the VoteController to handle button clicks
-        postReadingView.setVoteController(voteController);
-
-        return this;
-    }
-
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame

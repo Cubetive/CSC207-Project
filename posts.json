@@ -6,8 +6,8 @@
     "date": "11/20/2025",
     "content": "Some random description and extra words",
     "votes": [
-      5,
-      3
+      7,
+      5
     ],
     "replies": [
       {
@@ -27,8 +27,8 @@
         "date": "11/17/2025",
         "content": "Some random second comment.",
         "votes": [
-          4,
-          2
+          8,
+          4
         ],
         "replies": [
           {
@@ -37,8 +37,8 @@
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
             "votes": [
-              8,
-              5
+              13,
+              11
             ],
             "replies": []
           },
@@ -48,7 +48,7 @@
             "date": "11/21/2025",
             "content": "2nd random response to the second comment",
             "votes": [
-              15,
+              18,
               13
             ],
             "replies": []
@@ -128,7 +128,7 @@
                 "date": "11/21/2025",
                 "content": "Some random response to the reply of the second comment",
                 "votes": [
-                  0,
+                  1,
                   0
                 ],
                 "replies": [
@@ -138,7 +138,7 @@
                     "date": "11/21/2025",
                     "content": "藍月なくる大好き",
                     "votes": [
-                      0,
+                      2,
                       0
                     ],
                     "replies": [
@@ -148,8 +148,8 @@
                         "date": "11/21/2025",
                         "content": "testing",
                         "votes": [
-                          0,
-                          0
+                          2,
+                          1
                         ],
                         "replies": []
                       }

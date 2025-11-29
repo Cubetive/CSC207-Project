@@ -16,10 +16,21 @@ public class InMemoryUserDataAccessObject implements EditProfileDataAccessInterf
     private final Map<String, User> usersByEmail = new HashMap<>();
 
     /**
+     * Check if a user with the given username exists.
+     * @param username the username to check
+     * @return true if a user with the given username exists, false otherwise
+     */
+    @Override
+    public boolean existsByUsername(String username) {
+        return usersByUsername.containsKey(username);
+    }
+
+    /**
      * Gets a user by username.
      * @param username the username to search for
      * @return the user with the given username, or null if not found
      */
+    @Override
     public User getUserByUsername(String username) {
         return usersByUsername.get(username);
     }

@@ -1,6 +1,7 @@
 package use_case.edit_profile;
 
 import entities.User;
+import use_case.session.SessionRepository;
 
 /**
  * Interactor for the edit profile use case.
@@ -9,11 +10,14 @@ import entities.User;
 public class EditProfileInteractor implements EditProfileInputBoundary {
     private final EditProfileDataAccessInterface userDataAccess;
     private final EditProfileOutputBoundary userPresenter;
+    private final SessionRepository sessionRepository;
 
     public EditProfileInteractor(EditProfileDataAccessInterface userDataAccess,
-                                EditProfileOutputBoundary userPresenter) {
+                                EditProfileOutputBoundary userPresenter,
+                                SessionRepository sessionRepository) {
         this.userDataAccess = userDataAccess;
         this.userPresenter = userPresenter;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -85,6 +89,12 @@ public class EditProfileInteractor implements EditProfileInputBoundary {
             editProfileInputData.getBio(),
             editProfileInputData.getProfilePicture()
         );
+
+        // Update session with the updated user (to reflect profile picture and other changes)
+        final User updatedUser = userDataAccess.getUserByUsername(editProfileInputData.getNewUsername());
+        if (updatedUser != null) {
+            sessionRepository.setCurrentUser(updatedUser);
+        }
 
         // Prepare success response with updated information
         final EditProfileOutputData outputData = new EditProfileOutputData(

@@ -7,11 +7,13 @@ import interface_adapter.edit_profile.EditProfileViewModel;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 /**
  * The View for the Edit Profile Use Case.
@@ -25,10 +27,13 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
     private final JTextField usernameInputField = new JTextField(20);
     private final JTextField fullNameInputField = new JTextField(20);
     private final JTextArea bioInputField = new JTextArea(5, 20);
-    private final JTextField profilePictureInputField = new JTextField(20);
+    private final JButton browseImageButton = new JButton("Select Profile Picture");
+    private final JLabel selectedImageLabel = new JLabel("No image selected");
     private final JPasswordField currentPasswordInputField = new JPasswordField(20);
     private final JPasswordField newPasswordInputField = new JPasswordField(20);
     private final JPasswordField repeatNewPasswordInputField = new JPasswordField(20);
+    
+    private String selectedImagePath = "";
 
     private final JLabel usernameErrorField = new JLabel();
     private final JLabel fullNameErrorField = new JLabel();
@@ -71,10 +76,16 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         addDocumentListener(usernameInputField, this::updateUsername);
         addDocumentListener(fullNameInputField, this::updateFullName);
         addDocumentListener(bioInputField, this::updateBio);
-        addDocumentListener(profilePictureInputField, this::updateProfilePicture);
         addDocumentListener(currentPasswordInputField, this::updateCurrentPassword);
         addDocumentListener(newPasswordInputField, this::updateNewPassword);
         addDocumentListener(repeatNewPasswordInputField, this::updateRepeatNewPassword);
+
+        // Set up browse image button
+        browseImageButton.addActionListener(e -> browseForImage());
+        
+        // Style the selected image label
+        selectedImageLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        selectedImageLabel.setForeground(new Color(100, 100, 100));
 
         // Set up button actions
         saveButton.addActionListener(new ActionListener() {
@@ -137,7 +148,8 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         addInputField(EditProfileViewModel.USERNAME_LABEL, usernameInputField, usernameErrorField);
         addInputField(EditProfileViewModel.FULLNAME_LABEL, fullNameInputField, fullNameErrorField);
         addTextAreaField(EditProfileViewModel.BIO_LABEL, bioInputField, bioErrorField);
-        addInputField(EditProfileViewModel.PROFILE_PICTURE_LABEL, profilePictureInputField, profilePictureErrorField);
+        addProfilePictureField(EditProfileViewModel.PROFILE_PICTURE_LABEL, browseImageButton, 
+                              selectedImageLabel, profilePictureErrorField);
         
         // Add password fields section
         this.add(Box.createVerticalStrut(10));
@@ -185,6 +197,64 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.add(panel);
+    }
+
+    /**
+     * Adds a profile picture field with a browse button.
+     */
+    private void addProfilePictureField(String labelText, JButton browseButton, 
+                                       JLabel selectedImageLabel, JLabel errorField) {
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        final JLabel label = new JLabel(labelText);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        browseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        browseButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        browseButton.setFocusPainted(false);
+        browseButton.setMaximumSize(new Dimension(300, 30));
+        
+        selectedImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        errorField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        errorField.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        panel.add(label);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(browseButton);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(selectedImageLabel);
+        panel.add(Box.createVerticalStrut(2));
+        panel.add(errorField);
+        panel.add(Box.createVerticalStrut(10));
+
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.add(panel);
+    }
+
+    /**
+     * Opens a file chooser dialog to select an image file.
+     */
+    private void browseForImage() {
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Profile Picture");
+        
+        // Filter to show only image files
+        final FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
+            "Image files", "jpg", "jpeg", "png", "gif", "bmp", "webp");
+        fileChooser.setFileFilter(imageFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        
+        final int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            final File selectedFile = fileChooser.getSelectedFile();
+            // Store the absolute path to the file
+            selectedImagePath = selectedFile.getAbsolutePath();
+            selectedImageLabel.setText(selectedFile.getName());
+            selectedImageLabel.setForeground(new Color(0, 100, 0));
+            updateProfilePicture();
+        }
     }
 
     /**
@@ -288,7 +358,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
     private void updateProfilePicture() {
         if (!isUpdatingFromState) {
             final EditProfileState currentState = editProfileViewModel.getState();
-            currentState.setProfilePicture(profilePictureInputField.getText());
+            currentState.setProfilePicture(selectedImagePath);
             editProfileViewModel.setState(currentState);
         }
     }
@@ -335,7 +405,24 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         usernameInputField.setText(state.getNewUsername());
         fullNameInputField.setText(state.getFullName());
         bioInputField.setText(state.getBio() != null ? state.getBio() : "");
-        profilePictureInputField.setText(state.getProfilePicture() != null ? state.getProfilePicture() : "");
+        
+        // Update profile picture display
+        if (state.getProfilePicture() != null && !state.getProfilePicture().isEmpty()) {
+            selectedImagePath = state.getProfilePicture();
+            final File file = new File(selectedImagePath);
+            if (file.exists()) {
+                selectedImageLabel.setText(file.getName());
+                selectedImageLabel.setForeground(new Color(0, 100, 0));
+            } else {
+                selectedImageLabel.setText("File not found: " + file.getName());
+                selectedImageLabel.setForeground(new Color(200, 0, 0));
+            }
+        } else {
+            selectedImagePath = "";
+            selectedImageLabel.setText("No image selected");
+            selectedImageLabel.setForeground(new Color(100, 100, 100));
+        }
+        
         currentPasswordInputField.setText(state.getCurrentPassword());
         newPasswordInputField.setText(state.getNewPassword());
         repeatNewPasswordInputField.setText(state.getRepeatNewPassword());
@@ -357,7 +444,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
      * @param currentUsername the current username
      * @param fullName the current full name
      * @param bio the current bio
-     * @param profilePicture the current profile picture URL
+     * @param profilePicture the current profile picture file path
      */
     public void loadUserData(String currentUsername, String fullName, String bio, String profilePicture) {
         final EditProfileState state = editProfileViewModel.getState();
@@ -366,6 +453,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         state.setFullName(fullName != null ? fullName : "");
         state.setBio(bio != null ? bio : "");
         state.setProfilePicture(profilePicture != null ? profilePicture : "");
+        selectedImagePath = profilePicture != null ? profilePicture : "";
         state.setCurrentPassword("");
         state.setNewPassword("");
         state.setRepeatNewPassword("");

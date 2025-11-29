@@ -2,19 +2,19 @@ package use_case.edit_post;
 
 import javax.swing.JDialog;
 
-import entities.Post;
-
 public class EditPostInputData {
 
+    private int id;
     private String username;
-    private Post postToEdit;
-    private String newContent;
+    private ReadPostState postToEdit;
+    private String contentNew;
     private JDialog dialog;
 
-    public EditPostInputData(String username, Post postToEdit, String newContent, JDialog dialog) {
+    public EditPostInputData(int id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+        this.id = id;
         this.username = username;
         this.postToEdit = postToEdit;
-        this.newContent = newContent;
+        this.contentNew = contentNew;
         this.dialog = dialog;
     }
 
@@ -23,15 +23,19 @@ public class EditPostInputData {
     }
 
     public String getNewContent() {
-        return this.newContent;
+        return this.contentNew;
     }
 
-    public Post getPostToEdit() {
+    public ReadPostState getPostToEdit() {
         return this.postToEdit;
     }
 
     public JDialog getDialog() {
         return this.dialog;
+    }
+
+    public int getID() {
+        return this.id;
     }
 
 }

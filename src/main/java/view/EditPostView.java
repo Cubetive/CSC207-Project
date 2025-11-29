@@ -3,48 +3,35 @@ import javax.swing.*;
 
 import interface_adapter.edit_post.EditPostController;
 import use_case.edit_post.EditPostInputData;
-import entities.OriginalPost;
-import entities.Post;
 import entities.User;
 
 import java.awt.*;
 
 public class EditPostView {
+    private User cur_user;
 
-    private User exampleUser = new User("John", "user123", "user123@gmail.com", "abcdef"); // TODO: find way to get user requesting to edit
-
-    private Post examplePost = new OriginalPost(
-            "title",
-            "user123",
-            "This is the original post text. You may edit it."
-    ); // TODO: find way to get all types of post
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new EditPostView().createMainUI());
+    public EditPostView(InMemorySessionRepository sessionRepository) {
+        this.cur_user = sessionRepository.getCurrentUser();
     }
 
-    private void createMainUI() {
-        JFrame frame = new JFrame("Forum Main UI");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
-
+    private void createEditButton() {
         JButton editButton = new JButton("Edit Post");
         editButton.setPreferredSize(new Dimension(120, 40));
 
-        editButton.addActionListener(e -> openEditPostDialog(examplePost));
+        editButton.addActionListener(e -> openEditPostDialog(state));
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        if (exampleUser.getUsername().equals(examplePost.getCreatorUsername())) {
-            panel.add(editButton);
+        JPanel editPanel = new JPanel();
+        editPanel.setLayout(new GridBagLayout());
+        if (cur_user.getUsername().equals(state.getUsername())) {
+            editPanel.add(editButton);
         }
 
-        frame.add(panel);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        mainPanel.add(editPanel);
+        mainPanel.setLocationRelativeTo(null);
+        mainPanel.setVisible(true);
     }
 
-    private void openEditPostDialog(Post post) {
+    private void openEditPostDialog(ReadPostState state) {
         JDialog dialog = new JDialog((Frame) null, "Edit Post", true);
         dialog.setSize(550, 450);
         dialog.setLayout(new BorderLayout(10, 10));
@@ -57,7 +44,7 @@ public class EditPostView {
         JLabel bodyLabel = new JLabel("Post Text");
         bodyLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        JTextArea bodyArea = new JTextArea(post.getContent(), 10, 40);
+        JTextArea bodyArea = new JTextArea(state.getContent(), 10, 40);
         bodyArea.setLineWrap(true);
         bodyArea.setWrapStyleWord(true);
         bodyArea.setFont(new Font("Serif", Font.PLAIN, 14));
@@ -85,7 +72,7 @@ public class EditPostView {
 
             // Controller call
             EditPostController editPostController =
-                new EditPostController(new EditPostInputData(exampleUser.getUsername(), examplePost, updatedText, dialog));
+                new EditPostController(new EditPostInputData(state.getID(), cur_user.getUsername(), state, updatedText, dialog));
             editPostController.editPost();
         });
 

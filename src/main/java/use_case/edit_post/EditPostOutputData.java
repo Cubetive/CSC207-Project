@@ -1,15 +1,13 @@
 package use_case.edit_post;
 
-import entities.Post;
-
 public class EditPostOutputData {
-    private Post outputPost;
+    private ReadPostState outputPost;
 
-    public EditPostOutputData(Post outputPost) {
+    public EditPostOutputData(ReadPostState outputPost) {
         this.outputPost = outputPost;
     }
 
-    public Post getOutputPost() {
+    public ReadPostState getOutputPost() {
         return this.outputPost;
     }
 }

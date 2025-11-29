@@ -1,5 +1,6 @@
 package use_case.read_post;
 
+import entities.Post;
 import entities.OriginalPost;
 import entities.ReplyPost;
 

@@ -58,9 +58,15 @@ public class FilePostDataAccessObject implements
                     final String username = postObj.get("username").getAsString();
                     final String content = postObj.get("content").getAsString();
                     final Date creationDate = dateFormat.parse(postObj.get("date").getAsString());
-                    final JsonArray votesArray = postObj.getAsJsonArray("votes");
-                    final int upvotes = votesArray.get(0).getAsInt();
-                    final int downvotes = votesArray.get(1).getAsInt();
+                    int upvotes = 0;
+                    int downvotes = 0;
+                    if (postObj.has("votes") && !postObj.get("votes").isJsonNull()) {
+                        JsonArray votesArray = postObj.getAsJsonArray("votes");
+                        if (votesArray.size() >= 2) {
+                            upvotes = votesArray.get(0).getAsInt();
+                            downvotes = votesArray.get(1).getAsInt();
+                        }
+                    }
 
                     final OriginalPost post = new OriginalPost(id, title, content, username, creationDate, upvotes, downvotes);
                     postIdMap.put(id, post);
@@ -76,6 +82,7 @@ public class FilePostDataAccessObject implements
         } catch (IOException | ParseException e) {
             System.err.println("Error reading posts from file: " + e.getMessage());
         }
+        System.out.println("DAO DEBUG: getAllPosts loaded " + posts.size() + " posts from file.");
 
         this.posts = posts;
         return posts;
@@ -96,9 +103,16 @@ public class FilePostDataAccessObject implements
             final String username = replyObj.get("username").getAsString();
             final String content = replyObj.get("content").getAsString();
             final Date creationDate = dateFormat.parse(replyObj.get("date").getAsString());
-            final JsonArray votesArray = replyObj.getAsJsonArray("votes");
-            final int upvotes = votesArray.get(0).getAsInt();
-            final int downvotes = votesArray.get(1).getAsInt();
+
+            int upvotes = 0;
+            int downvotes = 0;
+            if (replyObj.has("votes") && !replyObj.get("votes").isJsonNull()) {
+                JsonArray votesArray = replyObj.getAsJsonArray("votes");
+                if (votesArray.size() >= 2) {
+                    upvotes = votesArray.get(0).getAsInt();
+                    downvotes = votesArray.get(1).getAsInt();
+                }
+            }
 
             final ReplyPost reply = new ReplyPost(id, username, content, creationDate, upvotes, downvotes);
             postIdMap.put(id, reply);
@@ -115,27 +129,48 @@ public class FilePostDataAccessObject implements
 
     @Override
     public Post getPostById(long id) {
+        if (!postIdMap.containsKey(id)) {
+            getAllPosts(); // This repopulates postIdMap
+        }
         return postIdMap.get(id);
     }
 
+    /**
+     * Public save method that saves the current in-memory state.
+     * Delegates to the unified logic below.
+     */
     public void save() {
+        save(this.posts);
+    }
+
+    /**
+     * The Single Source of Truth for writing to the file.
+     * Uses manual JSON construction to ensure keys match the reading logic.
+     */
+    private void save(List<OriginalPost> postsToSave) {
         JsonArray jsonArray = new JsonArray();
 
-        for (OriginalPost post : posts) {
+        for (OriginalPost post : postsToSave) {
             JsonObject postObj = new JsonObject();
             postObj.addProperty("id", post.getId());
             postObj.addProperty("title", post.getTitle());
+
             postObj.addProperty("username", post.getCreatorUsername());
+
             postObj.addProperty("date", dateFormat.format(post.getCreationDate()));
+
             postObj.addProperty("content", post.getContent());
+
             // Votes
             JsonArray votesArray = new JsonArray();
             votesArray.add(post.getVotes()[0]);
             votesArray.add(post.getVotes()[1]);
             postObj.add("votes", votesArray);
+
             // Replies
             JsonArray repliesArray = new JsonArray();
             for (ReplyPost reply : post.getReplies()) {
+                // We use the helper formatReply which also does manual mapping
                 JsonObject replyObj = formatReply(reply);
                 repliesArray.add(replyObj);
             }
@@ -144,7 +179,8 @@ public class FilePostDataAccessObject implements
             jsonArray.add(postObj);
         }
 
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (Writer writer = new FileWriter(filePath)) {
+            // Use gsonSaving for pretty printing
             gsonSaving.toJson(jsonArray, writer);
         } catch (IOException e) {
             throw new RuntimeException("Error writing file: " + e.getMessage());
@@ -153,16 +189,13 @@ public class FilePostDataAccessObject implements
 
     @Override
     public void saveVote(long id, int newUpvotes, int newDownvotes) {
-        // 1. Read all data
         List<OriginalPost> allPosts = getAllPosts();
 
-        // 2. Find the object in this specific list instance and update it
-        // (We need to re-find it because getAllPosts() creates NEW objects from the file)
         boolean found = updateVoteInList(allPosts, id, newUpvotes, newDownvotes);
 
-        // 3. Write the updated list back to the file
         if (found) {
-            save(allPosts); // You need a method that writes the list to JSON
+            this.posts = allPosts;
+            save(allPosts);
         }
     }
 
@@ -174,8 +207,6 @@ public class FilePostDataAccessObject implements
                 post.setDownvotes(down);
                 return true;
             }
-            // If this post has replies, search them (assuming getReplies() is available or cast needed)
-            // Note: You might need to cast 'post' to check for replies if 'Post' class doesn't have getReplies()
             if (post instanceof OriginalPost) {
                 if (updateVoteInList(((OriginalPost) post).getReplies(), targetId, up, down)) return true;
             } else if (post instanceof ReplyPost) {
@@ -183,15 +214,6 @@ public class FilePostDataAccessObject implements
             }
         }
         return false;
-    }
-
-    // You likely already have a save() method, but if not:
-    private void save(List<OriginalPost> posts) {
-        try (Writer writer = new FileWriter(filePath)) {
-            gson.toJson(posts, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public JsonObject formatReply(ReplyPost replyPost) {

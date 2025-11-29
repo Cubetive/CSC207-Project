@@ -94,8 +94,17 @@ public class AppBuilder {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("state".equals(evt.getPropertyName())) {
                     final String viewName = (String) evt.getNewValue();
+
+                    // 🔥 DEBUG LINE 1: See what view is actually being requested
+                    System.out.println("APP BUILDER DEBUG: View switching to: [" + viewName + "]");
+
                     // Load posts when browse posts view becomes active
                     if ("browse posts".equals(viewName) && browsePostsView != null) {
+                        browsePostsView.loadPosts();
+                    }
+
+                    if ("browse posts".equals(viewName) && browsePostsView != null) {
+                        System.out.println("APP BUILDER DEBUG: Triggering loadPosts()..."); // 🔥 DEBUG LINE 2
                         browsePostsView.loadPosts();
                     }
                 }

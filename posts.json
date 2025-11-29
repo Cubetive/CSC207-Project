@@ -7,7 +7,7 @@
     "content": "Some random description and extra words",
     "votes": [
       5,
-      1
+      2
     ],
     "replies": [
       {
@@ -16,8 +16,8 @@
         "date": "11/17/2025",
         "content": "Some random first comment.",
         "votes": [
-          2,
-          0
+          5,
+          4
         ],
         "replies": []
       },
@@ -27,8 +27,8 @@
         "date": "11/17/2025",
         "content": "Some random second comment.",
         "votes": [
-          3,
-          1
+          4,
+          2
         ],
         "replies": [
           {
@@ -37,8 +37,8 @@
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
             "votes": [
-              1,
-              0
+              2,
+              1
             ],
             "replies": []
           },
@@ -48,8 +48,8 @@
             "date": "11/21/2025",
             "content": "2nd random response to the second comment",
             "votes": [
-              0,
-              0
+              7,
+              5
             ],
             "replies": []
           }

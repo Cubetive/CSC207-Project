@@ -22,16 +22,22 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
 
     @Override
     public void execute() {
+        System.out.println("INTERACTOR DEBUG: BrowsePostsInteractor execute called."); // 🔥 CHECK 1
         try {
             final List<OriginalPost> posts = postDataAccess.getAllPosts();
+            System.out.println("INTERACTOR DEBUG: DAO returned " + posts.size() + " posts."); // 🔥 CHECK 2
 
             // Convert entity posts to output data
             final List<BrowsePostsOutputData.PostData> postDataList = getPostData(posts);
+            System.out.println("INTERACTOR DEBUG: Converted to " + postDataList.size() + " output objects."); // 🔥 CHECK 3
 
             final BrowsePostsOutputData outputData = new BrowsePostsOutputData(postDataList);
             outputBoundary.prepareSuccessView(outputData);
+            System.out.println("INTERACTOR DEBUG: Sent success to Presenter."); // 🔥 CHECK 4
 
         } catch (Exception e) {
+            System.err.println("INTERACTOR CRASH: " + e.getMessage()); // 🔥 CHECK FAILURE
+            e.printStackTrace();
             outputBoundary.prepareFailView("Failed to load posts: " + e.getMessage());
         }
     }

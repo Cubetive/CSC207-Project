@@ -99,7 +99,12 @@ public class FilePostDataAccessObject implements
             final int downvotes = votesArray.get(1).getAsInt();
 
             final ReplyPost reply = new ReplyPost(id, username, content, creationDate, upvotes, downvotes);
-            postIdMap.put(id, reply);
+            // Only add reply to map if an OriginalPost with this ID doesn't already exist
+            // (OriginalPosts should take precedence since they're the main posts)
+            Post existingPost = postIdMap.get(id);
+            if (existingPost == null || !(existingPost instanceof OriginalPost)) {
+                postIdMap.put(id, reply);
+            }
 
             // Recursively parse nested replies
             if (replyObj.has("replies")) {
@@ -113,6 +118,10 @@ public class FilePostDataAccessObject implements
 
     @Override
     public Post getPostById(long id) {
+        // Ensure the map is populated by calling getAllPosts if it's empty
+        if (postIdMap.isEmpty()) {
+            getAllPosts();
+        }
         return postIdMap.get(id);
     }
 

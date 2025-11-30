@@ -16,6 +16,7 @@ public class Main {
                 .addBrowsePostsView()
                 .addReadPostView()
                 .addEditProfileView()
+                .addCreatePostView()
                 .addLoginUseCase()
                 .addLogoutUseCase()
                 .addSignupUseCase()
@@ -25,6 +26,7 @@ public class Main {
                 .addTranslationUseCase()
                 .addReplyPostUseCase()
                 .addEditProfileUseCase()
+                .addCreatePostUseCase()
                 .build();
 
         application.pack();

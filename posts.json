@@ -196,5 +196,29 @@
         "replies": []
       }
     ]
+  },
+  {
+    "id": 18,
+    "title": "Some Post made by new_username",
+    "username": "new_username",
+    "date": "11/30/2025",
+    "content": "Test if new_username is displayed.",
+    "votes": [
+      0,
+      0
+    ],
+    "replies": []
+  },
+  {
+    "id": 19,
+    "title": "asd",
+    "username": "new_username",
+    "date": "11/30/2025",
+    "content": "asd",
+    "votes": [
+      0,
+      0
+    ],
+    "replies": []
   }
 ]

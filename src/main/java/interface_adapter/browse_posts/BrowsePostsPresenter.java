@@ -1,5 +1,8 @@
 package interface_adapter.browse_posts;
 
+import interface_adapter.ViewManagerModel;
+import interface_adapter.create_post.CreatePostState;
+import interface_adapter.create_post.CreatePostViewModel;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
 import use_case.browse_posts.BrowsePostsOutputData;
 
@@ -9,9 +12,20 @@ import use_case.browse_posts.BrowsePostsOutputData;
 public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
 
     private final BrowsePostsViewModel viewModel;
+    private CreatePostViewModel createPostViewModel;
+    private ViewManagerModel viewManagerModel;
 
     public BrowsePostsPresenter(BrowsePostsViewModel viewModel) {
         this.viewModel = viewModel;
+
+    }
+
+    public void setCreatePostViewModel(CreatePostViewModel createPostViewModel) {
+        this.createPostViewModel = createPostViewModel;
+    }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
     }
 
     @Override
@@ -29,5 +43,11 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
         state.setErrorMessage(errorMessage);
         viewModel.setState(state);
         viewModel.firePropertyChange();
+    }
+
+    public void switchToCreatePostView() {
+        createPostViewModel.setState(new CreatePostState());
+        this.viewManagerModel.setState(createPostViewModel.getViewName());
+        this.viewManagerModel.firePropertyChanged();
     }
 }

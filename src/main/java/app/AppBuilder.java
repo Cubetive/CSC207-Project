@@ -1,9 +1,15 @@
 package app;
 
+import interface_adapter.create_post.CreatePostController;
+import interface_adapter.create_post.CreatePostPresenter;
+import interface_adapter.create_post.CreatePostViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
+import use_case.create_post_use_case.CreatePostInputBoundary;
+import use_case.create_post_use_case.CreatePostInteractor;
+import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.logout.LogoutDataAccessInterface;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
@@ -102,6 +108,7 @@ public class AppBuilder {
     private ReadPostViewModel readPostViewModel;
     private EditProfileViewModel editProfileViewModel;
     private TranslationViewModel translationViewModel;
+    private CreatePostViewModel createPostViewModel;
 
 
     // Views
@@ -110,6 +117,7 @@ public class AppBuilder {
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
     private EditProfileView editProfileView;
+    private CreatingPostView creatingPostView;
 
     // Translation Controller (needed for post reading view)
     private TranslationController translationController; // NEW
@@ -181,7 +189,8 @@ public class AppBuilder {
      */
     public AppBuilder addBrowsePostsView() {
         browsePostsViewModel = new BrowsePostsViewModel();
-        browsePostsView = new BrowsePostsView(browsePostsViewModel);
+        createPostViewModel = new CreatePostViewModel();
+        browsePostsView = new BrowsePostsView(browsePostsViewModel, createPostViewModel);
         cardPanel.add(browsePostsView, browsePostsView.getViewName());
         return this;
     }
@@ -207,6 +216,29 @@ public class AppBuilder {
         cardPanel.add(editProfileView, editProfileView.getViewName());
         return this;
     }
+
+    //Execute after addBrowsePostsView
+    public AppBuilder addCreatePostView() {
+        creatingPostView = new CreatingPostView(this.createPostViewModel);
+        cardPanel.add(creatingPostView, creatingPostView.getViewName());
+        return this;
+    }
+
+
+    //Right now, needs to be called after the reading view and browse post use case have been added.
+    public AppBuilder addCreatePostUseCase() {
+        final CreatePostOutputBoundary createPostOutputBoundary =
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
+        final CreatePostInputBoundary createPostInteractor =
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
+
+        final CreatePostController controller = new CreatePostController(createPostInteractor);
+        creatingPostView.setController(controller);
+        createPostOutputBoundary.setPostReadingView(this.postReadingView);
+        return this;
+    }
+
+
 
     // NEW: for translation.
     /**
@@ -284,6 +316,10 @@ public class AppBuilder {
     public AppBuilder addBrowsePostsUseCase() {
         final BrowsePostsOutputBoundary browsePostsOutputBoundary =
                 new BrowsePostsPresenter(browsePostsViewModel);
+        //Necessary for creation use case
+        browsePostsOutputBoundary.setCreatePostViewModel(createPostViewModel);
+        browsePostsOutputBoundary.setViewManagerModel(viewManagerModel);
+
         final BrowsePostsInputBoundary browsePostsInteractor =
                 new BrowsePostsInteractor(postDataAccessObject, browsePostsOutputBoundary);
 

@@ -97,6 +97,9 @@ public class ReadPostOutputData {
             this.downvotes = downvotes;
             this.nestedReplies = nestedReplies;
         }
+        public long getId() {
+            return id;
+        }
 
         public long getId() {
             return id;

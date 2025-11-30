@@ -82,6 +82,20 @@ public class FilePostDataAccessObject implements
 
                     posts.add(post);
                 }
+                
+                // Second pass: restore references after all posts are loaded
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    final JsonElement element = jsonArray.get(i);
+                    final JsonObject postObj = element.getAsJsonObject();
+                    
+                    if (postObj.has("referencedPostId") && !postObj.get("referencedPostId").isJsonNull()) {
+                        final long referencedPostId = postObj.get("referencedPostId").getAsLong();
+                        final Post referencedPost = postIdMap.get(referencedPostId);
+                        if (referencedPost != null) {
+                            posts.get(i).setReferencedPost(referencedPost);
+                        }
+                    }
+                }
             }
         } catch (IOException | ParseException e) {
             System.err.println("Error reading posts from file: " + e.getMessage());
@@ -186,6 +200,11 @@ public class FilePostDataAccessObject implements
                 repliesArray.add(replyObj);
             }
             postObj.add("replies", repliesArray);
+            
+            // Referenced post ID (if this post references another post)
+            if (post.hasReference() && post.getReferencedPost() != null) {
+                postObj.addProperty("referencedPostId", post.getReferencedPost().getId());
+            }
 
             jsonArray.add(postObj);
         }

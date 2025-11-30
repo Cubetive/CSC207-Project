@@ -32,6 +32,7 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.login.LoginViewModel;
 import interface_adapter.upvote_downvote.VoteController; // NEW
 import interface_adapter.upvote_downvote.VotePresenter; // NEW
 import interface_adapter.upvote_downvote.VoteViewModel; // NEW
@@ -86,6 +87,7 @@ public class AppBuilder {
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
     private TranslationViewModel translationViewModel; // NEW
+    private LoginViewModel loginViewModel;
 
     // Views
     private SignupView signupView;
@@ -103,6 +105,7 @@ public class AppBuilder {
 
         // --- NEW (FIX): Initialize ViewModel in constructor to guarantee it's not null ---
         this.translationViewModel = new TranslationViewModel();
+        this.loginViewModel = new LoginViewModel();
 
         // Add property change listener to load posts when browse posts view becomes active
         viewManagerModel.addPropertyChangeListener(new PropertyChangeListener() {

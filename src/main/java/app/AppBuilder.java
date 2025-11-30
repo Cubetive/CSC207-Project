@@ -85,6 +85,15 @@ import use_case.translate.TranslationInputBoundary;
 import use_case.translate.TranslationInteractor;
 import use_case.translate.TranslationOutputBoundary;
 import use_case.translate.TranslationDataAccessInterface;
+import interface_adapter.create_post.CreatePostController;
+import interface_adapter.create_post.CreatePostPresenter;
+import use_case.create_post_use_case.CreatePostInputBoundary;
+import use_case.create_post_use_case.CreatePostInteractor;
+import use_case.create_post_use_case.CreatePostOutputBoundary;
+import interface_adapter.reference_post.ReferencePostPresenter;
+import use_case.reference_post.ReferencePostInputBoundary;
+import use_case.reference_post.ReferencePostInteractor;
+import use_case.reference_post.ReferencePostOutputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,6 +117,7 @@ public class AppBuilder {
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
     final SessionRepository sessionRepository = new InMemorySessionRepository();
+    private TranslationDataAccessObject translationDataAccessObject;
 
     // View models
     private SignupViewModel signupViewModel;
@@ -115,7 +125,6 @@ public class AppBuilder {
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
     private TranslationViewModel translationViewModel; // NEW
-    private LoginViewModel loginViewModel;
     private EditProfileViewModel editProfileViewModel;
     private interface_adapter.create_post.CreatePostViewModel createPostViewModel;
     private interface_adapter.reference_post.ReferencePostViewModel referencePostViewModel;
@@ -227,6 +236,35 @@ public class AppBuilder {
         return this;
     }
 
+    /**
+     * Adds the Create Post View to the application.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostView() {
+        createPostViewModel = new interface_adapter.create_post.CreatePostViewModel();
+        creatingPostView = new view.CreatingPostView(createPostViewModel);
+        cardPanel.add(creatingPostView, creatingPostView.getViewName());
+        creatingPostView.setCreatePostClickListener(postId -> {
+            if (postReadingView != null) {
+                viewManagerModel.setState(postReadingView.getViewName());
+                viewManagerModel.firePropertyChanged();
+                postReadingView.loadPost(postId);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Adds the Reference Post View to the application.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostView() {
+        referencePostViewModel = new interface_adapter.reference_post.ReferencePostViewModel();
+        referencePostView = new view.ReferencePostView(referencePostViewModel);
+        cardPanel.add(referencePostView, referencePostView.getViewName());
+        return this;
+    }
+
     // NEW: for translation.
     /**
      * Adds the Translation Use Case to the application.
@@ -261,16 +299,6 @@ public class AppBuilder {
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);
-        return this;
-    }
-
-    /**
-     * Adds the Login View to the application.
-     * @return this builder
-     */
-    public AppBuilder addLoginView() {
-        loginView = new LoginView(loginViewModel);
-        cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
@@ -443,6 +471,40 @@ public class AppBuilder {
             postReadingView.setVoteController(voteController);
         }
 
+        return this;
+    }
+
+    /**
+     * Adds the Create Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostUseCase() {
+        final CreatePostOutputBoundary createPostOutputBoundary =
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
+        final CreatePostInputBoundary createPostInteractor =
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary);
+
+        final CreatePostController controller = new CreatePostController(createPostInteractor);
+        if (creatingPostView != null) {
+            creatingPostView.setController(controller);
+        }
+        return this;
+    }
+
+    /**
+     * Adds the Reference Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostUseCase() {
+        final ReferencePostOutputBoundary referencePostOutputBoundary =
+                new ReferencePostPresenter(referencePostViewModel, viewManagerModel);
+        final ReferencePostInputBoundary referencePostInteractor =
+                new ReferencePostInteractor(postDataAccessObject, referencePostOutputBoundary);
+
+        referencePostController = new interface_adapter.reference_post.ReferencePostController(referencePostInteractor);
+        if (referencePostView != null) {
+            referencePostView.setController(referencePostController);
+        }
         return this;
     }
 

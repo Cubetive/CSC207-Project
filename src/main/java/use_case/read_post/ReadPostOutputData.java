@@ -101,10 +101,6 @@ public class ReadPostOutputData {
             return id;
         }
 
-        public long getId() {
-            return id;
-        }
-
         public String getUsername() {
             return username;
         }

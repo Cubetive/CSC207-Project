@@ -13,6 +13,7 @@ import use_case.reply_post.ReplyPostInputBoundary;
 import use_case.reply_post.ReplyPostInteractor;
 import use_case.reply_post.ReplyPostOutputBoundary;
 import view.BrowsePostsView;
+import view.EditProfileView;
 import view.LoginView;
 import view.PostReadingView;
 import view.SignupView;
@@ -36,6 +37,8 @@ import interface_adapter.signup.SignupViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.edit_profile.EditProfileController;
+import interface_adapter.edit_profile.EditProfileViewModel;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -100,6 +103,7 @@ public class AppBuilder {
     private LoginView loginView;
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
+    private EditProfileView editProfileView;
 
     // Translation Controller (needed for post reading view)
     private TranslationController translationController; // NEW
@@ -168,6 +172,17 @@ public class AppBuilder {
         readPostViewModel = new ReadPostViewModel();
         postReadingView = new PostReadingView(readPostViewModel, translationViewModel); // NEW added new param
         cardPanel.add(postReadingView, postReadingView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds the Edit Profile View to the application.
+     * @return this builder
+     */
+    public AppBuilder addEditProfileView() {
+        editProfileViewModel = new EditProfileViewModel();
+        editProfileView = new EditProfileView(editProfileViewModel);
+        cardPanel.add(editProfileView, editProfileView.getViewName());
         return this;
     }
 
@@ -359,8 +374,33 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addEditProfileUseCase() {
-        // Edit Profile use case setup would go here if needed
-        // Currently not fully integrated into the main application flow
+        final EditProfileController controller = EditProfileUseCaseFactory.create(
+                viewManagerModel,
+                editProfileViewModel,
+                userDataAccessObject,
+                sessionRepository
+        );
+        
+        if (editProfileView != null) {
+            editProfileView.setEditProfileController(controller);
+        }
+
+        // Set up edit profile button click handler in browse posts view
+        if (browsePostsView != null) {
+            browsePostsView.setOnEditProfileClick(() -> {
+                viewManagerModel.setState(editProfileView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+        }
+
+        // Set up cancel button to go back to browse posts
+        if (editProfileView != null) {
+            editProfileView.setOnCancelAction(() -> {
+                viewManagerModel.setState(browsePostsView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+        }
+
         return this;
     }
 

@@ -220,5 +220,17 @@
       0
     ],
     "replies": []
+  },
+  {
+    "id": 20,
+    "title": "Git is frustrating",
+    "username": "new_username",
+    "date": "11/30/2025",
+    "content": "It really is.",
+    "votes": [
+      0,
+      0
+    ],
+    "replies": []
   }
 ]

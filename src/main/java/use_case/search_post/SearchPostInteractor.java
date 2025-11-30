@@ -3,28 +3,32 @@ package use_case.search_post;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 
-import entities.OriginalPost;
+import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.search_post.SearchPostPresenter;
+import use_case.browse_posts.BrowsePostsOutputData;
 
 public class SearchPostInteractor implements SearchPostInputBoundary {
     
     private SearchPostOutputBoundary searchPostOutputBoundary;
 
     @Override
-    public void searchPosts(DefaultListModel<String> listModel, List<OriginalPost> entire_op_list, String keyword) {
-        List<OriginalPost> search_list = new ArrayList<OriginalPost>();
-        for(int i = 0; i < entire_op_list.size(); i++) {
-            if (entire_op_list.get(i).getTitle().toLowerCase().contains(keyword.toLowerCase())) {
-                search_list.add(entire_op_list.get(i));
+    public void searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword) {
+        List<BrowsePostsOutputData.PostData> search_list = new ArrayList<>();
+        for(int i = 0; i < state.getPosts().size(); i++) {
+            if (state.getPosts().get(i).getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                search_list.add(state.getPosts().get(i));
             }
         }
 
-        SearchPostOutputData searchPostOutputData = new SearchPostOutputData(search_list);
+        BrowsePostsState search_state = new BrowsePostsState();
+        search_state.setPosts(search_list);
+
+        SearchPostOutputData searchPostOutputData = new SearchPostOutputData(search_state);
         
         searchPostOutputBoundary = new SearchPostPresenter(searchPostOutputData);
-        searchPostOutputBoundary.prepareSuccessView(listModel);
+        searchPostOutputBoundary.prepareSuccessView(postsPanel);
     }
 
 }

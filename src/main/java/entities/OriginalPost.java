@@ -1,23 +1,24 @@
 package entities;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OriginalPost extends Post {
-    private String title;
-    private List<ReplyPost> replies = new ArrayList<>();
+    private final String title;
+    private final List<ReplyPost> replies = new ArrayList<>();
 
-
-    public OriginalPost(String title, String username, String text) {
-        super(username, text);
+    public OriginalPost(long id, String title, String content, String username, Date creation_date, int upvotes, int downvotes) {
+        super(id, username, content, creation_date, upvotes, downvotes);
         this.title = title;
-    }
-
-    public ReplyPost replyToPost(String username, String text) {
-        // TODO
-        return new ReplyPost(username, text);
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public List<ReplyPost> getReplies() { return this.replies; }
+
+    public void addReply(ReplyPost replyPost) {
+        this.replies.add(replyPost);
     }
 }

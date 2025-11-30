@@ -1,33 +1,31 @@
 package use_case.search_post;
 
-import java.util.List;
+import interface_adapter.browse_posts.BrowsePostsState;
 
-import javax.swing.DefaultListModel;
-
-import entities.OriginalPost;
+import javax.swing.JPanel;
 
 public class SearchPostInputData {
 
-    private DefaultListModel<String> listModel;
-    private List<OriginalPost> entire_op_list;
+    private JPanel postsPanel;
+    private BrowsePostsState state;
     private String keyword;
 
-    public SearchPostInputData(DefaultListModel<String> listModel, List<OriginalPost> entire_op_list, String keyword) {
-        this.listModel = listModel;
-        this.entire_op_list = entire_op_list;
+    public SearchPostInputData(JPanel postsPanel, BrowsePostsState state, String keyword) {
+        this.postsPanel = postsPanel;
+        this.state = state;
         this.keyword = keyword;
     }
 
-    public List<OriginalPost> getEntireOPList() {
-        return this.entire_op_list;
+    public JPanel getJPanel() {
+        return this.postsPanel;
+    }
+    
+    public BrowsePostsState getState() {
+        return this.state;
     }
 
     public String getKeyword() {
         return this.keyword;
-    }
-
-    public DefaultListModel<String> getListModel() {
-        return this.listModel;
     }
     
 }

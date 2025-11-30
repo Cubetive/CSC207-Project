@@ -692,6 +692,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                     : "Original Post";
             referenceBannerButton.setText(referencedTitle);
             referenceBannerPanel.setVisible(true);
+            // Force revalidation to ensure banner is displayed
+            referenceBannerPanel.revalidate();
+            referenceBannerPanel.repaint();
             
             // Update referenced post container
             referencedPostTitleLabel.setText(

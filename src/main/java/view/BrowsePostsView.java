@@ -230,12 +230,9 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (postClickListener != null) {
-                    // If this post references another post, navigate to the referenced post
-                    // Otherwise, navigate to this post
-                    final long postIdToLoad = (post.hasReference() && post.getReferencedPostId() != null)
-                            ? post.getReferencedPostId()
-                            : post.getId();
-                    postClickListener.onPostClicked(postIdToLoad);
+                    // Always navigate to the clicked post (not the referenced one)
+                    // The referenced post will be shown in the PostReadingView
+                    postClickListener.onPostClicked(post.getId());
                 }
             }
 
@@ -269,7 +266,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.add(titleLabel);
         
         // Add clickable reference indicator if post has a reference
-        if (post.hasReference() && post.getReferencedPostId() != null) {
+        if (post.hasReference()) {
+            // If referencedPostId is null, we can't navigate, but still show the indicator
+            final boolean canNavigate = post.getReferencedPostId() != null;
+            
             final JButton referenceButton = new JButton("🔗 References: " + 
                     (post.getReferencedPostTitle() != null && !post.getReferencedPostTitle().isEmpty() 
                             ? post.getReferencedPostTitle() 
@@ -285,11 +285,17 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             referenceButton.setContentAreaFilled(false);
             referenceButton.setOpaque(true);
             referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            referenceButton.addActionListener(e -> {
-                if (postClickListener != null) {
-                    postClickListener.onPostClicked(post.getReferencedPostId());
-                }
-            });
+            if (canNavigate) {
+                referenceButton.addActionListener(e -> {
+                    if (postClickListener != null) {
+                        postClickListener.onPostClicked(post.getReferencedPostId());
+                    }
+                });
+            } else {
+                // Disable button if we can't navigate
+                referenceButton.setEnabled(false);
+                referenceButton.setToolTipText("Referenced post ID not available");
+            }
             // Add hover effect
             referenceButton.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override

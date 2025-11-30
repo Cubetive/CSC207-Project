@@ -135,5 +135,20 @@ class BrowsePostsInteractorTest {
             this.failCalled = true;
             this.errorMessage = errorMessage;
         }
+
+        @Override
+        public void switchToCreatePostView() {
+            // Not needed for these tests
+        }
+
+        @Override
+        public void setCreatePostViewModel(interface_adapter.create_post.CreatePostViewModel createPostViewModel) {
+            // Not needed for these tests
+        }
+
+        @Override
+        public void setViewManagerModel(interface_adapter.ViewManagerModel viewManagerModel) {
+            // Not needed for these tests
+        }
     }
 }

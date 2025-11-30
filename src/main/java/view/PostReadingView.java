@@ -5,12 +5,20 @@ import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
+import interface_adapter.upvote_downvote.VoteController;
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationViewModel;
+import interface_adapter.translate.TranslationState;
 import use_case.read_post.ReadPostOutputData;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The View for reading a post and its replies.
@@ -20,14 +28,39 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     public static final String CONFIRM_CANCEL_MESSAGE = "Are you sure? This draft will not be saved.";
 
     private final ReadPostViewModel viewModel;
+    private TranslationViewModel translationViewModel;
     private ReadPostController controller;
     private ReplyPostController replyController;
+    private VoteController voteController;
+    private TranslationController translationController;
     private Runnable onBackAction;
+    private long currentPostId = 1;
+
+    private String textContent = "";
+
+    // Fields to track translation UI elements for COMMENTS
+    private final Map<String, JTextArea> commentTranslationAreas = new HashMap<>();
+    private final Map<String, JLabel> commentTranslationStatusLabels = new HashMap<>();
+    private final Map<String, JButton> commentTranslationButtons = new HashMap<>();
+    private String lastTextTranslatedKey = null;
+    private final Set<String> translationsInProgress = new HashSet<>();
+    private static final String MAIN_POST_KEY = "MAIN_POST";
 
     private final JButton backButton;
     private final JLabel titleLabel;
     private final JLabel authorLabel;
     private final JTextArea contentArea;
+
+    // Translation UI Components
+    private final JLabel translateLabel;
+    private final JComboBox<String> languageDropdown;
+    private final JButton translateButton;
+    private JTextArea translatedContentArea;
+    private JLabel translationStatusLabel;
+    private final JScrollPane translatedContentScrollPane;
+    // Supported languages for the dropdown
+    private static final String[] SUPPORTED_LANGUAGES = {"ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru"};
+
     private final JButton upvoteButton;
     private final JButton downvoteButton;
     private final JLabel voteCountLabel;
@@ -36,9 +69,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
 
-    public PostReadingView(ReadPostViewModel viewModel) {
+    public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
+        this.translationViewModel = translationViewModel;
+        this.translationViewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
@@ -110,11 +145,109 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         contentContainer.add(contentArea, BorderLayout.CENTER);
 
+        // Translation Controls and Display
+        final JPanel translationPanel = new JPanel();
+        translationPanel.setLayout(new BoxLayout(translationPanel, BoxLayout.Y_AXIS));
+        translationPanel.setBackground(new Color(245, 245, 245));
+        translationPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        translationPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+
+        // Translation Controls (Dropdown + Button)
+        final JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        controlPanel.setOpaque(false);
+        controlPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        translateLabel = new JLabel("Translate to:");
+        translateLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        languageDropdown = new JComboBox<>(SUPPORTED_LANGUAGES);
+        languageDropdown.setSelectedItem("es");
+
+        translateButton = new JButton("Translate Post");
+        translateButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        translateButton.setFocusPainted(false);
+        translateButton.setBackground(new Color(173, 216, 230)); // Light Blue
+        translateButton.setForeground(new Color(50, 50, 50));
+        translateButton.setOpaque(true);
+        translateButton.setBorderPainted(false);
+        translateButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(135, 206, 250), 1),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
+        translateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Inline ActionListener for the translate button
+        translateButton.addActionListener(e -> {
+            if (translationController == null) {
+                JOptionPane.showMessageDialog(this, "Translation service is not configured.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                translateButton.setEnabled(false);
+                translationStatusLabel.setText("Translating...");
+                translatedContentArea.setText("Loading translation...");
+
+                translationsInProgress.add(MAIN_POST_KEY);
+
+                String targetLanguage = (String) languageDropdown.getSelectedItem();
+                final long postId = currentPostId;
+                final String content = textContent;
+
+                new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        translationController.execute(postId, content, targetLanguage);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        translationViewModel.firePropertyChanged();
+                    }
+                }.execute();
+            } catch (Exception ex) {
+                System.err.println("CRASH: Main Post Translation failed on EDT!");
+                ex.printStackTrace();
+            }
+        });
+
+        controlPanel.add(translateLabel);
+        controlPanel.add(languageDropdown);
+        controlPanel.add(translateButton);
+        translationPanel.add(controlPanel);
+
+        // Translation Status and Content Area
+        translationStatusLabel = new JLabel("Select a language and click Translate.");
+        translationStatusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        translationStatusLabel.setForeground(new Color(150, 150, 150));
+        translationStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        translationPanel.add(translationStatusLabel);
+        translationPanel.add(Box.createVerticalStrut(5));
+
+        translatedContentArea = new JTextArea(4, 40);
+        translatedContentArea.setEditable(false);
+        translatedContentArea.setLineWrap(true);
+        translatedContentArea.setWrapStyleWord(true);
+        translatedContentArea.setFont(new Font("Arial", Font.PLAIN, 15));
+        translatedContentArea.setBackground(new Color(230, 230, 235)); // Differentiated background
+        translatedContentArea.setForeground(new Color(50, 50, 50));
+        translatedContentScrollPane = new JScrollPane(translatedContentArea);
+        translatedContentScrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        translatedContentScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        translatedContentScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+
+        translationPanel.add(translatedContentScrollPane);
+
         // Vote panel
         final JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         votePanel.setBackground(new Color(245, 245, 245));
 
-        upvoteButton = new JButton("\u25B2");  // Up triangle
+        upvoteButton = new JButton("\u25B2");
         upvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         upvoteButton.setFocusPainted(false);
         upvoteButton.setBackground(new Color(240, 240, 240));
@@ -127,7 +260,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         upvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        downvoteButton = new JButton("\u25BC");  // Down triangle
+        downvoteButton = new JButton("\u25BC");
         downvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         downvoteButton.setFocusPainted(false);
         downvoteButton.setBackground(new Color(240, 240, 240));
@@ -147,6 +280,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         votePanel.add(upvoteButton);
         votePanel.add(downvoteButton);
         votePanel.add(voteCountLabel);
+
+        upvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(true, currentPostId);
+            }
+        });
+
+        downvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(false, currentPostId);
+            }
+        });
 
         // Comments label
         final JLabel commentsLabel = new JLabel(ReadPostViewModel.COMMENTS_LABEL);
@@ -179,12 +324,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        commentButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            final String content = commentField.getText();
-            final long parentId = readPostState.getId();
-            sendReply(content, parentId);
-        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
@@ -196,6 +335,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Add components to main panel
         mainPanel.add(contentContainer);
+        mainPanel.add(translationPanel); // Translation panel added
+
         mainPanel.add(Box.createVerticalStrut(15));
         mainPanel.add(votePanel);
         mainPanel.add(Box.createVerticalStrut(5));
@@ -219,11 +360,24 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("state".equals(evt.getPropertyName())) {
-            final ReadPostState state = (ReadPostState) evt.getNewValue();
-            updateView(state);
-        }
-        else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
+        if (evt.getSource() == viewModel) {
+            if ("state".equals(evt.getPropertyName())) {
+                final ReadPostState state = (ReadPostState) evt.getNewValue();
+                updateView(state);
+            }
+        } // 2. Translation Update (REMOVED SOURCE CHECK)
+        // We rely solely on the unique property name "translationState"
+        else if (TranslationViewModel.STATE_PROPERTY_NAME.equals(evt.getPropertyName())) {
+
+            final TranslationState state = (TranslationState) evt.getNewValue();
+
+            // Debug line to prove we caught it
+            System.out.println("DEBUG: View received translation event! Success: " + state.isTranslationSuccessful());
+
+            SwingUtilities.invokeLater(() -> {
+                handleTranslationChange(state);
+            });
+        } else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
             // Clear comment field
             commentField.setText("");
             // "Refresh" page
@@ -232,27 +386,155 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * Updates the view based on the current state.
+     * Handles updates from the TranslationViewModel.
      */
+    private void handleTranslationChange(TranslationState state) {
+        if (lastTextTranslatedKey == null) {
+            if (translateButton != null) {
+                translateButton.setEnabled(true);
+            }
+
+            JTextArea targetArea = translatedContentArea;
+            JLabel statusLabel = translationStatusLabel;
+
+            if (targetArea != null && statusLabel != null) {
+                if (state.isTranslationSuccessful()) {
+                    targetArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
+                    String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                    statusLabel.setText(
+                            String.format("Translated to %s%s. %s",
+                                    state.getTargetLanguage().toUpperCase(),
+                                    cacheIndicator,
+                                    state.getStatusMessage()
+                            )
+                    );
+                } else {
+                    targetArea.setText("Translation unavailable.");
+                    statusLabel.setText(state.getStatusMessage());
+                }
+                if (translatedContentScrollPane != null) {
+                    translatedContentScrollPane.revalidate();
+                    translatedContentScrollPane.repaint();
+                }
+                translationsInProgress.remove(MAIN_POST_KEY);
+            }
+        } else {
+            String lookupKey = lastTextTranslatedKey.trim();
+
+            try {
+                JTextArea commentArea = commentTranslationAreas.get(lookupKey);
+                JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
+                JButton commentButton = commentTranslationButtons.get(lookupKey);
+
+                if (commentButton != null) {
+                    commentButton.setEnabled(true);
+                }
+
+                if (commentArea != null && commentStatus != null) {
+                    if (state.isTranslationSuccessful()) {
+                        String text = state.getTranslatedText() != null ? state.getTranslatedText() : "";
+                        commentArea.setText(text);
+
+                        String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                        commentStatus.setText(
+                                String.format("Translated to %s%s. %s",
+                                        state.getTargetLanguage().toUpperCase(),
+                                        cacheIndicator,
+                                        state.getStatusMessage()
+                                )
+                        );
+                    } else {
+                        commentArea.setText("Translation unavailable.");
+                        commentStatus.setText(state.getStatusMessage());
+                    }
+
+                    try {
+                        commentArea.setPreferredSize(null);
+                        commentArea.setSize(commentArea.getPreferredSize());
+
+                        JScrollPane parentScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
+                        if (parentScrollPane != null) {
+                            parentScrollPane.setViewportView(commentArea);
+                            parentScrollPane.revalidate();
+                            parentScrollPane.repaint();
+                        }
+
+                        commentArea.revalidate();
+                        commentArea.repaint();
+                    } catch (Exception e) {
+                        System.err.println("ERROR: Failed during comment repaint/resize: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+
+                if (repliesPanel != null) {
+                    repliesPanel.revalidate();
+                    repliesPanel.repaint();
+                }
+
+            } catch (Exception e) {
+                System.err.println("CRASH: Unhandled exception in Comment Translation logic!");
+                e.printStackTrace();
+            } finally {
+                translationsInProgress.remove(lookupKey);
+                lastTextTranslatedKey = null;
+            }
+        }
+
+        if (this.getParent() != null) {
+            this.getParent().revalidate();
+            this.getParent().repaint();
+        }
+        this.invalidate();
+        this.revalidate();
+        this.repaint();
+    }
+
+    private void clearTranslationDisplay() {
+        if (translatedContentArea != null) {
+            translatedContentArea.setText("");
+        }
+        if (translationStatusLabel != null) {
+            translationStatusLabel.setText("Select a language and click Translate.");
+        }
+        if (translateButton != null) {
+            translateButton.setEnabled(true);
+        }
+    }
+
+    private void clearCommentTranslationDisplays() {
+        commentTranslationAreas.clear();
+        commentTranslationStatusLabels.clear();
+        commentTranslationButtons.clear();
+    }
+
     private void updateView(ReadPostState state) {
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        this.currentPostId = state.getId();
+        textContent = state.getContent();
+
+        if (!translationsInProgress.isEmpty()) {
+            return;
+        }
+        clearTranslationDisplay();
+        clearCommentTranslationDisplays();
+
+        setTranslationController(translationController);
 
         titleLabel.setText(state.getTitle());
         authorLabel.setText(state.getUsername());
         contentArea.setText(state.getContent());
         voteCountLabel.setText(String.valueOf(state.getUpvotes() - state.getDownvotes()));
 
-        // Clear and update replies
         repliesPanel.removeAll();
         if (!state.getReplies().isEmpty()) {
             for (ReadPostOutputData.ReplyData reply : state.getReplies()) {
                 final JPanel replyPanel = createReplyPanel(reply);
 
-                // Wrapper to force full width
                 final JPanel fullWidthWrapper = new JPanel(new BorderLayout());
                 fullWidthWrapper.setBackground(new Color(245, 245, 245));
                 fullWidthWrapper.add(replyPanel, BorderLayout.CENTER);
@@ -267,10 +549,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         repliesPanel.repaint();
     }
 
-    /**
-     * Creates a panel for displaying a single reply.
-     * @param reply the reply data
-     */
     private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -290,6 +568,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
+        final String commentKey = reply.getContent().trim();
+
         final JLabel usernameLabel = new JLabel(reply.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 13));
         usernameLabel.setForeground(new Color(70, 130, 180));
@@ -308,7 +588,82 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyContent.setAlignmentX(Component.LEFT_ALIGNMENT);
         replyContent.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // Vote and reply buttons
+        // --- Comment Translation UI ---
+        final JPanel commentTranslationPanel = new JPanel();
+        commentTranslationPanel.setLayout(new BoxLayout(commentTranslationPanel, BoxLayout.Y_AXIS));
+        commentTranslationPanel.setBackground(Color.WHITE);
+        commentTranslationPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        commentTranslationPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+
+        final JComboBox<String> commentLanguageDropdown = new JComboBox<>(SUPPORTED_LANGUAGES);
+        commentLanguageDropdown.setSelectedItem("es");
+        commentLanguageDropdown.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        final JButton commentTranslateButton = new JButton("Translate Comment");
+        commentTranslateButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        commentTranslateButton.setFocusPainted(false);
+        commentTranslateButton.setBackground(new Color(200, 220, 240));
+        commentTranslateButton.setForeground(new Color(50, 50, 50));
+        commentTranslateButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        commentTranslateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        final JLabel commentTranslationStatusLabel = new JLabel("Select language and translate.");
+        commentTranslationStatusLabel.setFont(new Font("Arial", Font.ITALIC, 11));
+        commentTranslationStatusLabel.setForeground(new Color(150, 150, 150));
+
+        final JTextArea translatedReplyContentArea = new JTextArea(3, 40);
+        translatedReplyContentArea.setEditable(false);
+        translatedReplyContentArea.setLineWrap(true);
+        translatedReplyContentArea.setWrapStyleWord(true);
+        translatedReplyContentArea.setFont(new Font("Arial", Font.ITALIC, 13));
+        translatedReplyContentArea.setBackground(new Color(240, 240, 245));
+        translatedReplyContentArea.setForeground(new Color(50, 50, 50));
+        final JScrollPane translatedReplyContentScrollPane = new JScrollPane(translatedReplyContentArea);
+        translatedReplyContentScrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 1));
+        translatedReplyContentScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        translatedReplyContentScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+
+        commentTranslationAreas.put(commentKey, translatedReplyContentArea);
+        commentTranslationStatusLabels.put(commentKey, commentTranslationStatusLabel);
+        commentTranslationButtons.put(commentKey, commentTranslateButton);
+
+        commentTranslateButton.addActionListener(e -> {
+            if (translationController == null) {
+                commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
+                return;
+            }
+            commentTranslateButton.setEnabled(false);
+            commentTranslationStatusLabel.setText("Translating...");
+            translatedReplyContentArea.setText("Loading translation...");
+
+            lastTextTranslatedKey = commentKey;
+            translationsInProgress.add(lastTextTranslatedKey);
+
+            final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
+            final String replyContentText = reply.getContent();
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    translationController.execute(replyContentText, targetLanguage);
+                    return null;
+                }
+            }.execute();
+        });
+
+        final JPanel commentControlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        commentControlPanel.setOpaque(false);
+        commentControlPanel.add(new JLabel("Translate:"));
+        commentControlPanel.add(commentLanguageDropdown);
+        commentControlPanel.add(commentTranslateButton);
+
+        commentTranslationPanel.add(commentControlPanel);
+        commentTranslationPanel.add(Box.createVerticalStrut(5));
+        commentTranslationPanel.add(commentTranslationStatusLabel);
+        commentTranslationPanel.add(Box.createVerticalStrut(5));
+        commentTranslationPanel.add(translatedReplyContentScrollPane);
+
+        // Vote and Reply buttons
         final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         actionsPanel.setOpaque(false);
         actionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -340,8 +695,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         replyDownvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        final JLabel replyVoteCount = new JLabel(String.valueOf(
-                reply.getUpvotes() - reply.getDownvotes()));
+        final JLabel replyVoteCount = new JLabel(String.valueOf(reply.getUpvotes() - reply.getDownvotes()));
         replyVoteCount.setFont(new Font("Arial", Font.BOLD, 13));
         replyVoteCount.setForeground(new Color(100, 100, 100));
 
@@ -364,6 +718,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         actionsPanel.add(replyVoteCount);
         actionsPanel.add(Box.createHorizontalStrut(8));
         actionsPanel.add(replyButton);
+
+        replyUpvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(true, reply.getId());
+            }
+        });
+
+        replyDownvoteButton.addActionListener(e -> {
+            if (voteController != null) {
+                voteController.execute(false, reply.getId());
+            }
+        });
 
         // Reply box
         final JPanel replyPanel = new JPanel(new BorderLayout());
@@ -450,6 +816,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
+
+        panel.add(commentTranslationPanel);
+        panel.add(Box.createVerticalStrut(10));
+
         panel.add(actionsPanel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(replyPanel);
@@ -475,27 +845,33 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.controller = controller;
     }
 
-    public void setReplyController(ReplyPostController replyController) { this.replyController = replyController; }
+    public void setReadPostController(ReadPostController controller) {
+        this.controller = controller;
+    }
+
+    public void setTranslationController(TranslationController controller) {
+        this.translationController = controller;
+    }
+
+    public void setVoteController(VoteController voteController) {
+        this.voteController = voteController;
+    }
 
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;
     }
 
-    /**
-     * Loads a post by its ID.
-     * @param postId the unique identifier of the post to load
-     */
     public void loadPost(long postId) {
+        this.currentPostId = postId;
         if (controller != null) {
             controller.execute(postId);
         }
     }
 
-    /**
-     * Sends a comment/reply
-     * @param content The content of the reply
-     * @param parentId The id of the reply's parent
-     */
+    public void setReplyController(ReplyPostController replyController) {
+        this.replyController = replyController;
+    }
+
     public void sendReply(String content, long parentId) {
         replyController.execute(content, parentId);
     }

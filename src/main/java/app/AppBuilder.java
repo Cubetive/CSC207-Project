@@ -354,7 +354,6 @@ public class AppBuilder {
         return this;
     }
 
-
     /**
      * Adds the Edit Profile Use Case to the application.
      * @return this builder

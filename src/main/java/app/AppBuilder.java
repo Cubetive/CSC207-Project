@@ -328,11 +328,15 @@ public class AppBuilder {
         
         // Set up view referenced post button to navigate to the referenced post
         postReadingView.setOnViewReferencedPostClick(() -> {
-            // The referenced post ID is already handled in the view's action listener
-            // This just ensures navigation works properly
-            if (postReadingView != null) {
+            // Get the referenced post ID from the current state and load it
+            final interface_adapter.read_post.ReadPostState state = readPostViewModel.getState();
+            if (state.getReferencedPost() != null && postReadingView != null) {
+                final long referencedPostId = state.getReferencedPost().getId();
+                // Ensure we're on the post reading view
                 viewManagerModel.setState(postReadingView.getViewName());
                 viewManagerModel.firePropertyChanged();
+                // Load the referenced post
+                postReadingView.loadPost(referencedPostId);
             }
         });
 

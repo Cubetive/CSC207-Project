@@ -44,6 +44,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private String lastTextTranslatedKey = null;
     private final Set<String> translationsInProgress = new HashSet<>();
     private static final String MAIN_POST_KEY = "MAIN_POST";
+    private static final String CONFIRM_CANCEL_MESSAGE = "You have unsaved changes. Are you sure you want to cancel?";
+    private static final String CONFIRM_CANCEL_TITLE = "Confirm Cancel";
 
 
     private final JButton backButton;
@@ -69,8 +71,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
-
-    private long currentPostId; // Tracks the ID of the displayed post
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
@@ -892,6 +892,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     public void setVoteController(VoteController voteController) {
         this.voteController = voteController;
+    }
+
+    public void setReplyController(ReplyPostController replyController) {
+        this.replyController = replyController;
     }
 
     public void setOnBackAction(Runnable onBackAction) {

@@ -65,6 +65,7 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             final List<ReadPostOutputData.ReplyData> nestedReplies = convertReplies(reply.getReplies());
 
             final ReadPostOutputData.ReplyData replyData = new ReadPostOutputData.ReplyData(
+                    reply.getId(),
                     reply.getCreatorUsername(),
                     reply.getContent(),
                     votes[0],  // upvotes

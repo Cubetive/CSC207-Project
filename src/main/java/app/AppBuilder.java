@@ -209,16 +209,12 @@ public class AppBuilder {
 
     /**
      * Adds the Login Use Case to the application.
+     * Note: This method is currently not used as LoginView is not part of the main flow.
      * @return this builder
      */
     public AppBuilder addLoginUseCase() {
-        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(
-                loginViewModel, viewManagerModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(
-                userDataAccessObject, loginOutputBoundary, sessionRepository);
-
-        final LoginController controller = new LoginController(loginInteractor);
-        loginView.setLoginController(controller);
+        // Login use case is not currently integrated into the main application flow
+        // If needed, add LoginView and LoginViewModel to AppBuilder and implement here
         return this;
     }
 
@@ -314,6 +310,34 @@ public class AppBuilder {
 
         return this;
     }
+
+    /**
+     * Adds the Reply Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addReplyPostUseCase() {
+        final ReplyPostOutputBoundary replyPostOutputBoundary =
+                new ReplyPostPresenter(readPostViewModel);
+        final ReplyPostInputBoundary replyPostInteractor =
+                new ReplyPostInteractor(postDataAccessObject, replyPostOutputBoundary, sessionRepository);
+
+        final ReplyPostController controller = new ReplyPostController(replyPostInteractor);
+        if (postReadingView != null) {
+            postReadingView.setReplyController(controller);
+        }
+        return this;
+    }
+
+    /**
+     * Adds the Edit Profile Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addEditProfileUseCase() {
+        // Edit Profile use case setup would go here if needed
+        // Currently not fully integrated into the main application flow
+        return this;
+    }
+
     /**
      * Builds and returns the application JFrame.
      * @return the application JFrame

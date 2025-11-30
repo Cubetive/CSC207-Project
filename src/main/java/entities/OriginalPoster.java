@@ -15,11 +15,6 @@ public class OriginalPoster extends User{
         //TODO: implement deletePost
     }
 
-    public OriginalPost editPost(OriginalPost post, String text){
-        post.editText(text);
-        return post;
-    }
-
     public void referencePost(Post post){
         //TODO: implement referencePost
     }

@@ -43,7 +43,7 @@ public abstract class Post {
         this.votes[0] = upvotes;
         this.votes[1] = downvotes;
         this.referencedPost = null;
-        //Update next id.
+        // Update nextId to ensure it's always higher than loaded IDs
         if (id >= nextId) {
             nextId = id + 1;
         }

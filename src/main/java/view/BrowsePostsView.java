@@ -18,6 +18,15 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.*;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import interface_adapter.search_post.SearchPostController;
+import use_case.search_post.SearchPostInputData;
+
 /**
  * The View for browsing posts.
  */
@@ -26,7 +35,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final BrowsePostsViewModel viewModel;
     private final CreatePostViewModel createPostViewModel;
     private BrowsePostsController controller;
-    private PostClickListener postClickListener;
+    private static PostClickListener postClickListener;
     private Runnable onLogoutAction;
 
     private final JPanel postsPanel;
@@ -39,6 +48,9 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private Runnable onEditProfileClick;
     private Runnable onProfilePictureUpdate;
 
+    private static JTextField searchField;
+    private JPanel searchPanel;
+
     public BrowsePostsView(BrowsePostsViewModel viewModel, CreatePostViewModel createPostViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
@@ -50,14 +62,45 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         // Title panel with BorderLayout for left, center, right alignment
         titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(new Color(70, 130, 180));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 35, 20));
 
         // Title in center
         final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
         title.setFont(new Font("Arial", Font.BOLD, 26));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setHorizontalAlignment(SwingConstants.LEFT);
         title.setForeground(Color.WHITE);
-        titlePanel.add(title, BorderLayout.CENTER);
+        titlePanel.add(title, BorderLayout.WEST);
+
+        searchPanel = new JPanel();
+        searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+        searchPanel.setOpaque(false);
+
+        // Search field
+        searchField = new JTextField();
+        searchField.setOpaque(false);
+
+        searchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        int borderThickness = 3;
+        Border thickLineBorder = BorderFactory.createLineBorder(Color.WHITE, borderThickness);
+
+        // Add a titled border around search box
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+                thickLineBorder,
+                "Search Posts",
+                TitledBorder.LEADING,
+                TitledBorder.TOP,
+                null,
+                Color.WHITE
+        );
+
+        searchField.setBorder(titledBorder);
+
+        searchPanel.add(searchField);
+
+        searchFieldListener();
+
+        titlePanel.add(searchPanel, BorderLayout.CENTER);
 
         // Right panel for profile picture and edit profile button
         final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -112,7 +155,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         });
         leftPanel.add(logoutButton);
 
-        titlePanel.add(title, BorderLayout.CENTER);
         titlePanel.add(leftPanel, BorderLayout.WEST);
         titlePanel.add(rightPanel, BorderLayout.EAST);
 
@@ -177,6 +219,22 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    public void searchFieldListener() {
+
+        // Add search listener
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { searchPosts(); }
+            public void removeUpdate(DocumentEvent e) { searchPosts(); }
+            public void changedUpdate(DocumentEvent e) { searchPosts(); }
+
+            private void searchPosts() {
+                String keyword = searchField.getText();
+                SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(postsPanel, viewModel.getState(), keyword));
+                searchPostController.searchPosts();
+            }
+        });
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("state".equals(evt.getPropertyName())) {
@@ -226,7 +284,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     /**
      * Creates a panel for displaying a single post.
      */
-    private JPanel createPostPanel(BrowsePostsOutputData.PostData post) {
+    public static JPanel createPostPanel(BrowsePostsOutputData.PostData post) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
@@ -243,6 +301,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (postClickListener != null) {
+                    searchField.setText("");
                     postClickListener.onPostClicked(post.getId());
                 }
             }

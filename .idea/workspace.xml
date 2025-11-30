@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Basic Ui now operable. Now moving to creating example app with only creation and reading.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/ExampleDataBaseObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/ExampleDataBaseObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostBasic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostBasic.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/users.csv" afterDir="false" />
-    </list>
+    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Basic Ui now operable. Now moving to creating example app with only creation and reading." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,7 +47,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Main.executor": "Debug",
+    "Application.Main.executor": "Run",
     "Application.TestCreatePostBasic.executor": "Debug",
     "Application.TestCreatePostComplex.executor": "Run",
     "Application.TestCreatePostUI.executor": "Run",
@@ -136,11 +128,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/view/CreatingPostView.java</url>
-          <line>41</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java</url>
           <line>50</line>

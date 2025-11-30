@@ -200,6 +200,7 @@ public class FilePostDataAccessObject implements
     //Save a new original post.
     @Override
     public void save(OriginalPost originalPost) {
+        List<OriginalPost> currentPosts = this.getAllPosts();
         this.posts.add(originalPost);
         this.save();
     }

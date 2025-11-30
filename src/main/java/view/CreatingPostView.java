@@ -42,6 +42,13 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                             createPostController.execute(currentState.getTitle(),
                                     currentState.getContent()
                             );
+                            boolean succeeded = createPostController.isSuccess();
+                            if (succeeded) {
+                                setVisible(false);
+                                contentTextField.setText("");
+                                titleTextField.setText("");
+                                createPostController.resetSuccess();
+                            }
                         }
                     }
 
@@ -52,22 +59,28 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         addDocumentListener(titleTextField, this::updateTitle);
         addDocumentListener(contentTextField, this::updateContent);
 
-        //TODO: Discuss with fred integration problems. In the meantime, below is mouse tracker for updating to
-        //TODO: ReadingPostView.
-
         //TODO: Add ActionListeners for other buttons.
 
         //Placeholder Labels for future buttons
-        final JButton logout = new JButton("Logout");
-        final JButton search = new JButton("Search");
-        final JButton browse = new JButton("Browse");
-        final JButton profile = new JButton("Profile");
+        final JButton backToBrowse = new JButton("Back");
         final JPanel buttons = new JPanel();
-        buttons.add(logout);
-        buttons.add(search);
-        buttons.add(browse);
-        buttons.add(profile);
+        buttons.add(backToBrowse);
         buttons.add(createPostButton);
+        backToBrowse.addActionListener(
+                // Button Logic
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(backToBrowse)) {
+                            setVisible(false);
+                            contentTextField.setText("");
+                            titleTextField.setText("");
+                            createPostController.resetSuccess();
+                            createPostController.switchToBrowseView();
+                        }
+                    }
+
+                }
+        );
 
         //Content setup.
         final JPanel contentPanel = new JPanel();

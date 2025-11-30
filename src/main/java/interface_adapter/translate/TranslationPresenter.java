@@ -38,6 +38,8 @@ public class TranslationPresenter implements TranslationOutputBoundary {
             translationState.setTargetLanguage(outputData.getTargetLanguage());
             translationState.setTranslationError(null); // Clear any previous error
 
+            System.out.println("DEBUG: Presenter setting isTranslationSuccessful = TRUE");
+
             translationState.setTranslationSuccessful(true);
 
             this.translationViewModel.setState(translationState);

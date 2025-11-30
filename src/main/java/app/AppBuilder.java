@@ -18,7 +18,6 @@ import view.LoginView;
 import view.PostReadingView;
 import view.SignupView;
 import view.ViewManager;
-import view.EditProfileView;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
 import data_access.InMemorySessionRepository;
@@ -119,38 +118,10 @@ public class AppBuilder {
     // For setting up TranslationInteractor
     private ReadPostDataAccessInterface readPostDataAccessInterface;
 
-//    public AppBuilder() {
-//        cardPanel.setLayout(cardLayout);
-//
-//        // --- NEW (FIX): Initialize ViewModel in constructor to guarantee it's not null ---
-//        this.translationViewModel = new TranslationViewModel();
-//
-//        // Add property change listener to load posts when browse posts view becomes active
-//        viewManagerModel.addPropertyChangeListener(new PropertyChangeListener() {
-//            @Override
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                if ("state".equals(evt.getPropertyName())) {
-//                    final String viewName = (String) evt.getNewValue();
-//
-//                    // 🔥 DEBUG LINE 1: See what view is actually being requested
-//                    System.out.println("APP BUILDER DEBUG: View switching to: [" + viewName + "]");
-//
-//                    // Load posts when browse posts view becomes active
-//                    if ("browse posts".equals(viewName) && browsePostsView != null) {
-//                        browsePostsView.loadPosts();
-//                    }
-//
-//                    if ("browse posts".equals(viewName) && browsePostsView != null) {
-//                        System.out.println("APP BUILDER DEBUG: Triggering loadPosts()..."); // 🔥 DEBUG LINE 2
-//                        browsePostsView.loadPosts();
-//                    }
-//                }
-//            }
-//        });
-//    }
-
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+        this.translationDataAccessObject = new TranslationDataAccessObject();
+        this.translationViewModel = new TranslationViewModel();
 
         // Add property change listener to load posts when browse posts view becomes active
         // and load user data when edit profile view becomes active

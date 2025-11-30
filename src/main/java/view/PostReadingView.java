@@ -365,13 +365,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 final ReadPostState state = (ReadPostState) evt.getNewValue();
                 updateView(state);
             }
-        } else if (evt.getSource() == translationViewModel) {
-            if (evt.getPropertyName().equals(TranslationViewModel.STATE_PROPERTY_NAME)) {
-                final TranslationState state = (TranslationState) evt.getNewValue();
-                SwingUtilities.invokeLater(() -> {
-                    handleTranslationChange(state);
-                });
-            }
+        } // 2. Translation Update (REMOVED SOURCE CHECK)
+        // We rely solely on the unique property name "translationState"
+        else if (TranslationViewModel.STATE_PROPERTY_NAME.equals(evt.getPropertyName())) {
+
+            final TranslationState state = (TranslationState) evt.getNewValue();
+
+            // Debug line to prove we caught it
+            System.out.println("DEBUG: View received translation event! Success: " + state.isTranslationSuccessful());
+
+            SwingUtilities.invokeLater(() -> {
+                handleTranslationChange(state);
+            });
         } else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
             // Clear comment field
             commentField.setText("");
@@ -810,6 +815,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
+
+        panel.add(commentTranslationPanel);
+        panel.add(Box.createVerticalStrut(10));
+
         panel.add(actionsPanel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(replyPanel);

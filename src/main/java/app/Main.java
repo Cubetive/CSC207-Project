@@ -21,6 +21,8 @@ public class Main {
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
+                .addVoteUseCase()
+                .addTranslationUseCase()
                 .addReplyPostUseCase()
                 .addEditProfileUseCase()
                 .build();

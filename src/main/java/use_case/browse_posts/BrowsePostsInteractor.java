@@ -42,6 +42,23 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         final List<BrowsePostsOutputData.PostData> postDataList = new ArrayList<>();
         for (OriginalPost post : posts) {
             final int[] votes = post.getVotes();
+            
+            // Check if post has a reference
+            boolean hasReference = post.hasReference();
+            String referencedPostTitle = null;
+            if (hasReference && post.getReferencedPost() != null) {
+                final entities.Post referencedPost = post.getReferencedPost();
+                if (referencedPost instanceof OriginalPost) {
+                    referencedPostTitle = ((OriginalPost) referencedPost).getTitle();
+                } else {
+                    // For reply posts, use content preview
+                    final String content = referencedPost.getContent();
+                    referencedPostTitle = content.length() > 50 
+                            ? content.substring(0, 50) + "..." 
+                            : content;
+                }
+            }
+            
             final BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
                     post.getId(),
                     post.getTitle(),
@@ -49,7 +66,9 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
                     post.getCreatorUsername(),
                     post.getCreationDate(),
                     votes[0],  // upvotes
-                    votes[1]   // downvotes
+                    votes[1],  // downvotes
+                    hasReference,
+                    referencedPostTitle
             );
             postDataList.add(postData);
         }

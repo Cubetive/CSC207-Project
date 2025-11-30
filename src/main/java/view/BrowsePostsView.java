@@ -253,11 +253,31 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             }
         });
 
-        // Title
+        // Title with reference indicator
+        final JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        titlePanel.setBackground(Color.WHITE);
+        titlePanel.setOpaque(false);
+        
         final JLabel titleLabel = new JLabel(post.getTitle());
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(50, 50, 50));
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titlePanel.add(titleLabel);
+        
+        // Add reference indicator if post has a reference
+        if (post.hasReference()) {
+            final JLabel referenceIndicator = new JLabel("🔗 References: " + 
+                    (post.getReferencedPostTitle() != null && !post.getReferencedPostTitle().isEmpty() 
+                            ? post.getReferencedPostTitle() 
+                            : "Another Post"));
+            referenceIndicator.setFont(new Font("Arial", Font.ITALIC, 12));
+            referenceIndicator.setForeground(new Color(70, 130, 180));
+            referenceIndicator.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(70, 130, 180), 1),
+                    BorderFactory.createEmptyBorder(2, 6, 2, 6)
+            ));
+            titlePanel.add(referenceIndicator);
+        }
+        titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Username and creation date
         final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a");
@@ -280,7 +300,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         contentArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentArea.setRows(2);
 
-        panel.add(titleLabel);
+        panel.add(titlePanel);
         panel.add(Box.createVerticalStrut(6));
         panel.add(usernameLabel);
         panel.add(Box.createVerticalStrut(10));

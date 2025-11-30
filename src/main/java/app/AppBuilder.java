@@ -325,6 +325,16 @@ public class AppBuilder {
             viewManagerModel.setState(browsePostsView.getViewName());
             viewManagerModel.firePropertyChanged();
         });
+        
+        // Set up view referenced post button to navigate to the referenced post
+        postReadingView.setOnViewReferencedPostClick(() -> {
+            // The referenced post ID is already handled in the view's action listener
+            // This just ensures navigation works properly
+            if (postReadingView != null) {
+                viewManagerModel.setState(postReadingView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            }
+        });
 
         return this;
     }

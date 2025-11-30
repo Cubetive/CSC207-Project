@@ -8,6 +8,9 @@
       <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" afterDir="false" />
+    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Merge branch 'main' into reply-post-test&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/data_access/InMemoryPostDataAccessObject.java">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostState.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" afterDir="false" />
@@ -38,6 +41,7 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/data_access/FilePostDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/FilePostDataAccessObject.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/data_access/FileUserDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/FileUserDataAccessObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/data_access/InMemoryUserDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryUserDataAccessObject.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/entities/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entities/Post.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entities/User.java" afterDir="false" />
@@ -54,6 +58,7 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/use_case/read_post/ReadPostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/read_post/ReadPostInteractor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/use_case/reply_post/ReplyPostInteractorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/use_case/reply_post/ReplyPostInteractorTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/users.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,6 +110,7 @@
     "Application.TestCreatePostBasic.executor": "Debug",
     "Application.TestCreatePostComplex.executor": "Run",
     "Application.TestCreatePostUI.executor": "Run",
+    "JUnit.ReplyPostInteractorTest.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "Merging logout-use-case",

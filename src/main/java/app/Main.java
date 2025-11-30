@@ -19,9 +19,6 @@ public class Main {
                 .addLogoutUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
-                .addReplyPostUseCase()
-                .addVoteUseCase()        // Don't forget this!
-                .addEditProfileUseCase()
                 .build();
 
         application.pack();

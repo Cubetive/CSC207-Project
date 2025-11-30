@@ -24,15 +24,13 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
     public void execute() {
         try {
             final List<OriginalPost> posts = postDataAccess.getAllPosts();
-            posts.sort((p1, p2) -> {
-                int score1 = p1.getVotes()[0] - p1.getVotes()[1];
-                int score2 = p2.getVotes()[0] - p2.getVotes()[1];
-                return score2 - score1; // Descending
-            });
+
             // Convert entity posts to output data
             final List<BrowsePostsOutputData.PostData> postDataList = getPostData(posts);
+
             final BrowsePostsOutputData outputData = new BrowsePostsOutputData(postDataList);
             outputBoundary.prepareSuccessView(outputData);
+
         } catch (Exception e) {
             outputBoundary.prepareFailView("Failed to load posts: " + e.getMessage());
         }

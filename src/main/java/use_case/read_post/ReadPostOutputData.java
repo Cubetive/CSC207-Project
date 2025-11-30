@@ -58,8 +58,8 @@ public class ReadPostOutputData {
     public static class ReplyData {
         private final String username;
         private final String content;
-        private int upvotes;
-        private int downvotes;
+        private final int upvotes;
+        private final int downvotes;
         private final List<ReplyData> nestedReplies;
 
         public ReplyData(String username, String content, int upvotes, int downvotes,
@@ -89,14 +89,6 @@ public class ReadPostOutputData {
 
         public List<ReplyData> getNestedReplies() {
             return nestedReplies;
-        }
-
-        public void setUpvotes(int upvotes) {
-            this.upvotes = upvotes;
-        }
-
-        public void setDownvotes(int downvotes) {
-            this.downvotes = downvotes;
         }
     }
 }

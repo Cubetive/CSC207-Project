@@ -25,6 +25,64 @@ public class User {
         this.replies = new ArrayList<>();
     }
 
+    public void login() {
+        // TODO: Implement login
+    }
+
+    public void changePassword(String oldPassword, String newPassword) {
+        if (this.password.equals(oldPassword)) {
+            this.password = newPassword;
+        }
+    }
+
+    public void logout() {
+        // TODO: Implement logout
+    }
+
+    public void editProfile(String full_name, String bio, String profilePicture) {
+        if (full_name != null && !full_name.trim().isEmpty()) {
+            this.full_name = full_name;
+        }
+        if (bio != null) {
+            this.bio = bio;
+        }
+        if (profilePicture != null) {
+            this.profilePicture = profilePicture;
+        }
+    }
+
+    public void viewProfile() {
+        // TODO: Implement viewProfile
+    }
+
+    public List<OriginalPost> browsePosts() {
+        // TODO: Implement browsePosts
+        return List.of();
+    }
+
+    public List<OriginalPost> searchPosts(String keyword) {
+        List<OriginalPost> search_list = new ArrayList<OriginalPost>();
+        for(int i = 0; i < this.original_posts.size(); i++) {
+            if (this.original_posts.get(i).getTitle().contains(keyword)) {
+                search_list.add(this.original_posts.get(i));
+            }
+        }
+        return search_list;
+    }
+
+    public String translateText(Post post, String output_lang) {
+        // TODO: Implement translateText
+        return output_lang;
+    }
+
+    public void upvotePost(Post post) {
+        // TODO: Implement upvotePost
+    }
+
+    public void downvotePost(Post post) {
+        // TODO: Implement downvotePoster
+    }
+
     // Getters
     public String getFullName() {
         return full_name;
@@ -65,6 +123,10 @@ public class User {
     // Setters for mutable fields
     public void setFullName(String full_name) {
         this.full_name = full_name;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setPassword(String password) {

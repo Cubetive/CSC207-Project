@@ -10,6 +10,7 @@ import interface_adapter.create_post.CreatePostViewModel;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.translate.TranslationViewModel;
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
@@ -73,7 +74,8 @@ public class CreatePostTestBuilder {
 
     public CreatePostTestBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        postReadingView = new PostReadingView(readPostViewModel);
+        TranslationViewModel translationViewModel = new TranslationViewModel();
+        postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
         cardPanel.add(postReadingView, postReadingView.getViewName());
         return this;
     }

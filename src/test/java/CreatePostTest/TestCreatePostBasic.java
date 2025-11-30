@@ -1,6 +1,7 @@
 package CreatePostTest;
 
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.translate.TranslationViewModel;
 import view.CreatingPostView;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_post.CreatePostController;
@@ -17,6 +18,7 @@ public class TestCreatePostBasic {
     public static void main(String[] args) {
         CreatePostViewModel viewModel = new CreatePostViewModel();
         ReadPostViewModel readPostViewModel = new ReadPostViewModel();
+        TranslationViewModel  translationViewModel = new TranslationViewModel();
         final CreatePostOutputBoundary presenter = new CreatePostPresenter(
                 viewModel,
                 new ViewManagerModel(),
@@ -30,7 +32,7 @@ public class TestCreatePostBasic {
         );
 
 
-        PostReadingView postReadingView = new PostReadingView(readPostViewModel);
+        PostReadingView postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
 
         CreatePostController controller = new CreatePostController(interactor);
         CreatingPostView view = new CreatingPostView(viewModel);

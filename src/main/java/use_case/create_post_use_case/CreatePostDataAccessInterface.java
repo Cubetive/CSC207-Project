@@ -4,6 +4,7 @@ import entities.OriginalPost;
 import entities.Post;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface CreatePostDataAccessInterface {
 
@@ -12,5 +13,7 @@ public interface CreatePostDataAccessInterface {
 
     // Saves a post to database.
     void save(OriginalPost originalPost);
+
+    List<OriginalPost> getAllPosts();
 
 }

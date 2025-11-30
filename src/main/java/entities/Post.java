@@ -43,6 +43,10 @@ public abstract class Post {
         this.votes[0] = upvotes;
         this.votes[1] = downvotes;
         this.referencedPost = null;
+        //Update next id.
+        if (id >= nextId) {
+            nextId = id + 1;
+        }
     }
 
     public Date getCreationDate() {

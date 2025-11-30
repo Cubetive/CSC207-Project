@@ -3,6 +3,7 @@ package use_case.create_post_use_case;
 import entities.OriginalPost;
 
 import java.util.Date;
+import java.util.List;
 
 public class CreatePostInteractor implements CreatePostInputBoundary{
     private final CreatePostDataAccessInterface filePostAccess;
@@ -28,6 +29,7 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
             createPostPresenter.prepareMissingFieldView("Missing content or title.");
         }
         else {
+            List<OriginalPost> list = filePostAccess.getAllPosts();
             OriginalPost originalPost = new OriginalPost(username, title, content); // Create Post object.
 
             filePostAccess.save(originalPost); //saves the Post to Database.

@@ -263,19 +263,43 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titleLabel.setForeground(new Color(50, 50, 50));
         titlePanel.add(titleLabel);
         
-        // Add reference indicator if post has a reference
-        if (post.hasReference()) {
-            final JLabel referenceIndicator = new JLabel("🔗 References: " + 
+        // Add clickable reference indicator if post has a reference
+        if (post.hasReference() && post.getReferencedPostId() != null) {
+            final JButton referenceButton = new JButton("🔗 References: " + 
                     (post.getReferencedPostTitle() != null && !post.getReferencedPostTitle().isEmpty() 
                             ? post.getReferencedPostTitle() 
                             : "Another Post"));
-            referenceIndicator.setFont(new Font("Arial", Font.ITALIC, 12));
-            referenceIndicator.setForeground(new Color(70, 130, 180));
-            referenceIndicator.setBorder(BorderFactory.createCompoundBorder(
+            referenceButton.setFont(new Font("Arial", Font.ITALIC, 12));
+            referenceButton.setForeground(new Color(70, 130, 180));
+            referenceButton.setBackground(Color.WHITE);
+            referenceButton.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(70, 130, 180), 1),
                     BorderFactory.createEmptyBorder(2, 6, 2, 6)
             ));
-            titlePanel.add(referenceIndicator);
+            referenceButton.setFocusPainted(false);
+            referenceButton.setContentAreaFilled(false);
+            referenceButton.setOpaque(true);
+            referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            referenceButton.addActionListener(e -> {
+                e.consume(); // Prevent event from bubbling to panel click
+                if (postClickListener != null) {
+                    postClickListener.onPostClicked(post.getReferencedPostId());
+                }
+            });
+            // Add hover effect
+            referenceButton.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    referenceButton.setBackground(new Color(240, 248, 255));
+                    referenceButton.setForeground(new Color(50, 100, 150));
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    referenceButton.setBackground(Color.WHITE);
+                    referenceButton.setForeground(new Color(70, 130, 180));
+                }
+            });
+            titlePanel.add(referenceButton);
         }
         titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 

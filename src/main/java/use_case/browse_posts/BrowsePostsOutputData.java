@@ -31,15 +31,16 @@ public class BrowsePostsOutputData {
         private final int downvotes;
         private final boolean hasReference;
         private final String referencedPostTitle;
+        private final Long referencedPostId;
 
         public PostData(long id, String title, String content, String username,
                        Date creationDate, int upvotes, int downvotes) {
-            this(id, title, content, username, creationDate, upvotes, downvotes, false, null);
+            this(id, title, content, username, creationDate, upvotes, downvotes, false, null, null);
         }
         
         public PostData(long id, String title, String content, String username,
                        Date creationDate, int upvotes, int downvotes,
-                       boolean hasReference, String referencedPostTitle) {
+                       boolean hasReference, String referencedPostTitle, Long referencedPostId) {
             this.id = id;
             this.title = title;
             this.content = content;
@@ -49,6 +50,7 @@ public class BrowsePostsOutputData {
             this.downvotes = downvotes;
             this.hasReference = hasReference;
             this.referencedPostTitle = referencedPostTitle;
+            this.referencedPostId = referencedPostId;
         }
 
         public long getId() {
@@ -85,6 +87,10 @@ public class BrowsePostsOutputData {
         
         public String getReferencedPostTitle() {
             return referencedPostTitle;
+        }
+        
+        public Long getReferencedPostId() {
+            return referencedPostId;
         }
     }
 }

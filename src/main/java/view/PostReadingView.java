@@ -80,6 +80,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private Runnable onViewReferencedPostClick;
     private final JPanel referencingPostsContainer;
     private final JPanel referencingPostsListPanel;
+    private final JPanel referenceBannerPanel;
+    private final JButton referenceBannerButton;
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
@@ -156,6 +158,55 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         contentArea.setForeground(new Color(50, 50, 50));
 
         contentContainer.add(contentArea, BorderLayout.CENTER);
+
+        // Reference banner (shown when this post references another post)
+        referenceBannerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        referenceBannerPanel.setBackground(new Color(240, 248, 255)); // Light blue background
+        referenceBannerPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 4, 1, 1, new Color(70, 130, 180)),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        referenceBannerPanel.setVisible(false);
+        referenceBannerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        referenceBannerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        
+        final JLabel referenceBannerLabel = new JLabel("🔗 This post references:");
+        referenceBannerLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        referenceBannerLabel.setForeground(new Color(50, 50, 50));
+        
+        referenceBannerButton = new JButton();
+        referenceBannerButton.setFont(new Font("Arial", Font.PLAIN, 13));
+        referenceBannerButton.setForeground(new Color(70, 130, 180));
+        referenceBannerButton.setBackground(new Color(240, 248, 255));
+        referenceBannerButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        referenceBannerButton.setFocusPainted(false);
+        referenceBannerButton.setContentAreaFilled(false);
+        referenceBannerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        referenceBannerButton.addActionListener(e -> {
+            if (onViewReferencedPostClick != null) {
+                onViewReferencedPostClick.run();
+            } else if (controller != null) {
+                // Get referenced post ID from state
+                final ReadPostState state = viewModel.getState();
+                if (state.getReferencedPost() != null) {
+                    loadPost(state.getReferencedPost().getId());
+                }
+            }
+        });
+        // Add hover effect
+        referenceBannerButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                referenceBannerButton.setForeground(new Color(50, 100, 150));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                referenceBannerButton.setForeground(new Color(70, 130, 180));
+            }
+        });
+        
+        referenceBannerPanel.add(referenceBannerLabel);
+        referenceBannerPanel.add(referenceBannerButton);
 
         // Translation Controls and Display
         final JPanel translationPanel = new JPanel();
@@ -425,6 +476,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         referencingPostsContainer.add(referencingPostsScrollPane, BorderLayout.CENTER);
         
         // Add components to main panel
+        mainPanel.add(referenceBannerPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(contentContainer);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(referencedPostContainer);
@@ -633,6 +686,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         // Update referenced post display
         final ReadPostOutputData.ReferencedPostData referencedPost = state.getReferencedPost();
         if (referencedPost != null) {
+            // Show reference banner at top
+            final String referencedTitle = referencedPost.getTitle() != null && !referencedPost.getTitle().isEmpty()
+                    ? referencedPost.getTitle()
+                    : "Original Post";
+            referenceBannerButton.setText(referencedTitle);
+            referenceBannerPanel.setVisible(true);
+            
+            // Update referenced post container
             referencedPostTitleLabel.setText(
                     referencedPost.getTitle().isEmpty() ? "Referenced Post" : referencedPost.getTitle());
             referencedPostContentArea.setText(referencedPost.getContent());
@@ -653,6 +714,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 }
             });
         } else {
+            // Hide reference banner and container if no reference
+            referenceBannerPanel.setVisible(false);
             referencedPostContainer.setVisible(false);
         }
         

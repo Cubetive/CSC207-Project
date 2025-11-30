@@ -46,8 +46,10 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
             // Check if post has a reference
             boolean hasReference = post.hasReference();
             String referencedPostTitle = null;
+            Long referencedPostId = null;
             if (hasReference && post.getReferencedPost() != null) {
                 final entities.Post referencedPost = post.getReferencedPost();
+                referencedPostId = referencedPost.getId();
                 if (referencedPost instanceof OriginalPost) {
                     referencedPostTitle = ((OriginalPost) referencedPost).getTitle();
                 } else {
@@ -68,7 +70,8 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
                     votes[0],  // upvotes
                     votes[1],  // downvotes
                     hasReference,
-                    referencedPostTitle
+                    referencedPostTitle,
+                    referencedPostId
             );
             postDataList.add(postData);
         }

@@ -1,5 +1,6 @@
 package use_case.create_post_use_case;
 
+import entities.OriginalPost;
 import entities.Post;
 
 import java.util.ArrayList;
@@ -10,14 +11,6 @@ public interface CreatePostDataAccessInterface {
     //Boolean existsWithName(String name);
 
     // Saves a post to database.
-    void save(Post post);
+    void save(OriginalPost originalPost);
 
-    // Fetches a specific post.
-    Post getPost(String title);
-
-    //Get all viewable Posts.
-    ArrayList<Post> getAllPosts();
-
-    //Get all Posts with keyword in title
-    ArrayList<Post> getSelectPosts(String keyword);
 }

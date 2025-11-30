@@ -5,6 +5,7 @@ import entities.OriginalPost;
 import entities.Post;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
+import use_case.create_post_use_case.CreatePostDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
 import use_case.reply_post.ReplyPostDataAccessInterface;
 
@@ -21,7 +22,8 @@ import java.util.*;
 public class FilePostDataAccessObject implements
         BrowsePostsDataAccessInterface,
         ReadPostDataAccessInterface,
-        ReplyPostDataAccessInterface  {
+        ReplyPostDataAccessInterface, CreatePostDataAccessInterface
+        {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
@@ -125,6 +127,8 @@ public class FilePostDataAccessObject implements
         return postIdMap.get(id);
     }
 
+
+    // Looks at post array stored in this object and saves its contents to given Gson path (JSON database)
     public void save() {
         JsonArray jsonArray = new JsonArray();
 
@@ -179,16 +183,25 @@ public class FilePostDataAccessObject implements
 
         return replyPostObj;
     }
-
+    //Save a reply to an original post.
     @Override
     public void save(ReplyPost replyPost, OriginalPost parentPost) {
         parentPost.addReply(replyPost);
         this.save();
     }
 
+    //Save a reply to another reply.
     @Override
     public void save(ReplyPost replyPost, ReplyPost parentPost) {
         parentPost.addReply(replyPost);
+        this.save();
+    }
+
+    //Save a new original post.
+    @Override
+    public void save(OriginalPost originalPost) {
+        List<OriginalPost> currentPosts = this.getAllPosts();
+        this.posts.add(originalPost);
         this.save();
     }
 }

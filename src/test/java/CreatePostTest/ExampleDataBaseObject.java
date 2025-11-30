@@ -1,30 +1,25 @@
 package CreatePostTest;
 
+import data_access.FilePostDataAccessObject;
 import entities.OriginalPost;
 import entities.Post;
 import use_case.create_post_use_case.CreatePostDataAccessInterface;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-public class ExampleDataBaseObject implements CreatePostDataAccessInterface {
-    public void save(Post post) {}
-
-    public Post getPost(String title) {
-        if (title.equals("RandomTitle")) {
-            return new OriginalPost("RandomTitle", "RandomContent", "SomeUsername");
-        }
-        else {
-            return new OriginalPost("notRandomTitle", "notRandomContent", "notSomeUsername");
-        }
+public class ExampleDataBaseObject extends FilePostDataAccessObject {
+    /**
+     * Creates a new FilePostDataAccessObject that reads from the given file.
+     *
+     * @param filePath the path to the JSON file containing posts
+     */
+    public ExampleDataBaseObject(String filePath) {
+        super(filePath);
     }
 
-    public ArrayList<Post> getAllPosts() {
-        ArrayList<Post> posts = new ArrayList<>();
-        posts.add(new OriginalPost("RandomTitle", "RandomContent", "SomeUsername"));
-        return posts;
-    }
-
-    public ArrayList<Post> getSelectPosts(String keyword) {
-        return getAllPosts();
+    public void save(OriginalPost post) {
+        //Overwrite for test case.
+        super.save(post);
     }
 }

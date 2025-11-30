@@ -49,6 +49,7 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
         this.viewManagerModel.setState(readPostViewModel.getViewName());
         this.viewManagerModel.firePropertyChanged();
+        //TODO: call load post from PostReadingView (needs this object) to display.
     }
 
     public void prepareMissingFieldView(String error) {

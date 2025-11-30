@@ -46,6 +46,7 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
     }
 
     public void switchToCreatePostView() {
+        createPostViewModel.setState(new CreatePostState());
         this.viewManagerModel.setState(createPostViewModel.getViewName());
         this.viewManagerModel.firePropertyChanged();
     }

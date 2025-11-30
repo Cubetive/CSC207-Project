@@ -46,6 +46,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                             boolean succeeded = createPostController.isSuccess();
                             if (succeeded) {
                                 setVisible(false);
+                                contentTextField.setText("");
+                                titleTextField.setText("");
                                 createPostController.resetSuccess();
                             }
                         }

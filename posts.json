@@ -5,32 +5,66 @@
     "username": "SomeUsername",
     "date": "11/20/2025",
     "content": "Some random description and extra words",
-    "votes": [5, 1],
+    "votes": [
+      7,
+      5
+    ],
     "replies": [
       {
         "id": 2,
         "username": "Commenter1",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random first comment.",
-        "votes": [2, 0],
+        "votes": [
+          5,
+          4
+        ],
         "replies": []
       },
       {
         "id": 3,
         "username": "Commenter2",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random second comment.",
-        "votes": [3, 1],
+        "votes": [
+          8,
+          4
+        ],
         "replies": [
           {
             "id": 4,
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
-            "votes": [1, 0],
+            "votes": [
+              13,
+              11
+            ],
+            "replies": []
+          },
+          {
+            "id": 14,
+            "username": "SomeUsername",
+            "date": "11/21/2025",
+            "content": "2nd random response to the second comment",
+            "votes": [
+              18,
+              13
+            ],
             "replies": []
           }
         ]
+      },
+      {
+        "id": 17,
+        "username": "luciole",
+        "date": "11/26/2025",
+        "content": "Testing",
+        "votes": [
+          3,
+          2
+        ],
+        "replies": []
       }
     ]
   },
@@ -40,32 +74,126 @@
     "username": "Clash Royale",
     "date": "11/17/2025",
     "content": "Some random description and extra words",
-    "votes": [12, 3],
+    "votes": [
+      12,
+      4
+    ],
     "replies": [
       {
         "id": 6,
         "username": "Commenter1",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random first comment.",
-        "votes": [4, 2],
-        "replies": []
+        "votes": [
+          7,
+          2
+        ],
+        "replies": [
+          {
+            "id": 15,
+            "username": "Clash Royale",
+            "date": "11/21/2025",
+            "content": "Nice comment",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
+          }
+        ]
       },
       {
         "id": 7,
         "username": "Commenter2",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random second comment.",
-        "votes": [6, 1],
+        "votes": [
+          6,
+          1
+        ],
         "replies": [
           {
             "id": 8,
             "username": "Responder_To_Commenter2",
             "date": "11/17/2025",
             "content": "Some random response to the second comment",
-            "votes": [2, 1],
+            "votes": [
+              2,
+              1
+            ],
+            "replies": [
+              {
+                "id": 10,
+                "username": "Clash Royale",
+                "date": "11/21/2025",
+                "content": "Some random response to the reply of the second comment",
+                "votes": [
+                  1,
+                  1
+                ],
+                "replies": [
+                  {
+                    "id": 12,
+                    "username": "Clash Royale",
+                    "date": "11/21/2025",
+                    "content": "藍月なくる大好き",
+                    "votes": [
+                      3,
+                      0
+                    ],
+                    "replies": [
+                      {
+                        "id": 13,
+                        "username": "Clash Royale",
+                        "date": "11/21/2025",
+                        "content": "testing",
+                        "votes": [
+                          2,
+                          1
+                        ],
+                        "replies": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "username": "Clash Royale",
+        "date": "11/21/2025",
+        "content": "Y\u0027all should start playing Clash Royale frfr",
+        "votes": [
+          4,
+          0
+        ],
+        "replies": [
+          {
+            "id": 11,
+            "username": "Clash Royale",
+            "date": "11/21/2025",
+            "content": "Yeah I agree!",
+            "votes": [
+              0,
+              0
+            ],
             "replies": []
           }
         ]
+      },
+      {
+        "id": 16,
+        "username": "luciole",
+        "date": "11/26/2025",
+        "content": "Je n\u0027aime pas le Clash Royale",
+        "votes": [
+          0,
+          0
+        ],
+        "replies": []
       }
     ]
   }

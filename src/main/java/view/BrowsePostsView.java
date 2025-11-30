@@ -3,6 +3,8 @@ package view;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
+import interface_adapter.logout.LogoutController;
+import interface_adapter.logout.LogoutPresenter;
 import use_case.browse_posts.BrowsePostsOutputData;
 
 import javax.swing.*;
@@ -19,6 +21,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final BrowsePostsViewModel viewModel;
     private BrowsePostsController controller;
     private PostClickListener postClickListener;
+    private Runnable onLogoutAction;
 
     private final JPanel postsPanel;
     private final JScrollPane scrollPane;
@@ -32,7 +35,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         this.setBackground(new Color(245, 245, 245));
 
         // Title panel
-        final JPanel titlePanel = new JPanel();
+        final JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(new Color(70, 130, 180));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -40,7 +43,28 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         title.setFont(new Font("Arial", Font.BOLD, 26));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(Color.WHITE);
-        titlePanel.add(title);
+
+        final JButton logoutButton = new JButton(LogoutPresenter.LOGOUT_BUTTON);
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 12));
+        logoutButton.setFocusPainted(false);
+        logoutButton.setBackground(new Color(166, 166, 166));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setOpaque(true);
+        logoutButton.setBorderPainted(false);
+        logoutButton.setContentAreaFilled(true);
+        logoutButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(50, 100, 150), 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        logoutButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        logoutButton.addActionListener(e -> {
+            if (onLogoutAction != null) {
+                onLogoutAction.run();
+            }
+        });
+
+        titlePanel.add(title, BorderLayout.CENTER);
+        titlePanel.add(logoutButton, BorderLayout.WEST);
 
         // Posts panel with vertical layout
         postsPanel = new JPanel();
@@ -211,6 +235,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     public void setController(BrowsePostsController controller) {
         this.controller = controller;
+    }
+
+    public void setOnLogoutAction(Runnable onLogoutAction) {
+        this.onLogoutAction = onLogoutAction;
     }
 
     /**

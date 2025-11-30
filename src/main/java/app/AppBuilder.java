@@ -1,7 +1,13 @@
 package app;
 
+import interface_adapter.logout.LogoutController;
+import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
+import use_case.logout.LogoutDataAccessInterface;
+import use_case.logout.LogoutInputBoundary;
+import use_case.logout.LogoutInteractor;
+import use_case.logout.LogoutOutputBoundary;
 import use_case.reply_post.ReplyPostInputBoundary;
 import use_case.reply_post.ReplyPostInteractor;
 import use_case.reply_post.ReplyPostOutputBoundary;
@@ -166,6 +172,23 @@ public class AppBuilder {
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);
+        return this;
+    }
+
+    public AppBuilder addLogoutUseCase() {
+        final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(
+                loginViewModel, viewManagerModel);
+        final LogoutInputBoundary logoutInteractor = new LogoutInteractor(
+                (LogoutDataAccessInterface) sessionRepository, logoutOutputBoundary);
+        final LogoutController controller = new LogoutController(logoutInteractor);
+
+        // Set Logout button in browse posts view
+        browsePostsView.setOnLogoutAction(() -> {
+            controller.execute();
+            // Update the username field with the previous session username as placeholder
+            loginViewModel.firePropertyChange();
+        });
+
         return this;
     }
 

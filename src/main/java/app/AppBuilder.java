@@ -189,7 +189,8 @@ public class AppBuilder {
      */
     public AppBuilder addBrowsePostsView() {
         browsePostsViewModel = new BrowsePostsViewModel();
-        browsePostsView = new BrowsePostsView(browsePostsViewModel);
+        createPostViewModel = new CreatePostViewModel();
+        browsePostsView = new BrowsePostsView(browsePostsViewModel, createPostViewModel);
         cardPanel.add(browsePostsView, browsePostsView.getViewName());
         return this;
     }
@@ -216,8 +217,8 @@ public class AppBuilder {
         return this;
     }
 
+    //Execute after addBrowsePostsView
     public AppBuilder addCreatePostView() {
-        this.createPostViewModel = new CreatePostViewModel();
         creatingPostView = new CreatingPostView(this.createPostViewModel);
         cardPanel.add(creatingPostView, creatingPostView.getViewName());
         return this;
@@ -315,6 +316,9 @@ public class AppBuilder {
     public AppBuilder addBrowsePostsUseCase() {
         final BrowsePostsOutputBoundary browsePostsOutputBoundary =
                 new BrowsePostsPresenter(browsePostsViewModel);
+        //Necessary for creation use case
+        browsePostsOutputBoundary.setCreatePostViewModel(createPostViewModel);
+        browsePostsOutputBoundary.setViewManagerModel(viewManagerModel);
         final BrowsePostsInputBoundary browsePostsInteractor =
                 new BrowsePostsInteractor(postDataAccessObject, browsePostsOutputBoundary);
 

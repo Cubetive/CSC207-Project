@@ -196,5 +196,17 @@
         "replies": []
       }
     ]
+  },
+  {
+    "id": 18,
+    "title": "New Post Experiment",
+    "username": "",
+    "date": "11/30/2025",
+    "content": "Is this working?",
+    "votes": [
+      0,
+      0
+    ],
+    "replies": []
   }
 ]

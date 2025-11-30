@@ -16,6 +16,8 @@ public class Main {
                 .addBrowsePostsView()
                 .addReadPostView()
                 .addEditProfileView()
+                .addCreatePostView()
+                .addCreatePostUseCase()
                 .addLoginUseCase()
                 .addLogoutUseCase()
                 .addSignupUseCase()

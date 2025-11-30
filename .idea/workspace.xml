@@ -4,10 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Fixed post id counting.">
+    <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Added use case and view to AppBuilder.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/app/AppBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/AppBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/browse_posts/BrowsePostsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/browse_posts/BrowsePostsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/browse_posts/BrowsePostsPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/browse_posts/BrowsePostsPresenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsInputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsInputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsOutputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/browse_posts/BrowsePostsOutputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,12 +84,21 @@
       <option name="project" value="LOCAL" />
       <updated>1764519546665</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added use case and view to AppBuilder.">
+      <option name="closed" value="true" />
+      <created>1764520620493</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764520620493</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed post id counting." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed post id counting." />
+    <MESSAGE value="Added use case and view to AppBuilder." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added use case and view to AppBuilder." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

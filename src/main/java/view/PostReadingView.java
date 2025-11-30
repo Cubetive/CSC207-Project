@@ -68,7 +68,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
-    //TODO: update signature for other use cases.
+
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);

@@ -6,9 +6,8 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
 import interface_adapter.upvote_downvote.VoteController;
-import interface_adapter.upvote_downvote.VotePresenter;
-import interface_adapter.translate.TranslationController; // NEW
-import interface_adapter.translate.TranslationViewModel; // NEW
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationViewModel;
 import interface_adapter.translate.TranslationState;
 import use_case.read_post.ReadPostOutputData;
 
@@ -25,9 +24,11 @@ import java.util.Set;
  * The View for reading a post and its replies.
  */
 public class PostReadingView extends JPanel implements PropertyChangeListener {
+    public static final String CONFIRM_CANCEL_TITLE = "Cancel Reply";
+    public static final String CONFIRM_CANCEL_MESSAGE = "Are you sure? This draft will not be saved.";
 
     private final ReadPostViewModel viewModel;
-    private TranslationViewModel translationViewModel = new TranslationViewModel();
+    private TranslationViewModel translationViewModel;
     private ReadPostController controller;
     private ReplyPostController replyController;
     private VoteController voteController;
@@ -45,7 +46,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final Set<String> translationsInProgress = new HashSet<>();
     private static final String MAIN_POST_KEY = "MAIN_POST";
 
-
     private final JButton backButton;
     private final JLabel titleLabel;
     private final JLabel authorLabel;
@@ -61,7 +61,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     // Supported languages for the dropdown
     private static final String[] SUPPORTED_LANGUAGES = {"ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru"};
 
-
     private final JButton upvoteButton;
     private final JButton downvoteButton;
     private final JLabel voteCountLabel;
@@ -70,9 +69,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
 
-    private long currentPostId; // Tracks the ID of the displayed post
-
-    public PostReadingView(ReadPostViewModel viewModel) {
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
@@ -182,7 +178,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Inline ActionListener for the translate button
         translateButton.addActionListener(e -> {
-            if (translationController == null) { // 💡 NEW: Check for controller existence
+            if (translationController == null) {
                 JOptionPane.showMessageDialog(this, "Translation service is not configured.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -251,7 +247,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         final JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         votePanel.setBackground(new Color(245, 245, 245));
 
-        upvoteButton = new JButton("\u25B2");  // Up triangle
+        upvoteButton = new JButton("\u25B2");
         upvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         upvoteButton.setFocusPainted(false);
         upvoteButton.setBackground(new Color(240, 240, 240));
@@ -264,7 +260,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         upvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        downvoteButton = new JButton("\u25BC");  // Down triangle
+        downvoteButton = new JButton("\u25BC");
         downvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         downvoteButton.setFocusPainted(false);
         downvoteButton.setBackground(new Color(240, 240, 240));
@@ -287,14 +283,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         upvoteButton.addActionListener(e -> {
             if (voteController != null) {
-                // true = upvote
                 voteController.execute(true, currentPostId);
             }
         });
 
         downvoteButton.addActionListener(e -> {
             if (voteController != null) {
-                // false = downvote
                 voteController.execute(false, currentPostId);
             }
         });
@@ -341,8 +335,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         // Add components to main panel
         mainPanel.add(contentContainer);
-        // Add translation panel.
-        mainPanel.add(translationPanel);
+        mainPanel.add(translationPanel); // Translation panel added
 
         mainPanel.add(Box.createVerticalStrut(15));
         mainPanel.add(votePanel);
@@ -372,16 +365,23 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 final ReadPostState state = (ReadPostState) evt.getNewValue();
                 updateView(state);
             }
-        }
-        else if (evt.getSource() == translationViewModel) {
-            if (evt.getPropertyName().equals(TranslationViewModel.STATE_PROPERTY_NAME)) {
+        } // 2. Translation Update (REMOVED SOURCE CHECK)
+        // We rely solely on the unique property name "translationState"
+        else if (TranslationViewModel.STATE_PROPERTY_NAME.equals(evt.getPropertyName())) {
 
-                final TranslationState state = (TranslationState) evt.getNewValue();
+            final TranslationState state = (TranslationState) evt.getNewValue();
 
-                SwingUtilities.invokeLater(() -> {
-                    handleTranslationChange(state);
-                });
-            }
+            // Debug line to prove we caught it
+            System.out.println("DEBUG: View received translation event! Success: " + state.isTranslationSuccessful());
+
+            SwingUtilities.invokeLater(() -> {
+                handleTranslationChange(state);
+            });
+        } else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
+            // Clear comment field
+            commentField.setText("");
+            // "Refresh" page
+            loadPost(viewModel.getState().getId());
         }
     }
 
@@ -418,8 +418,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 }
                 translationsInProgress.remove(MAIN_POST_KEY);
             }
-        }
-        else {
+        } else {
             String lookupKey = lastTextTranslatedKey.trim();
 
             try {
@@ -433,7 +432,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
                 if (commentArea != null && commentStatus != null) {
                     if (state.isTranslationSuccessful()) {
-                        // Ensure text is not null
                         String text = state.getTranslatedText() != null ? state.getTranslatedText() : "";
                         commentArea.setText(text);
 
@@ -492,9 +490,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.repaint();
     }
 
-    /**
-     * Resets the main post translation display area.
-     */
     private void clearTranslationDisplay() {
         if (translatedContentArea != null) {
             translatedContentArea.setText("");
@@ -507,18 +502,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         }
     }
 
-    /**
-     * Clears all comment translation areas and internal trackers.
-     */
     private void clearCommentTranslationDisplays() {
         commentTranslationAreas.clear();
         commentTranslationStatusLabels.clear();
         commentTranslationButtons.clear();
     }
 
-    /**
-     * Updates the view based on the current state.
-     */
     private void updateView(ReadPostState state) {
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage(),
@@ -541,13 +530,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         contentArea.setText(state.getContent());
         voteCountLabel.setText(String.valueOf(state.getUpvotes() - state.getDownvotes()));
 
-        // Clear and update replies
         repliesPanel.removeAll();
         if (!state.getReplies().isEmpty()) {
             for (ReadPostOutputData.ReplyData reply : state.getReplies()) {
-                final JPanel replyPanel = createReplyPanel(reply, 0);
+                final JPanel replyPanel = createReplyPanel(reply);
 
-                // Wrapper to force full width
                 final JPanel fullWidthWrapper = new JPanel(new BorderLayout());
                 fullWidthWrapper.setBackground(new Color(245, 245, 245));
                 fullWidthWrapper.add(replyPanel, BorderLayout.CENTER);
@@ -562,28 +549,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         repliesPanel.repaint();
     }
 
-    /**
-     * Creates a panel for displaying a single reply.
-     * @param reply the reply data
-     * @param indentLevel the indentation level for nested replies
-     */
-    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply, int indentLevel) {
+    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
         // Add left indent for nested replies
-        final int leftIndent = indentLevel * 15;
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
-                BorderFactory.createEmptyBorder(12, 15 + leftIndent, 12, 15)
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-
-        // --- Unique Key for this comment (original content) ---
-        // Used to map the translation result back to this specific JTextArea
-        final String commentKey = reply.getContent().trim();
 
         // Reply header
         final JPanel headerPanel = new JPanel(new BorderLayout());
@@ -591,9 +568,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
+        final String commentKey = reply.getContent().trim();
+
         final JLabel usernameLabel = new JLabel(reply.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 13));
         usernameLabel.setForeground(new Color(70, 130, 180));
+
+        headerPanel.add(usernameLabel, BorderLayout.WEST);
 
         // Reply content
         final JTextArea replyContent = new JTextArea(reply.getContent());
@@ -607,7 +588,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyContent.setAlignmentX(Component.LEFT_ALIGNMENT);
         replyContent.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // --- Comment Translation Controls and Display ---
+        // --- Comment Translation UI ---
         final JPanel commentTranslationPanel = new JPanel();
         commentTranslationPanel.setLayout(new BoxLayout(commentTranslationPanel, BoxLayout.Y_AXIS));
         commentTranslationPanel.setBackground(Color.WHITE);
@@ -626,7 +607,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslateButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         commentTranslateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Output elements for this specific comment
         final JLabel commentTranslationStatusLabel = new JLabel("Select language and translate.");
         commentTranslationStatusLabel.setFont(new Font("Arial", Font.ITALIC, 11));
         commentTranslationStatusLabel.setForeground(new Color(150, 150, 150));
@@ -643,26 +623,20 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translatedReplyContentScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         translatedReplyContentScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
-        // Store references for later updating in propertyChange
         commentTranslationAreas.put(commentKey, translatedReplyContentArea);
         commentTranslationStatusLabels.put(commentKey, commentTranslationStatusLabel);
-
         commentTranslationButtons.put(commentKey, commentTranslateButton);
 
-        // Action Listener for Comment Translation
         commentTranslateButton.addActionListener(e -> {
             if (translationController == null) {
                 commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
                 return;
             }
-
             commentTranslateButton.setEnabled(false);
             commentTranslationStatusLabel.setText("Translating...");
             translatedReplyContentArea.setText("Loading translation...");
 
-            // Set the tracking key to this comment's content
             lastTextTranslatedKey = commentKey;
-
             translationsInProgress.add(lastTextTranslatedKey);
 
             final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
@@ -689,7 +663,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslationPanel.add(Box.createVerticalStrut(5));
         commentTranslationPanel.add(translatedReplyContentScrollPane);
 
-        // Vote and reply buttons
+        // Vote and Reply buttons
         final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         actionsPanel.setOpaque(false);
         actionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -721,8 +695,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         replyDownvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        final JLabel replyVoteCount = new JLabel(String.valueOf(
-                reply.getUpvotes() - reply.getDownvotes()));
+        final JLabel replyVoteCount = new JLabel(String.valueOf(reply.getUpvotes() - reply.getDownvotes()));
         replyVoteCount.setFont(new Font("Arial", Font.BOLD, 13));
         replyVoteCount.setForeground(new Color(100, 100, 100));
 
@@ -839,40 +812,29 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         });
 
         // Adding everything in
-        headerPanel.add(usernameLabel, BorderLayout.WEST);
         panel.add(headerPanel);
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
+
         panel.add(commentTranslationPanel);
+        panel.add(Box.createVerticalStrut(10));
+
         panel.add(actionsPanel);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(replyPanel);
 
         // Add nested replies directly to panel
         if (!reply.getNestedReplies().isEmpty()) {
             panel.add(Box.createVerticalStrut(12));
             for (ReadPostOutputData.ReplyData nestedReply : reply.getNestedReplies()) {
-                final JPanel nestedPanel = createReplyPanel(nestedReply, indentLevel + 1);
+                final JPanel nestedPanel = createReplyPanel(nestedReply);
                 panel.add(nestedPanel);
                 panel.add(Box.createVerticalStrut(8));
             }
         }
 
         return panel;
-    }
-
-
-    /**
-     * Loads a post by its ID.
-     * This method is responsible for storing the postId, which is required for subsequent
-     * actions like translation that are not handled by ReadPostState.
-     * @param postId the unique identifier of the post to load
-     */
-    public void loadPost(long postId) {
-        this.currentPostId = postId;
-
-        if (controller != null) {
-            controller.execute(postId);
-        }
     }
 
     public String getViewName() {
@@ -899,14 +861,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.onBackAction = onBackAction;
     }
 
+    public void loadPost(long postId) {
+        this.currentPostId = postId;
+        if (controller != null) {
+            controller.execute(postId);
+        }
+    }
 
-    /**
-     * Sends a comment/reply
-     * @param content The content of the reply
-     * @param parentId The id of the reply's parent
-     */
+    public void setReplyController(ReplyPostController replyController) {
+        this.replyController = replyController;
+    }
+
     public void sendReply(String content, long parentId) {
         replyController.execute(content, parentId);
     }
-
 }

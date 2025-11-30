@@ -114,6 +114,8 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
 
             String apiResponse = response.toString();
 
+            System.out.println("DEBUG: DAO Response Code: " + responseCode);
+
             if (responseCode != 200) {
                 return String.format("ERROR: Translation API Error (%d): %s", responseCode, apiResponse);
             }
@@ -138,6 +140,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                             // Extract the text
                             String translatedText = (String) firstTranslation.get("translatedText");
 
+                            System.out.println("DEBUG: DAO Parsed Text: [" + translatedText + "]");
                             // Unescape common JSON characters that might be returned in the text value
                             return translatedText.replace("\\\"", "\"").replace("\\n",
                                     "\n").replace("\\/", "/");

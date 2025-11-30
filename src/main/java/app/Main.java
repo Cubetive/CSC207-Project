@@ -11,16 +11,19 @@ public class Main {
         final AppBuilder appBuilder = new AppBuilder();
 
         final JFrame application = appBuilder
+                .addLoginView()
                 .addSignupView()
                 .addBrowsePostsView()
                 .addReadPostView()
-                .addTranslationUseCase()
-                .addSignupUseCase()
+                .addEditProfileView()
+                .addLoginUseCase()
                 .addLogoutUseCase()
+                .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
+                .addVoteUseCase()
+                .addTranslationUseCase()
                 .addReplyPostUseCase()
-                .addVoteUseCase()        // Don't forget this!
                 .addEditProfileUseCase()
                 .build();
 

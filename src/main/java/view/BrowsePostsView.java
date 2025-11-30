@@ -288,8 +288,12 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
      * Loads posts when the view becomes visible.
      */
     public void loadPosts() {
+        System.out.println("VIEW DEBUG: loadPosts called. Checking controller...");
         if (controller != null) {
+            System.out.println("VIEW DEBUG: Controller found. Executing...");
             controller.execute();
+        } else {
+            System.err.println("VIEW ERROR: Controller is NULL! The use case was not initialized correctly.");
         }
     }
 

@@ -45,7 +45,7 @@
       {
         "id": 6,
         "username": "Commenter1",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random first comment.",
         "votes": [4, 2],
         "replies": []
@@ -53,7 +53,7 @@
       {
         "id": 7,
         "username": "Commenter2",
-        "date":"11/17/2025",
+        "date": "11/17/2025",
         "content": "Some random second comment.",
         "votes": [6, 1],
         "replies": [
@@ -66,6 +66,40 @@
             "replies": []
           }
         ]
+      },
+      {
+        "id": 9,
+        "username": "Clash Royale",
+        "date": "11/21/2025",
+        "content": "Y\u0027all should start playing Clash Royale frfr",
+        "votes": [
+          0,
+          0
+        ],
+        "replies": [
+          {
+            "id": 11,
+            "username": "Clash Royale",
+            "date": "11/21/2025",
+            "content": "Yeah I agree!",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "username": "luciole",
+        "date": "11/26/2025",
+        "content": "Je n\u0027aime pas le Clash Royale",
+        "votes": [
+          0,
+          0
+        ],
+        "replies": []
       }
     ]
   }

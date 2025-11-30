@@ -51,7 +51,7 @@ public class ReferencePostInteractor implements ReferencePostInputBoundary {
             }
 
             final PostSearchResult result = new PostSearchResult(
-                String.valueOf(System.identityHashCode(post)), // Using hashcode as ID for now
+                String.valueOf(post.getId()), // Use actual post ID
                 title,
                 post.getContent(),
                 post.getCreatorUsername(),

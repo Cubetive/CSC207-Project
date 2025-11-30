@@ -13,9 +13,16 @@ public class ReadPostOutputData {
     private final int upvotes;
     private final int downvotes;
     private final List<ReplyData> replies;
+    private final ReferencedPostData referencedPost;
 
     public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies) {
+        this(id, title, content, username, upvotes, downvotes, replies, null);
+    }
+    
+    public ReadPostOutputData(long id, String title, String content, String username,
+                              int upvotes, int downvotes, List<ReplyData> replies,
+                              ReferencedPostData referencedPost) {
         this.id = id; // NEW
         this.title = title;
         this.content = content;
@@ -23,6 +30,7 @@ public class ReadPostOutputData {
         this.upvotes = upvotes;
         this.downvotes = downvotes;
         this.replies = replies;
+        this.referencedPost = referencedPost;
     }
     //NEW
     public long getId() {
@@ -50,6 +58,10 @@ public class ReadPostOutputData {
 
     public List<ReplyData> getReplies() {
         return replies;
+    }
+    
+    public ReferencedPostData getReferencedPost() {
+        return referencedPost;
     }
 
     /**
@@ -103,6 +115,39 @@ public class ReadPostOutputData {
 
         public void setDownvotes(int downvotes) {
             this.downvotes = downvotes;
+        }
+    }
+    
+    /**
+     * Data holder for referenced post information.
+     */
+    public static class ReferencedPostData {
+        private final long id;
+        private final String title;
+        private final String content;
+        private final String username;
+        
+        public ReferencedPostData(long id, String title, String content, String username) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.username = username;
+        }
+        
+        public long getId() {
+            return id;
+        }
+        
+        public String getTitle() {
+            return title;
+        }
+        
+        public String getContent() {
+            return content;
+        }
+        
+        public String getUsername() {
+            return username;
         }
     }
 }

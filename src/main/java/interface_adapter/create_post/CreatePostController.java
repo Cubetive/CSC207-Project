@@ -22,6 +22,14 @@ public class CreatePostController {
 
         createPostInteractor.execute(createPostInputData);
     }
+    
+    public void execute(String title, String content, String creator_username, String referencedPostId) {
+        // TODO: need to obtain current user from inMemorySessionRepository
+        final CreatePostInputData createPostInputData = 
+                new CreatePostInputData(title, content, creator_username, referencedPostId);
+
+        createPostInteractor.execute(createPostInputData);
+    }
 
     public void switchToBrowseView() {
         createPostInteractor.switchToBrowseView();

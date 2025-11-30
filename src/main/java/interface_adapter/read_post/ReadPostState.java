@@ -16,6 +16,7 @@ public class ReadPostState {
     private int upvotes = 0;
     private int downvotes = 0;
     private List<ReadPostOutputData.ReplyData> replies = new ArrayList<>();
+    private ReadPostOutputData.ReferencedPostData referencedPost = null;
     private String errorMessage;
 
     public long getId() {
@@ -80,5 +81,13 @@ public class ReadPostState {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+    
+    public ReadPostOutputData.ReferencedPostData getReferencedPost() {
+        return referencedPost;
+    }
+    
+    public void setReferencedPost(ReadPostOutputData.ReferencedPostData referencedPost) {
+        this.referencedPost = referencedPost;
     }
 }

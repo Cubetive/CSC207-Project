@@ -21,8 +21,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     private final JTextArea contentTextField = new  JTextArea(10, 30);
     private final JTextField titleTextField = new  JTextField(30);
+    private final JPanel referencedPostPanel;
+    private final JLabel referencedPostLabel;
 
     private CreatePostController createPostController;
+    private Runnable onReferencePostClick;
 
     public CreatingPostView(CreatePostViewModel inputCreatePostViewModel) {
         this.createPostViewModel = inputCreatePostViewModel;
@@ -39,11 +42,19 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                         if (evt.getSource().equals(createPostButton)) {
                             final CreatePostState currentState = createPostViewModel.getState();
 
-                            createPostController.execute(currentState.getTitle(),
-                                    currentState.getContent(),
-                                    currentState.getCreator_username()
-
-                            );
+                            final String referencedPostId = currentState.getReferencedPostId();
+                            if (referencedPostId != null && !referencedPostId.isEmpty()) {
+                                createPostController.execute(currentState.getTitle(),
+                                        currentState.getContent(),
+                                        currentState.getCreator_username(),
+                                        referencedPostId
+                                );
+                            } else {
+                                createPostController.execute(currentState.getTitle(),
+                                        currentState.getContent(),
+                                        currentState.getCreator_username()
+                                );
+                            }
                         }
                     }
 
@@ -64,12 +75,34 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         final JButton search = new JButton("Search");
         final JButton browse = new JButton("Browse");
         final JButton profile = new JButton("Profile");
+        final JButton referencePostButton = new JButton("Reference Post");
+        referencePostButton.addActionListener(e -> {
+            if (onReferencePostClick != null) {
+                onReferencePostClick.run();
+            }
+        });
         final JPanel buttons = new JPanel();
         buttons.add(logout);
         buttons.add(search);
         buttons.add(browse);
         buttons.add(profile);
+        buttons.add(referencePostButton);
         buttons.add(createPostButton);
+        
+        // Referenced post display panel
+        referencedPostPanel = new JPanel();
+        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel, BoxLayout.Y_AXIS));
+        referencedPostPanel.setBackground(new Color(245, 245, 245));
+        referencedPostPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced Post"),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        referencedPostPanel.setVisible(false);
+        
+        referencedPostLabel = new JLabel();
+        referencedPostLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        referencedPostLabel.setForeground(new Color(80, 80, 80));
+        referencedPostPanel.add(referencedPostLabel);
 
         //Content setup.
         final JPanel contentPanel = new JPanel();
@@ -90,6 +123,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         this.add(header);
         this.add(titlePanel);
         this.add(contentPanel);
+        this.add(referencedPostPanel);
         this.add(buttons);
 
     }
@@ -170,5 +204,41 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     public interface CreatePostClickListener {
         void onCreatePostClicked(long postId);
+    }
+    
+    public void setOnReferencePostClick(Runnable onReferencePostClick) {
+        this.onReferencePostClick = onReferencePostClick;
+    }
+    
+    /**
+     * Updates the display of the referenced post.
+     * @param referencedPostTitle the title of the referenced post (or content if no title)
+     * @param referencedPostContent the content preview of the referenced post
+     */
+    public void setReferencedPost(String referencedPostTitle, String referencedPostContent) {
+        if (referencedPostTitle != null && !referencedPostTitle.isEmpty()) {
+            final String displayText = "<html><b>Title:</b> " + referencedPostTitle + "<br>" +
+                    "<b>Content:</b> " + 
+                    (referencedPostContent.length() > 100 
+                            ? referencedPostContent.substring(0, 100) + "..." 
+                            : referencedPostContent) + 
+                    "</html>";
+            referencedPostLabel.setText(displayText);
+            referencedPostPanel.setVisible(true);
+        } else {
+            referencedPostPanel.setVisible(false);
+        }
+        this.revalidate();
+        this.repaint();
+    }
+    
+    /**
+     * Clears the referenced post display.
+     */
+    public void clearReferencedPost() {
+        referencedPostPanel.setVisible(false);
+        referencedPostLabel.setText("");
+        this.revalidate();
+        this.repaint();
     }
 }

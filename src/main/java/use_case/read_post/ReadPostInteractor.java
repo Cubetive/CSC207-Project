@@ -36,6 +36,22 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
             // Convert entity to output data
             final int[] votes = post.getVotes();
             final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(originalPost.getReplies());
+            
+            // Get referenced post if it exists
+            ReadPostOutputData.ReferencedPostData referencedPostData = null;
+            if (originalPost.hasReference()) {
+                final Post referencedPost = originalPost.getReferencedPost();
+                String referencedTitle = "";
+                if (referencedPost instanceof OriginalPost) {
+                    referencedTitle = ((OriginalPost) referencedPost).getTitle();
+                }
+                referencedPostData = new ReadPostOutputData.ReferencedPostData(
+                        referencedPost.getId(),
+                        referencedTitle,
+                        referencedPost.getContent(),
+                        referencedPost.getCreatorUsername()
+                );
+            }
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
                     originalPost.getId(),
@@ -44,7 +60,8 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
                     originalPost.getCreatorUsername(),
                     votes[0],  // upvotes
                     votes[1],  // downvotes
-                    replyDataList
+                    replyDataList,
+                    referencedPostData
             );
 
             outputBoundary.prepareSuccessView(outputData);

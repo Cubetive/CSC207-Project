@@ -71,6 +71,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
+    private final JPanel referencedPostContainer;
+    private final JLabel referencedPostTitleLabel;
+    private final JTextArea referencedPostContentArea;
+    private final JLabel referencedPostAuthorLabel;
+    private final JButton viewReferencedPostButton;
+    private Runnable onViewReferencedPostClick;
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
@@ -338,8 +344,56 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         repliesPanel.setLayout(new BoxLayout(repliesPanel, BoxLayout.Y_AXIS));
         repliesPanel.setBackground(new Color(245, 245, 245));
 
+        // Referenced post panel (initially hidden)
+        referencedPostContainer = new JPanel(new BorderLayout());
+        referencedPostContainer.setBackground(new Color(240, 248, 255)); // Light blue background
+        referencedPostContainer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced Post"),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        referencedPostContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        referencedPostContainer.setVisible(false);
+        
+        referencedPostTitleLabel = new JLabel();
+        referencedPostTitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        referencedPostTitleLabel.setForeground(new Color(50, 50, 50));
+        
+        referencedPostContentArea = new JTextArea(3, 30);
+        referencedPostContentArea.setFont(new Font("Arial", Font.PLAIN, 13));
+        referencedPostContentArea.setLineWrap(true);
+        referencedPostContentArea.setWrapStyleWord(true);
+        referencedPostContentArea.setEditable(false);
+        referencedPostContentArea.setBackground(new Color(240, 248, 255));
+        referencedPostContentArea.setForeground(new Color(80, 80, 80));
+        
+        referencedPostAuthorLabel = new JLabel();
+        referencedPostAuthorLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        referencedPostAuthorLabel.setForeground(new Color(120, 120, 120));
+        
+        viewReferencedPostButton = new JButton("View Referenced Post");
+        viewReferencedPostButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        viewReferencedPostButton.setFocusPainted(false);
+        viewReferencedPostButton.setBackground(new Color(70, 130, 180));
+        viewReferencedPostButton.setForeground(Color.WHITE);
+        viewReferencedPostButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        viewReferencedPostButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        final JPanel referencedPostInfoPanel = new JPanel();
+        referencedPostInfoPanel.setLayout(new BoxLayout(referencedPostInfoPanel, BoxLayout.Y_AXIS));
+        referencedPostInfoPanel.setBackground(new Color(240, 248, 255));
+        referencedPostInfoPanel.add(referencedPostTitleLabel);
+        referencedPostInfoPanel.add(Box.createVerticalStrut(5));
+        referencedPostInfoPanel.add(new JScrollPane(referencedPostContentArea));
+        referencedPostInfoPanel.add(Box.createVerticalStrut(5));
+        referencedPostInfoPanel.add(referencedPostAuthorLabel);
+        
+        referencedPostContainer.add(referencedPostInfoPanel, BorderLayout.CENTER);
+        referencedPostContainer.add(viewReferencedPostButton, BorderLayout.EAST);
+        
         // Add components to main panel
         mainPanel.add(contentContainer);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(referencedPostContainer);
         // Add translation panel.
         mainPanel.add(translationPanel);
 
@@ -539,6 +593,32 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         authorLabel.setText(state.getUsername());
         contentArea.setText(state.getContent());
         voteCountLabel.setText(String.valueOf(state.getUpvotes() - state.getDownvotes()));
+        
+        // Update referenced post display
+        final ReadPostOutputData.ReferencedPostData referencedPost = state.getReferencedPost();
+        if (referencedPost != null) {
+            referencedPostTitleLabel.setText(
+                    referencedPost.getTitle().isEmpty() ? "Referenced Post" : referencedPost.getTitle());
+            referencedPostContentArea.setText(referencedPost.getContent());
+            referencedPostAuthorLabel.setText("By: " + referencedPost.getUsername());
+            referencedPostContainer.setVisible(true);
+            
+            // Set up button to view referenced post
+            // Remove all existing action listeners
+            for (java.awt.event.ActionListener al : viewReferencedPostButton.getActionListeners()) {
+                viewReferencedPostButton.removeActionListener(al);
+            }
+            viewReferencedPostButton.addActionListener(e -> {
+                if (onViewReferencedPostClick != null) {
+                    onViewReferencedPostClick.run();
+                } else if (controller != null) {
+                    // Fallback: load the referenced post directly
+                    loadPost(referencedPost.getId());
+                }
+            });
+        } else {
+            referencedPostContainer.setVisible(false);
+        }
 
         // Clear and update replies
         repliesPanel.removeAll();
@@ -890,6 +970,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.translationController = controller;
     }
 
+    public void setOnViewReferencedPostClick(Runnable onViewReferencedPostClick) {
+        this.onViewReferencedPostClick = onViewReferencedPostClick;
+    }
+    
     public void setVoteController(VoteController voteController) {
         this.voteController = voteController;
     }

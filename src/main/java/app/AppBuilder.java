@@ -98,6 +98,8 @@ public class AppBuilder {
     private TranslationViewModel translationViewModel; // NEW
     private LoginViewModel loginViewModel;
     private EditProfileViewModel editProfileViewModel;
+    private interface_adapter.create_post.CreatePostViewModel createPostViewModel;
+    private interface_adapter.reference_post.ReferencePostViewModel referencePostViewModel;
 
     // Views
     private SignupView signupView;
@@ -105,9 +107,12 @@ public class AppBuilder {
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
     private EditProfileView editProfileView;
+    private view.CreatingPostView creatingPostView;
+    private view.ReferencePostView referencePostView;
 
     // Translation Controller (needed for post reading view)
     private TranslationController translationController; // NEW
+    private interface_adapter.reference_post.ReferencePostController referencePostController;
 
     // For setting up TranslationInteractor
     private ReadPostDataAccessInterface readPostDataAccessInterface;
@@ -402,6 +407,123 @@ public class AppBuilder {
             });
         }
 
+        return this;
+    }
+    
+    /**
+     * Adds the Reference Post View to the application.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostView() {
+        referencePostViewModel = new interface_adapter.reference_post.ReferencePostViewModel();
+        referencePostView = new view.ReferencePostView(referencePostViewModel);
+        cardPanel.add(referencePostView, referencePostView.getViewName());
+        return this;
+    }
+    
+    /**
+     * Adds the Reference Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostUseCase() {
+        // Setup presenter
+        final use_case.reference_post.ReferencePostOutputBoundary referencePostOutputBoundary =
+                new interface_adapter.reference_post.ReferencePostPresenter(
+                        referencePostViewModel, viewManagerModel);
+        
+        // Setup interactor
+        final use_case.reference_post.ReferencePostInputBoundary referencePostInteractor =
+                new use_case.reference_post.ReferencePostInteractor(
+                        postDataAccessObject, referencePostOutputBoundary);
+        
+        // Create controller
+        referencePostController = new interface_adapter.reference_post.ReferencePostController(
+                referencePostInteractor);
+        
+        // Set controller in view
+        if (referencePostView != null) {
+            referencePostView.setController(referencePostController);
+        }
+        
+        // Set up navigation from reference post view back to create post view
+        if (referencePostView != null && creatingPostView != null) {
+            referencePostView.setOnCancelAction(() -> {
+                viewManagerModel.setState(creatingPostView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+            
+            // When a post is selected, update the create post state and return
+            referencePostView.setOnReferenceSelected(() -> {
+                final use_case.reference_post.ReferencePostOutputData.PostSearchResult selected =
+                        referencePostView.getSelectedReferencedPost();
+                if (selected != null && createPostViewModel != null) {
+                    final interface_adapter.create_post.CreatePostState state =
+                            createPostViewModel.getState();
+                    state.setReferencedPostId(selected.getPostId());
+                    createPostViewModel.setState(state);
+                    
+                    // Update the display in CreatingPostView
+                    creatingPostView.setReferencedPost(
+                            selected.getTitle().isEmpty() ? "No Title" : selected.getTitle(),
+                            selected.getContent()
+                    );
+                    
+                    // Return to create post view
+                    viewManagerModel.setState(creatingPostView.getViewName());
+                    viewManagerModel.firePropertyChanged();
+                }
+            });
+        }
+        
+        return this;
+    }
+    
+    /**
+     * Adds the Create Post View to the application.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostView() {
+        createPostViewModel = new interface_adapter.create_post.CreatePostViewModel();
+        creatingPostView = new view.CreatingPostView(createPostViewModel);
+        cardPanel.add(creatingPostView, creatingPostView.getViewName());
+        return this;
+    }
+    
+    /**
+     * Adds the Create Post Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostUseCase() {
+        // Setup presenter
+        final use_case.create_post_use_case.CreatePostOutputBoundary createPostOutputBoundary =
+                new interface_adapter.create_post.CreatePostPresenter(
+                        createPostViewModel, viewManagerModel, readPostViewModel);
+        
+        // Setup interactor
+        final use_case.create_post_use_case.CreatePostInputBoundary createPostInteractor =
+                new use_case.create_post_use_case.CreatePostInteractor(
+                        postDataAccessObject, createPostOutputBoundary);
+        
+        // Create controller
+        final interface_adapter.create_post.CreatePostController createPostController =
+                new interface_adapter.create_post.CreatePostController(createPostInteractor);
+        
+        // Set controller in view
+        if (creatingPostView != null) {
+            creatingPostView.setController(createPostController);
+        }
+        
+        // Set up reference post button click handler
+        if (creatingPostView != null && referencePostView != null) {
+            creatingPostView.setOnReferencePostClick(() -> {
+                // Clear any previous selection
+                referencePostView.clearSelectedReferencedPost();
+                // Navigate to reference post view
+                viewManagerModel.setState(referencePostView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+        }
+        
         return this;
     }
 

@@ -281,7 +281,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             referenceButton.setOpaque(true);
             referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             referenceButton.addActionListener(e -> {
-                e.consume(); // Prevent event from bubbling to panel click
                 if (postClickListener != null) {
                     postClickListener.onPostClicked(post.getReferencedPostId());
                 }

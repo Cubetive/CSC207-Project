@@ -7,10 +7,12 @@
     <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" afterDir="false" />
+    </list>
     <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Merge branch 'main' into logout-use-case&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/view/BrowsePostsView.java">
       <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" afterDir="false" />
+    </list>
     <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Merge branch 'main' into reply-post-test&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/data_access/InMemoryPostDataAccessObject.java">
       <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />

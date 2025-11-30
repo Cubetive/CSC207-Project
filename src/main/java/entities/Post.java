@@ -43,6 +43,10 @@ public abstract class Post {
         this.votes[0] = upvotes;
         this.votes[1] = downvotes;
         this.referencedPost = null;
+        // Update nextId to ensure it's always higher than loaded IDs
+        if (id >= nextId) {
+            nextId = id + 1;
+        }
     }
 
     public Date getCreationDate() {
@@ -72,6 +76,14 @@ public abstract class Post {
     public String getTranslation(String language) {
         // TODO
         return "";
+    }
+
+    public void setUpvotes(int upvotes) {
+        this.votes[0] = upvotes;
+    }
+
+    public void setDownvotes(int downvotes) {
+        this.votes[1] = downvotes;
     }
 
     public void upvote() {

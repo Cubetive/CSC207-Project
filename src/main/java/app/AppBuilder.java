@@ -13,6 +13,7 @@ import use_case.reply_post.ReplyPostInputBoundary;
 import use_case.reply_post.ReplyPostInteractor;
 import use_case.reply_post.ReplyPostOutputBoundary;
 import view.BrowsePostsView;
+import view.LoginView;
 import view.PostReadingView;
 import view.SignupView;
 import view.ViewManager;
@@ -32,7 +33,12 @@ import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import use_case.login.LoginInputBoundary;
+import use_case.login.LoginInteractor;
+import use_case.login.LoginOutputBoundary;
 import interface_adapter.upvote_downvote.VoteController; // NEW
 import interface_adapter.upvote_downvote.VotePresenter; // NEW
 import interface_adapter.upvote_downvote.VoteViewModel; // NEW
@@ -91,6 +97,7 @@ public class AppBuilder {
 
     // Views
     private SignupView signupView;
+    private LoginView loginView;
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
 
@@ -211,13 +218,29 @@ public class AppBuilder {
     }
 
     /**
+     * Adds the Login View to the application.
+     * @return this builder
+     */
+    public AppBuilder addLoginView() {
+        loginView = new LoginView(loginViewModel);
+        cardPanel.add(loginView, loginView.getViewName());
+        return this;
+    }
+
+    /**
      * Adds the Login Use Case to the application.
-     * Note: This method is currently not used as LoginView is not part of the main flow.
      * @return this builder
      */
     public AppBuilder addLoginUseCase() {
-        // Login use case is not currently integrated into the main application flow
-        // If needed, add LoginView and LoginViewModel to AppBuilder and implement here
+        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(
+                loginViewModel, viewManagerModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(
+                userDataAccessObject, loginOutputBoundary, sessionRepository);
+
+        final LoginController controller = new LoginController(loginInteractor);
+        if (loginView != null) {
+            loginView.setLoginController(controller);
+        }
         return this;
     }
 

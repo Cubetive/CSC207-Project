@@ -12,10 +12,12 @@ public class Main {
 
         final JFrame application = appBuilder
                 .addSignupView()
+                .addLoginView()
                 .addBrowsePostsView()
                 .addReadPostView()
                 .addTranslationUseCase()
                 .addSignupUseCase()
+                .addLoginUseCase()
                 .addLogoutUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()

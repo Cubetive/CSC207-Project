@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReplyPostInteractorTest {
     void saveDummyOriginalPost(InMemoryPostDataAccessObject postRepository, OriginalPost originalPost) {
-        postRepository.save(originalPost);
+        postRepository.savePost(originalPost);
     }
 
     void saveDummyReplyPost(InMemoryPostDataAccessObject postRepository, ReplyPost replyPost, long parentId) {

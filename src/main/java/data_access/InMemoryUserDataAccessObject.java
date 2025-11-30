@@ -16,10 +16,21 @@ public class InMemoryUserDataAccessObject implements EditProfileDataAccessInterf
     private final Map<String, User> usersByEmail = new HashMap<>();
 
     /**
+     * Check if a user with the given username exists.
+     * @param username the username to check
+     * @return true if a user with the given username exists, false otherwise
+     */
+    @Override
+    public boolean existsByUsername(String username) {
+        return usersByUsername.containsKey(username);
+    }
+
+    /**
      * Gets a user by username.
      * @param username the username to search for
      * @return the user with the given username, or null if not found
      */
+    @Override
     public User getUserByUsername(String username) {
         return usersByUsername.get(username);
     }
@@ -52,17 +63,40 @@ public class InMemoryUserDataAccessObject implements EditProfileDataAccessInterf
 
     /**
      * Updates a user's profile information.
-     * @param username the username of the user to update
+     * @param currentUsername the current username of the user to update
+     * @param newUsername the new username (can be same as current if not changing)
      * @param fullName the new full name
      * @param bio the new bio
      * @param profilePicture the new profile picture URL
      */
-    public void updateUserProfile(String username, String fullName, String bio, String profilePicture) {
+    @Override
+    public void updateUserProfile(String currentUsername, String newUsername, String fullName, 
+                                  String bio, String profilePicture) {
+        User user = usersByUsername.get(currentUsername);
+        if (user != null) {
+            // Update the user's profile information
+            user.editProfile(fullName, bio, profilePicture);
+            
+            // If username is changing, update the maps
+            if (!currentUsername.equals(newUsername)) {
+                user.setUsername(newUsername);
+                usersByUsername.remove(currentUsername);
+                usersByUsername.put(newUsername, user);
+                // Email map doesn't need updating since email didn't change
+            }
+        }
+    }
+
+    /**
+     * Updates a user's password.
+     * @param username the username of the user
+     * @param newPassword the new password
+     */
+    @Override
+    public void updatePassword(String username, String newPassword) {
         User user = usersByUsername.get(username);
         if (user != null) {
-            user.setFullName(fullName);
-            user.setBio(bio);
-            user.setProfilePicture(profilePicture);
+            user.setPassword(newPassword);
         }
     }
 }

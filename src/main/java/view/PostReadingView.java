@@ -587,6 +587,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyContent.setForeground(new Color(60, 60, 60));
         replyContent.setAlignmentX(Component.LEFT_ALIGNMENT);
         replyContent.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
         // --- Comment Translation UI ---
         final JPanel commentTranslationPanel = new JPanel();
         commentTranslationPanel.setLayout(new BoxLayout(commentTranslationPanel, BoxLayout.Y_AXIS));

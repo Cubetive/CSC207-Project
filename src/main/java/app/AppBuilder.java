@@ -32,12 +32,12 @@ import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.upvote_downvote.VoteController; // NEW
-import interface_adapter.upvote_downvote.VotePresenter; // NEW
-import interface_adapter.upvote_downvote.VoteViewModel; // NEW
-import interface_adapter.translate.TranslationController; // NEW IMPORT
-import interface_adapter.translate.TranslationPresenter; // NEW IMPORT
-import interface_adapter.translate.TranslationViewModel; // NEW
+import interface_adapter.upvote_downvote.VoteController;
+import interface_adapter.upvote_downvote.VotePresenter;
+import interface_adapter.upvote_downvote.VoteViewModel;
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationPresenter;
+import interface_adapter.translate.TranslationViewModel;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
@@ -64,13 +64,13 @@ import use_case.edit_profile.EditProfileOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.upvote_downvote.VoteInputBoundary; // NEW
-import use_case.upvote_downvote.VoteInteractor; // NEW
-import use_case.upvote_downvote.VoteOutputBoundary; // NEW
-import use_case.translate.TranslationInputBoundary; // NEW IMPORT
-import use_case.translate.TranslationInteractor; // NEW IMPORT
-import use_case.translate.TranslationOutputBoundary; // NEW IMPORT
-import use_case.translate.TranslationDataAccessInterface; // NEW IMPORT
+import use_case.upvote_downvote.VoteInputBoundary;
+import use_case.upvote_downvote.VoteInteractor;
+import use_case.upvote_downvote.VoteOutputBoundary;
+import use_case.translate.TranslationInputBoundary;
+import use_case.translate.TranslationInteractor;
+import use_case.translate.TranslationOutputBoundary;
+import use_case.translate.TranslationDataAccessInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -215,24 +215,15 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addTranslationUseCase() {
-        // --- CRITICAL DEPENDENCY INJECTION STEP ---
-        // --- FIX: Instantiates the TranslationViewModel to prevent NullPointerException ---
-        // 1. Instantiate the REAL Data Access Object (using the Generative Language API)
-
-        // 2. Setup the Output Boundary (Presenter)
         final TranslationOutputBoundary translationOutputBoundary =
                 new TranslationPresenter(translationViewModel, viewManagerModel);
 
-        // 3. Setup the Interactor (Use Case) //FIX: changed from readPostDataAccessInterface to postDataAccessObject
         final TranslationInputBoundary translationInteractor =
                 new TranslationInteractor(postDataAccessObject, this.translationDataAccessObject,
                         translationOutputBoundary);
 
-        // 4. Create the Controller
         translationController = new TranslationController(translationInteractor);
 
-        // The controller is stored and will be passed to PostReadingView in addReadPostView().
-        // FIX: Inject the Controller into the PostReadingView
         if (postReadingView != null) {
             postReadingView.setTranslationController(translationController);
         }
@@ -393,23 +384,16 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addVoteUseCase() {
-        // 1. Create the Presenter (It updates the existing ReadPostViewModel)
-        // We don't need a separate VoteViewModel because the result (new numbers)
-        // is just an update to the post state.
         final VoteOutputBoundary voteOutputBoundary =
                 new VotePresenter(readPostViewModel);
 
-        // 2. Create the Interactor
-        // Casting postDataAccessObject because it implements VoteDataAccessInterface
         final VoteInputBoundary voteInteractor = new VoteInteractor(
                 postDataAccessObject,
                 voteOutputBoundary
         );
 
-        // 3. Create the Controller
         final VoteController voteController = new VoteController(voteInteractor);
 
-        // 4. Inject the Controller into the View
         if (postReadingView != null) {
             postReadingView.setVoteController(voteController);
         }

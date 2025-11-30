@@ -34,7 +34,7 @@ public class TranslationInteractor implements TranslationInputBoundary {
 
         try {
             if (textContent == null || textContent.trim().isEmpty()) {
-                System.out.println("DEBUG: Interactor decided FAILURE."); // 🔥 DEBUG LINE 4
+                System.out.println("DEBUG: Interactor decided FAILURE.");
                 outputBoundary.presentFailure("Cannot translate empty text.");
                 return;
             }
@@ -73,7 +73,7 @@ public class TranslationInteractor implements TranslationInputBoundary {
                     }
                 }
             } else {
-                System.out.println("DEBUG: Interactor decided SUCCESS."); // 🔥 DEBUG LINE 5
+                System.out.println("DEBUG: Interactor decided SUCCESS.");
                 translatedText = translationDataAccessObject.getTranslation(
                         textContent,
                         targetLanguageCode

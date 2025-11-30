@@ -230,7 +230,12 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (postClickListener != null) {
-                    postClickListener.onPostClicked(post.getId());
+                    // If this post references another post, navigate to the referenced post
+                    // Otherwise, navigate to this post
+                    final long postIdToLoad = (post.hasReference() && post.getReferencedPostId() != null)
+                            ? post.getReferencedPostId()
+                            : post.getId();
+                    postClickListener.onPostClicked(postIdToLoad);
                 }
             }
 

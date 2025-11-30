@@ -84,13 +84,6 @@ public class CreatePostTestBuilder {
         this.createPostViewModel = new CreatePostViewModel();
         creatingPostView = new CreatingPostView(this.createPostViewModel);
         cardPanel.add(creatingPostView, creatingPostView.getViewName());
-        creatingPostView.setCreatePostClickListener(postId -> {
-            if (postReadingView != null) {
-                viewManagerModel.setState(postReadingView.getViewName());
-                viewManagerModel.firePropertyChanged();
-                postReadingView.loadPost(postId);
-            }
-        });
         return this;
     }
 

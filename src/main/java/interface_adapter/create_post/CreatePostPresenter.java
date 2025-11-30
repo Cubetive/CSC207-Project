@@ -8,6 +8,7 @@ import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.create_post_use_case.CreatePostOutputData;
 import use_case.read_post.ReadPostOutputData;
+import view.PostReadingView;
 
 import javax.swing.text.View;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
     //TODO SearchViewModel
     //private SignupViewModel signupViewModel;
     private ViewManagerModel viewManagerModel;
+    private PostReadingView postReadingView;
 
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
                                ViewManagerModel viewManagerModel,
@@ -29,6 +31,10 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         //this.signupViewModel = signupViewModel;
         this.viewManagerModel = viewManagerModel;
         this.readPostViewModel = readPostViewModel;
+    }
+
+    public void setPostReadingView(PostReadingView postReadingView) {
+        this.postReadingView = postReadingView;
     }
 
     public void prepareCreatedView(CreatePostOutputData createPostOutputData) {
@@ -49,7 +55,11 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
         this.viewManagerModel.setState(readPostViewModel.getViewName());
         this.viewManagerModel.firePropertyChanged();
-        //TODO: call load post from PostReadingView (needs this object) to display.
+        this.postReadingView.loadPost(createPostOutputData.getOriginalPost().getId());
+        this.postReadingView.revalidate();
+        this.postReadingView.repaint();
+        this.postReadingView.setVisible(true);
+        this.viewManagerModel.firePropertyChanged();
     }
 
     public void prepareMissingFieldView(String error) {
@@ -57,12 +67,6 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         final CreatePostState createPostState = createPostViewModel.getState();
         createPostState.setMissingError(error);
         createPostViewModel.firePropertyChange();
-    }
-
-    public void switchToSignUpView() {
-        //TODO
-        //viewManagerModel.setState(signupViewModel.getViewName);
-        viewManagerModel.firePropertyChanged();
     }
 
     public void switchToBrowseView() {

@@ -2,9 +2,11 @@ package interface_adapter.create_post;
 
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInputData;
+import use_case.create_post_use_case.CreatePostInteractor;
 
 public class CreatePostController {
     final CreatePostInputBoundary createPostInteractor;
+    private boolean success = false;
 
     public CreatePostController(CreatePostInputBoundary createPostInteractor) {
         this.createPostInteractor = createPostInteractor;
@@ -21,6 +23,7 @@ public class CreatePostController {
         final CreatePostInputData createPostInputData = new CreatePostInputData(title, content, creator_username);
 
         createPostInteractor.execute(createPostInputData);
+        this.success = createPostInteractor.isSuccess();
     }
 
     public void switchToBrowseView() {
@@ -31,7 +34,13 @@ public class CreatePostController {
         createPostInteractor.switchToSearchView();
     }
 
-    public void switchToSignInView() {
-        createPostInteractor.switchToSignUpView();
+    public boolean isSuccess() {
+        return success;
     }
+
+    public void resetSuccess() {
+        this.success = false;
+        this.createPostInteractor.resetSuccess();
+    }
+
 }

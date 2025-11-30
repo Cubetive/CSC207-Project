@@ -42,8 +42,12 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                             createPostController.execute(currentState.getTitle(),
                                     currentState.getContent(),
                                     currentState.getCreator_username()
-
                             );
+                            boolean succeeded = createPostController.isSuccess();
+                            if (succeeded) {
+                                setVisible(false);
+                                createPostController.resetSuccess();
+                            }
                         }
                     }
 

@@ -7,19 +7,19 @@ import java.util.Date;
 public class CreatePostInteractor implements CreatePostInputBoundary{
     private final CreatePostDataAccessInterface filePostAccess;
     private final CreatePostOutputBoundary createPostPresenter;
-    //TODO Replace interface with data access object when implemented.
+    private boolean success;
 
     public CreatePostInteractor(
             CreatePostDataAccessInterface filePostAccess,
             CreatePostOutputBoundary createPostPresenter) {
         this.filePostAccess = filePostAccess;
         this.createPostPresenter = createPostPresenter;
+        this.success = false;
     }
 
     @Override
     public void execute(CreatePostInputData createPostInputData) {
         // TODO: Get the next original post id.
-        long next_id = 0;
         String content = createPostInputData.getContent();
         String title = createPostInputData.getTitle();
         String username = createPostInputData.getCreator_username();
@@ -28,15 +28,14 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
             createPostPresenter.prepareMissingFieldView("Missing content or title.");
         }
         else {
-            OriginalPost originalPost = new OriginalPost(next_id, title, content, username,
-                    new Date(), 0, 0); // Create Post object.
+            OriginalPost originalPost = new OriginalPost(username, title, content); // Create Post object.
 
             filePostAccess.save(originalPost); //saves the Post to Database.
 
             CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
             //Create the output object for display.
             createPostPresenter.prepareCreatedView(createPostOutputData); //Send output to presenter.
-
+            this.success = true;
         }
     }
 
@@ -48,7 +47,11 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         createPostPresenter.switchToSearchView();
     }
 
-    public void switchToSignUpView() {
-        createPostPresenter.switchToSignUpView();
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void resetSuccess() {
+        this.success = false;
     }
 }

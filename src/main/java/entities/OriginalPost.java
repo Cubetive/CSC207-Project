@@ -12,6 +12,11 @@ public class OriginalPost extends Post {
         this.title = title;
     }
 
+    public OriginalPost(String username, String title, String content) {
+        super(username, content);
+        this.title = title;
+    }
+
     public String getTitle() {
         return title;
     }

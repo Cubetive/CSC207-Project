@@ -25,7 +25,7 @@ public class EditPostInteractor implements EditPostInputBoundary {
             try {
                 // Load the JSON file into a List of Maps
                 List<Map<String, Object>> posts = mapper.readValue(
-                        new File(".../Posts.json"),
+                        new File(".../Posts.json"), // TODO: CHECK IF DATA PERSISTS
                         new TypeReference<List<Map<String, Object>>>() {}
                 );
 
@@ -49,9 +49,9 @@ public class EditPostInteractor implements EditPostInputBoundary {
 
         }
 
-        EditPostOutputData searchPostOutputData = new EditPostOutputData(postToEdit);
+        EditPostOutputData editPostOutputData = new EditPostOutputData(postToEdit);
         
-        editPostOutputBoundary = new EditPostPresenter(searchPostOutputData);
+        editPostOutputBoundary = new EditPostPresenter(editPostOutputData);
         editPostOutputBoundary.prepareSuccessView(dialog);
     }
 

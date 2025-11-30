@@ -1,6 +1,7 @@
 package use_case.read_post;
 
 import entities.OriginalPost;
+import entities.Post;
 import entities.ReplyPost;
 
 import java.util.ArrayList;
@@ -23,21 +24,24 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
     @Override
     public void execute(ReadPostInputData inputData) {
         try {
-            final OriginalPost post = postDataAccess.getPostById(inputData.getPostId());
+            final Post post = postDataAccess.getPostById(inputData.getPostId());
 
             if (post == null) {
                 outputBoundary.prepareFailView("Post not found with ID: " + inputData.getPostId());
                 return;
             }
 
+            final OriginalPost originalPost = (OriginalPost) post;
+
             // Convert entity to output data
             final int[] votes = post.getVotes();
-            final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(post.getReplies());
+            final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(originalPost.getReplies());
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreatorUsername(),
+                    originalPost.getId(),
+                    originalPost.getTitle(),
+                    originalPost.getContent(),
+                    originalPost.getCreatorUsername(),
                     votes[0],  // upvotes
                     votes[1],  // downvotes
                     replyDataList

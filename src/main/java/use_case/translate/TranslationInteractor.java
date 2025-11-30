@@ -43,7 +43,8 @@ public class TranslationInteractor implements TranslationInputBoundary {
 
             if (inputData.isPostTranslation()) {
 
-                OriginalPost post = postDataAccessObject.getPostById(postId);
+                // Use the generic 'Post' type since the interface now returns 'Post'
+                entities.Post post = postDataAccessObject.getPostById(postId);
 
                 if (post == null) {
                     outputBoundary.presentFailure("ERROR: Post entity not found for ID " + postId + ". Please check if your JSON parser is assigning a unique ID to the post entity.");

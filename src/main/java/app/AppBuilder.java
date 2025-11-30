@@ -1,5 +1,6 @@
 package app;
 
+import data_access.InMemorySessionRepository;
 import view.BrowsePostsView;
 import view.PostReadingView;
 import view.SignupView;
@@ -9,6 +10,7 @@ import data_access.FileUserDataAccessObject;
 import data_access.TranslationDataAccessObject;
 import entities.CommonUserFactory;
 import entities.UserFactory;
+import use_case.session.SessionRepository;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsPresenter;
@@ -59,6 +61,9 @@ public class AppBuilder {
     final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
     final TranslationDataAccessObject translationDataAccessObject = new TranslationDataAccessObject();
+
+    final SessionRepository sessionRepository = new InMemorySessionRepository();
+
     // View models
     private SignupViewModel signupViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
@@ -169,7 +174,7 @@ public class AppBuilder {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
                 signupViewModel, viewManagerModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory);
+                userDataAccessObject, signupOutputBoundary, userFactory, sessionRepository);
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);

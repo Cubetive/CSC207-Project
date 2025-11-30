@@ -3,7 +3,7 @@ package app;
 import javax.swing.*;
 
 /**
- * The Main class demonstrates how to use the Login, Signup and Browse Posts functionality.
+ * The Main class demonstrates how to use the Signup and Browse Posts functionality.
  */
 public class Main {
 
@@ -17,9 +17,12 @@ public class Main {
                 .addReadPostView()
                 .addEditProfileView()
                 .addLoginUseCase()
+                .addLogoutUseCase()
                 .addSignupUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
+                .addVoteUseCase()
+                .addTranslationUseCase()
                 .addReplyPostUseCase()
                 .addEditProfileUseCase()
                 .build();

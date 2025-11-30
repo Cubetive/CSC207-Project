@@ -1,7 +1,7 @@
 package use_case.read_post;
 
-import entities.Post;
 import entities.OriginalPost;
+import entities.Post;
 import entities.ReplyPost;
 
 import java.util.ArrayList;
@@ -31,16 +31,10 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
                 return;
             }
 
-            // Only OriginalPosts can be read directly (replies are nested within posts)
-            if (!(post instanceof OriginalPost)) {
-                outputBoundary.prepareFailView("The selected item is a reply, not a post. Please select an original post.");
-                return;
-            }
-
             final OriginalPost originalPost = (OriginalPost) post;
 
             // Convert entity to output data
-            final int[] votes = originalPost.getVotes();
+            final int[] votes = post.getVotes();
             final List<ReadPostOutputData.ReplyData> replyDataList = convertReplies(originalPost.getReplies());
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
@@ -55,8 +49,6 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
 
             outputBoundary.prepareSuccessView(outputData);
 
-        } catch (ClassCastException e) {
-            outputBoundary.prepareFailView("Failed to load post: The selected item is not a valid post.");
         } catch (Exception e) {
             outputBoundary.prepareFailView("Failed to load post: " + e.getMessage());
         }

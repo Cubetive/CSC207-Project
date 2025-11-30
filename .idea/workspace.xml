@@ -4,16 +4,64 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="latest change">
+    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/posts.json" beforeDir="false" afterPath="$PROJECT_DIR$/posts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" afterDir="false" />
+    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Merge branch 'main' into logout-use-case&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/view/BrowsePostsView.java">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" afterDir="false" />
+    <list default="true" id="f3fc9be9-d51a-4f7e-9efb-5e27cc5dac56" name="Changes" comment="Merge branch 'main' into reply-post-test&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/data_access/InMemoryPostDataAccessObject.java">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/app/EditProfileUseCaseFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostState.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/edit_profile/EditProfilePresenter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/edit_profile/EditProfileState.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/edit_profile/EditProfileViewModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/reference_post/ReferencePostController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/reference_post/ReferencePostPresenter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/reference_post/ReferencePostState.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/reference_post/ReferencePostViewModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostDataAccessInterface.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileInputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileInputData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileOutputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileOutputData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostDataAccessInterface.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostInputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostInputData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostInteractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostOutputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/reference_post/ReferencePostOutputData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/view/EditProfileView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/ExampleDataBaseObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostBasic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/TestCreatePostComplex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/AppBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/AppBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/FilePostDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/FilePostDataAccessObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/FileUserDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/FileUserDataAccessObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryPostDataAccessObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/InMemoryUserDataAccessObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/data_access/InMemoryUserDataAccessObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/entities/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entities/Post.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entities/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/edit_profile/EditProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/edit_profile/EditProfileController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostUserDataAccessInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileDataAccessInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileDataAccessInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/edit_profile/EditProfileInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/read_post/ReadPostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/read_post/ReadPostInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/BrowsePostsView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/CreatePostTest/CreatePostTestBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/use_case/reply_post/ReplyPostInteractorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/use_case/reply_post/ReplyPostInteractorTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/users.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,7 +79,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Post-Creation" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -68,11 +116,11 @@
     "JUnit.ReplyPostInteractorTest.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Merging logout-use-case",
     "kotlin-language-version-configured": "true",
     "node.js.selected.package.tslint": "(autodetect)"
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -120,15 +168,7 @@
       <option name="project" value="LOCAL" />
       <updated>1764456111026</updated>
     </task>
-    <task id="LOCAL-00005" summary="latest change">
-      <option name="closed" value="true" />
-      <created>1764475942193</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1764475942193</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -147,21 +187,20 @@
     <MESSAGE value="Merged main into Post-Creation to resolve conflicts." />
     <MESSAGE value="Debugging fail view part 1" />
     <MESSAGE value="Basic Ui now operable. Now moving to creating example app with only creation and reading." />
-    <MESSAGE value="latest change" />
-    <option name="LAST_COMMIT_MESSAGE" value="latest change" />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic Ui now operable. Now moving to creating example app with only creation and reading." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java</url>
-          <line>58</line>
-          <option name="timeStamp" value="18" />
+          <line>50</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java</url>
-          <line>61</line>
-          <option name="timeStamp" value="19" />
+          <url>file://$PROJECT_DIR$/src/main/java/interface_adapter/read_post/ReadPostPresenter.java</url>
+          <line>29</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

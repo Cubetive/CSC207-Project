@@ -2,6 +2,7 @@ package CreatePostTest;
 
 import app.AppBuilder;
 import data_access.FilePostDataAccessObject;
+import data_access.InMemorySessionRepository;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.create_post.CreatePostController;
@@ -17,6 +18,7 @@ import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.read_post.ReadPostInputBoundary;
 import use_case.read_post.ReadPostInteractor;
 import use_case.read_post.ReadPostOutputBoundary;
+import use_case.session.SessionRepository;
 import view.BrowsePostsView;
 import view.CreatingPostView;
 import view.PostReadingView;
@@ -34,11 +36,12 @@ public class CreatePostTestBuilder {
     private BrowsePostsView browsePostsView;
     private CreatePostViewModel createPostViewModel;
     private CreatingPostView creatingPostView;
+    private final SessionRepository sessionRepository;
 
     public CreatePostTestBuilder() {
         this.cardPanel.setLayout(new CardLayout());
         this.postDataAccessObject = new ExampleDataBaseObject("exampleposts.json");
-
+        this.sessionRepository = new InMemorySessionRepository();
     }
 
 
@@ -64,7 +67,7 @@ public class CreatePostTestBuilder {
         final CreatePostOutputBoundary createPostOutputBoundary =
                 new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
         final CreatePostInputBoundary createPostInteractor =
-                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary);
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
 
         final CreatePostController controller = new CreatePostController(createPostInteractor);
         creatingPostView.setController(controller);

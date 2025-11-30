@@ -230,7 +230,7 @@ public class AppBuilder {
         final CreatePostOutputBoundary createPostOutputBoundary =
                 new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
         final CreatePostInputBoundary createPostInteractor =
-                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary);
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
 
         final CreatePostController controller = new CreatePostController(createPostInteractor);
         creatingPostView.setController(controller);

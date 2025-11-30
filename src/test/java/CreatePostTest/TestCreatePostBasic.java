@@ -1,7 +1,9 @@
 package CreatePostTest;
 
+import data_access.InMemorySessionRepository;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.translate.TranslationViewModel;
+import use_case.session.SessionRepository;
 import view.CreatingPostView;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_post.CreatePostController;
@@ -24,11 +26,11 @@ public class TestCreatePostBasic {
                 new ViewManagerModel(),
                 readPostViewModel
         );
-
+        SessionRepository sessionRepository = new InMemorySessionRepository();
         final CreatePostInputBoundary interactor = new CreatePostInteractor(
                 new ExampleDataBaseObject("posts.json"),
-                presenter
-
+                presenter,
+                sessionRepository
         );
 
 

@@ -72,7 +72,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
     private long currentPostId; // Tracks the ID of the displayed post
 
-    public PostReadingView(ReadPostViewModel viewModel) {
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);

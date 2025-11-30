@@ -30,10 +30,6 @@ public class CreatePostController {
         createPostInteractor.switchToBrowseView();
     }
 
-    public void switchToSearchView() {
-        createPostInteractor.switchToSearchView();
-    }
-
     public boolean isSuccess() {
         return success;
     }

@@ -6,8 +6,6 @@ public interface CreatePostInputBoundary {
 
     void switchToBrowseView();
 
-    void switchToSearchView();
-
     boolean isSuccess();
 
     void resetSuccess();

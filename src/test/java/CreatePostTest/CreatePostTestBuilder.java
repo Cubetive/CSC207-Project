@@ -42,6 +42,7 @@ public class CreatePostTestBuilder {
         this.cardPanel.setLayout(new CardLayout());
         this.postDataAccessObject = new ExampleDataBaseObject("exampleposts.json");
         this.sessionRepository = new InMemorySessionRepository();
+        this.readPostViewModel = new ReadPostViewModel();
     }
 
 
@@ -65,7 +66,7 @@ public class CreatePostTestBuilder {
 
     public CreatePostTestBuilder addCreatePostUseCase() {
         final CreatePostOutputBoundary createPostOutputBoundary =
-                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
         final CreatePostInputBoundary createPostInteractor =
                 new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
 

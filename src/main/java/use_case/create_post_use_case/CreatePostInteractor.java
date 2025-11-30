@@ -49,10 +49,6 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         createPostPresenter.switchToBrowseView();
     }
 
-    public void switchToSearchView() {
-        createPostPresenter.switchToSearchView();
-    }
-
     public boolean isSuccess() {
         return success;
     }

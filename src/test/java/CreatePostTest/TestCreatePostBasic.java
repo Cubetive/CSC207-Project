@@ -1,6 +1,7 @@
 package CreatePostTest;
 
 import data_access.InMemorySessionRepository;
+import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.translate.TranslationViewModel;
 import use_case.session.SessionRepository;
@@ -21,10 +22,12 @@ public class TestCreatePostBasic {
         CreatePostViewModel viewModel = new CreatePostViewModel();
         ReadPostViewModel readPostViewModel = new ReadPostViewModel();
         TranslationViewModel  translationViewModel = new TranslationViewModel();
+        BrowsePostsViewModel browsePostsViewModel = new BrowsePostsViewModel();
         final CreatePostOutputBoundary presenter = new CreatePostPresenter(
                 viewModel,
                 new ViewManagerModel(),
-                readPostViewModel
+                readPostViewModel,
+                browsePostsViewModel
         );
         SessionRepository sessionRepository = new InMemorySessionRepository();
         final CreatePostInputBoundary interactor = new CreatePostInteractor(

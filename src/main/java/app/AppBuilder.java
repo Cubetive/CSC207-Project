@@ -225,10 +225,10 @@ public class AppBuilder {
     }
 
 
-    //Right now, needs to be called after the reading view has been added.
+    //Right now, needs to be called after the reading view and browse post use case have been added.
     public AppBuilder addCreatePostUseCase() {
         final CreatePostOutputBoundary createPostOutputBoundary =
-                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
         final CreatePostInputBoundary createPostInteractor =
                 new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
 
@@ -319,6 +319,7 @@ public class AppBuilder {
         //Necessary for creation use case
         browsePostsOutputBoundary.setCreatePostViewModel(createPostViewModel);
         browsePostsOutputBoundary.setViewManagerModel(viewManagerModel);
+
         final BrowsePostsInputBoundary browsePostsInteractor =
                 new BrowsePostsInteractor(postDataAccessObject, browsePostsOutputBoundary);
 

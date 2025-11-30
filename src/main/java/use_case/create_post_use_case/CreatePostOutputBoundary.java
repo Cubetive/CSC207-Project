@@ -10,7 +10,5 @@ public interface CreatePostOutputBoundary {
 
     void switchToBrowseView();
 
-    void switchToSearchView();
-
     void setPostReadingView(PostReadingView postReadingView);
 }

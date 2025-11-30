@@ -524,6 +524,14 @@ public class AppBuilder {
             });
         }
         
+        // Set up create post button in browse posts view to navigate to create post view
+        if (browsePostsView != null && creatingPostView != null) {
+            browsePostsView.setOnCreatePostClick(() -> {
+                viewManagerModel.setState(creatingPostView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+        }
+        
         return this;
     }
 

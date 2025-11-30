@@ -97,6 +97,7 @@ public class AppBuilder {
     private ReadPostViewModel readPostViewModel;
     private TranslationViewModel translationViewModel; // NEW
     private LoginViewModel loginViewModel;
+    private EditProfileViewModel editProfileViewModel;
 
     // Views
     private SignupView signupView;

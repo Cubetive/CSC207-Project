@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button.">
-      <change afterPath="$PROJECT_DIR$/exampleposts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/posts.json" beforeDir="false" afterPath="$PROJECT_DIR$/posts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exampleposts.json" beforeDir="false" afterPath="$PROJECT_DIR$/exampleposts.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,16 +127,5 @@
     <MESSAGE value="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button." />
     <MESSAGE value="Replaced bugged PostReadingView file" />
     <option name="LAST_COMMIT_MESSAGE" value="Replaced bugged PostReadingView file" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/entities/Post.java</url>
-          <line>46</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

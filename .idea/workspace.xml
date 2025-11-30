@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button.">
-      <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
+    <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Fixed CreatingPostView">
+      <change beforePath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/View/CreatingPostView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -109,7 +109,31 @@
       <option name="project" value="LOCAL" />
       <updated>1764523187194</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Fixed CreatingPostView">
+      <option name="closed" value="true" />
+      <created>1764531555613</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764531555613</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fixed CreatingPostView">
+      <option name="closed" value="true" />
+      <created>1764531575945</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1764531575945</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Fixed CreatingPostView">
+      <option name="closed" value="true" />
+      <created>1764531598651</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1764531598651</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -129,7 +153,8 @@
     <MESSAGE value="Mostly intergrated. Remaining problems: create post screen is not empty after being used, remove buttons at bottom and fix ui, add back button." />
     <MESSAGE value="Mostly intergrated. Remaining problems: username is incorrect, should be using session username, remove buttons at bottom and fix ui, add back button." />
     <MESSAGE value="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button." />
-    <option name="LAST_COMMIT_MESSAGE" value="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button." />
+    <MESSAGE value="Fixed CreatingPostView" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed CreatingPostView" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

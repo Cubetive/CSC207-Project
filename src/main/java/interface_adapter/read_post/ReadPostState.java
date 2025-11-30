@@ -9,8 +9,7 @@ import java.util.List;
  * The state for the Read Post View.
  */
 public class ReadPostState {
-
-    private long id = 0;
+    private long id;
     private String title = "";
     private String content = "";
     private String username = "";

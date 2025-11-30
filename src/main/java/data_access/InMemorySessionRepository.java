@@ -1,12 +1,13 @@
 package data_access;
 
 import entities.User;
+import use_case.logout.LogoutDataAccessInterface;
 import use_case.session.SessionRepository;
 
 /**
  * In-memory implementation of SessionRepository.
  */
-public class InMemorySessionRepository implements SessionRepository {
+public class InMemorySessionRepository implements SessionRepository, LogoutDataAccessInterface {
     private User currentUser;
 
     public InMemorySessionRepository() {

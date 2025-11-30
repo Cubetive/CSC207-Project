@@ -76,7 +76,7 @@
     "content": "Some random description and extra words",
     "votes": [
       12,
-      3
+      4
     ],
     "replies": [
       {
@@ -85,7 +85,7 @@
         "date": "11/17/2025",
         "content": "Some random first comment.",
         "votes": [
-          4,
+          7,
           2
         ],
         "replies": [
@@ -129,7 +129,7 @@
                 "content": "Some random response to the reply of the second comment",
                 "votes": [
                   1,
-                  0
+                  1
                 ],
                 "replies": [
                   {
@@ -138,7 +138,7 @@
                     "date": "11/21/2025",
                     "content": "藍月なくる大好き",
                     "votes": [
-                      2,
+                      3,
                       0
                     ],
                     "replies": [
@@ -167,7 +167,7 @@
         "date": "11/21/2025",
         "content": "Y\u0027all should start playing Clash Royale frfr",
         "votes": [
-          0,
+          4,
           0
         ],
         "replies": [

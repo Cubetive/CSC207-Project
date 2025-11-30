@@ -24,7 +24,7 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
         // Get the user object from current session
         final User user = sessionRepository.getCurrentUser();
         if (user == null) {
-            replyPostPresenter.prepareFailureView("User is not logged in! Please try again.");
+            replyPostPresenter.prepareFailureView("Error: User is not logged in! Please try again.");
             return;
         }
 
@@ -45,6 +45,11 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
             }
             else if (parentPost instanceof ReplyPost) {
                 replyPostDataAccessObject.save(replyPost, (ReplyPost)parentPost);
+            }
+            else if (parentPost == null) {
+                // Parent post doesn't exist (should not be the case for most of the time, but just as a precaution)
+                replyPostPresenter.prepareFailureView("Error: Post not found!");
+                return;
             }
 
             final ReplyPostOutputData replyPostOutputData = new ReplyPostOutputData(replyPost);

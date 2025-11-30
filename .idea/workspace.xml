@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d106d520-5997-47a7-8ef9-50dca8372796" name="Changes" comment="Mostly intergrated. Remaining problems: remove buttons at bottom and fix ui, add back button.">
-      <change beforePath="$PROJECT_DIR$/src/main/java/View/PostReadingView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/View/PostReadingView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/PostReadingView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -5,6 +5,7 @@ import entities.OriginalPost;
 import entities.Post;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
+import use_case.create_post_use_case.CreatePostDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
 import use_case.reply_post.ReplyPostDataAccessInterface;
 import use_case.upvote_downvote.VoteDataAccessInterface;
@@ -23,7 +24,7 @@ import java.util.*;
 public class FilePostDataAccessObject implements
         BrowsePostsDataAccessInterface,
         ReadPostDataAccessInterface,
-        ReplyPostDataAccessInterface, VoteDataAccessInterface {
+        ReplyPostDataAccessInterface, VoteDataAccessInterface,  CreatePostDataAccessInterface{
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
@@ -115,7 +116,12 @@ public class FilePostDataAccessObject implements
             }
 
             final ReplyPost reply = new ReplyPost(id, username, content, creationDate, upvotes, downvotes);
-            postIdMap.put(id, reply);
+            // Only add reply to map if an OriginalPost with this ID doesn't already exist
+            // (OriginalPosts should take precedence since they're the main posts)
+            Post existingPost = postIdMap.get(id);
+            if (existingPost == null || !(existingPost instanceof OriginalPost)) {
+                postIdMap.put(id, reply);
+            }
 
             // Recursively parse nested replies
             if (replyObj.has("replies")) {
@@ -139,6 +145,8 @@ public class FilePostDataAccessObject implements
      * Public save method that saves the current in-memory state.
      * Delegates to the unified logic below.
      */
+
+    // Looks at post array stored in this object and saves its contents to given Gson path (JSON database)
     public void save() {
         save(this.posts);
     }
@@ -237,16 +245,25 @@ public class FilePostDataAccessObject implements
 
         return replyPostObj;
     }
-
+    //Save a reply to an original post.
     @Override
     public void save(ReplyPost replyPost, OriginalPost parentPost) {
         parentPost.addReply(replyPost);
         this.save();
     }
 
+    //Save a reply to another reply.
     @Override
     public void save(ReplyPost replyPost, ReplyPost parentPost) {
         parentPost.addReply(replyPost);
+        this.save();
+    }
+
+    //Save a new original post.
+    @Override
+    public void save(OriginalPost originalPost) {
+        List<OriginalPost> currentPosts = this.getAllPosts();
+        this.posts.add(originalPost);
         this.save();
     }
 }

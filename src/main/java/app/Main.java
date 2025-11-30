@@ -3,7 +3,7 @@ package app;
 import javax.swing.*;
 
 /**
- * The Main class demonstrates how to use the Signup and Browse Posts functionality.
+ * The Main class allows the program to run, by adding all the use cases.
  */
 public class Main {
 

@@ -16,6 +16,7 @@ public class Main {
                 .addReadPostView()
                 .addTranslationUseCase()
                 .addSignupUseCase()
+                .addLogoutUseCase()
                 .addBrowsePostsUseCase()
                 .addReadPostUseCase()
                 .build();

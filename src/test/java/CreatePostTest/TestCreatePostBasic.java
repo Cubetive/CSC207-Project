@@ -24,7 +24,7 @@ public class TestCreatePostBasic {
         );
 
         final CreatePostInputBoundary interactor = new CreatePostInteractor(
-                new ExampleDataBaseObject(),
+                new ExampleDataBaseObject("posts.json"),
                 presenter
 
         );

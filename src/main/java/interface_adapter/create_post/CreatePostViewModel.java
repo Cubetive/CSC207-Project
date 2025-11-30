@@ -19,7 +19,7 @@ public class CreatePostViewModel extends ViewModel<CreatePostState> {
     private final String PROFILE_BUTTON_LABEL = "Profile";
 
     public CreatePostViewModel() {
-        super("Create Post");
+        super("CreatePost");
         setState(new CreatePostState());
     }
 }

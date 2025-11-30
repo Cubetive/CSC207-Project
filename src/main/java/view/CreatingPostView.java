@@ -17,6 +17,7 @@ import java.beans.PropertyChangeListener;
 
 public class CreatingPostView extends JPanel implements ActionListener, PropertyChangeListener {
     private final CreatePostViewModel createPostViewModel;
+    private CreatingPostView.CreatePostClickListener createPostClickListener;
 
     private final JTextArea contentTextField = new  JTextArea(10, 30);
     private final JTextField titleTextField = new  JTextField(30);
@@ -53,6 +54,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         addDocumentListener(titleTextField, this::updateTitle);
         addDocumentListener(contentTextField, this::updateContent);
 
+        //TODO: Discuss with fred integration problems. In the meantime, below is mouse tracker for updating to
+        //TODO: ReadingPostView.
 
         //TODO: Add ActionListeners for other buttons.
 
@@ -159,5 +162,13 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     public String getViewName() {
         return this.createPostViewModel.getViewName();
+    }
+
+    public void setCreatePostClickListener(CreatingPostView.CreatePostClickListener listener) {
+        this.createPostClickListener = listener;
+    }
+
+    public interface CreatePostClickListener {
+        void onCreatePostClicked(long postId);
     }
 }

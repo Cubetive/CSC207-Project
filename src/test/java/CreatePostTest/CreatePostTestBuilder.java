@@ -36,6 +36,8 @@ public class CreatePostTestBuilder {
 
     public CreatePostTestBuilder() {
         this.cardPanel.setLayout(new CardLayout());
+        this.postDataAccessObject = new ExampleDataBaseObject("exampleposts.json");
+
     }
 
 
@@ -65,7 +67,6 @@ public class CreatePostTestBuilder {
 
         final CreatePostController controller = new CreatePostController(createPostInteractor);
         creatingPostView.setController(controller);
-
         return this;
     }
 
@@ -80,6 +81,13 @@ public class CreatePostTestBuilder {
         this.createPostViewModel = new CreatePostViewModel();
         creatingPostView = new CreatingPostView(this.createPostViewModel);
         cardPanel.add(creatingPostView, creatingPostView.getViewName());
+        creatingPostView.setCreatePostClickListener(postId -> {
+            if (postReadingView != null) {
+                viewManagerModel.setState(postReadingView.getViewName());
+                viewManagerModel.firePropertyChanged();
+                postReadingView.loadPost(postId);
+            }
+        });
         return this;
     }
 
@@ -94,6 +102,8 @@ public class CreatePostTestBuilder {
         // Set initial view to creating post.
         viewManagerModel.setState(creatingPostView.getViewName());
         viewManagerModel.firePropertyChanged();
+
+
 
         return application;
     }

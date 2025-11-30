@@ -9,5 +9,17 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ExampleDataBaseObject extends FilePostDataAccessObject {
-    public void save(OriginalPost post) {}
+    /**
+     * Creates a new FilePostDataAccessObject that reads from the given file.
+     *
+     * @param filePath the path to the JSON file containing posts
+     */
+    public ExampleDataBaseObject(String filePath) {
+        super(filePath);
+    }
+
+    public void save(OriginalPost post) {
+        //Overwrite for test case.
+        super.save(post);
+    }
 }

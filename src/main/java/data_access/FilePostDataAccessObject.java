@@ -1,29 +1,36 @@
 package data_access;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import entities.OriginalPost;
+import entities.Post;
 import entities.ReplyPost;
 import use_case.browse_posts.BrowsePostsDataAccessInterface;
+import use_case.create_post_use_case.CreatePostDataAccessInterface;
 import use_case.read_post.ReadPostDataAccessInterface;
+import use_case.reply_post.ReplyPostDataAccessInterface;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * File-based implementation of the DAO for reading post data from JSON.
  */
-public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface, ReadPostDataAccessInterface {
+public class FilePostDataAccessObject implements
+        BrowsePostsDataAccessInterface,
+        ReadPostDataAccessInterface,
+        ReplyPostDataAccessInterface, CreatePostDataAccessInterface
+        {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
     private final Gson gson;
+    private final Gson gsonSaving;
+    private final Map<Long, Post> postIdMap = new HashMap<>();
+    private List<OriginalPost> posts = new ArrayList<>();
 
     /**
      * Creates a new FilePostDataAccessObject that reads from the given file.
@@ -32,12 +39,12 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
     public FilePostDataAccessObject(String filePath) {
         this.filePath = filePath;
         this.gson = new Gson();
+        this.gsonSaving = new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override
     public List<OriginalPost> getAllPosts() {
         final List<OriginalPost> posts = new ArrayList<>();
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
         try (FileReader reader = new FileReader(filePath)) {
             final JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
@@ -56,6 +63,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
                     final int downvotes = votesArray.get(1).getAsInt();
 
                     final OriginalPost post = new OriginalPost(id, title, content, username, creationDate, upvotes, downvotes);
+                    postIdMap.put(id, post);
 
                     if (postObj.has("replies")) {
                         final JsonArray repliesArray = postObj.getAsJsonArray("replies");
@@ -69,6 +77,7 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
             System.err.println("Error reading posts from file: " + e.getMessage());
         }
 
+        this.posts = posts;
         return posts;
     }
 
@@ -92,6 +101,12 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
             final int downvotes = votesArray.get(1).getAsInt();
 
             final ReplyPost reply = new ReplyPost(id, username, content, creationDate, upvotes, downvotes);
+            // Only add reply to map if an OriginalPost with this ID doesn't already exist
+            // (OriginalPosts should take precedence since they're the main posts)
+            Post existingPost = postIdMap.get(id);
+            if (existingPost == null || !(existingPost instanceof OriginalPost)) {
+                postIdMap.put(id, reply);
+            }
 
             // Recursively parse nested replies
             if (replyObj.has("replies")) {
@@ -104,15 +119,89 @@ public class FilePostDataAccessObject implements BrowsePostsDataAccessInterface,
     }
 
     @Override
-    public OriginalPost getPostById(long id) {
-        final List<OriginalPost> allPosts = getAllPosts();
+    public Post getPostById(long id) {
+        // Ensure the map is populated by calling getAllPosts if it's empty
+        if (postIdMap.isEmpty()) {
+            getAllPosts();
+        }
+        return postIdMap.get(id);
+    }
 
-        for (OriginalPost post : allPosts) {
-            if (post.getId() == id) {
-                return post;
+
+    // Looks at post array stored in this object and saves its contents to given Gson path (JSON database)
+    public void save() {
+        JsonArray jsonArray = new JsonArray();
+
+        for (OriginalPost post : posts) {
+            JsonObject postObj = new JsonObject();
+            postObj.addProperty("id", post.getId());
+            postObj.addProperty("title", post.getTitle());
+            postObj.addProperty("username", post.getCreatorUsername());
+            postObj.addProperty("date", dateFormat.format(post.getCreationDate()));
+            postObj.addProperty("content", post.getContent());
+            // Votes
+            JsonArray votesArray = new JsonArray();
+            votesArray.add(post.getVotes()[0]);
+            votesArray.add(post.getVotes()[1]);
+            postObj.add("votes", votesArray);
+            // Replies
+            JsonArray repliesArray = new JsonArray();
+            for (ReplyPost reply : post.getReplies()) {
+                JsonObject replyObj = formatReply(reply);
+                repliesArray.add(replyObj);
             }
+            postObj.add("replies", repliesArray);
+
+            jsonArray.add(postObj);
         }
 
-        return null;
+        try (FileWriter writer = new FileWriter(filePath)) {
+            gsonSaving.toJson(jsonArray, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing file: " + e.getMessage());
+        }
+    }
+
+    public JsonObject formatReply(ReplyPost replyPost) {
+        JsonObject replyPostObj = new JsonObject();
+        replyPostObj.addProperty("id", replyPost.getId());
+        replyPostObj.addProperty("username", replyPost.getCreatorUsername());
+        replyPostObj.addProperty("date", dateFormat.format(replyPost.getCreationDate()));
+        replyPostObj.addProperty("content", replyPost.getContent());
+        // Votes
+        JsonArray votesArray = new JsonArray();
+        votesArray.add(replyPost.getVotes()[0]);
+        votesArray.add(replyPost.getVotes()[1]);
+        replyPostObj.add("votes", votesArray);
+        // Replies
+        JsonArray repliesArray = new JsonArray();
+        for (ReplyPost reply : replyPost.getReplies()) {
+            JsonObject replyObj = formatReply(reply);
+            repliesArray.add(replyObj);
+        }
+        replyPostObj.add("replies", repliesArray);
+
+        return replyPostObj;
+    }
+    //Save a reply to an original post.
+    @Override
+    public void save(ReplyPost replyPost, OriginalPost parentPost) {
+        parentPost.addReply(replyPost);
+        this.save();
+    }
+
+    //Save a reply to another reply.
+    @Override
+    public void save(ReplyPost replyPost, ReplyPost parentPost) {
+        parentPost.addReply(replyPost);
+        this.save();
+    }
+
+    //Save a new original post.
+    @Override
+    public void save(OriginalPost originalPost) {
+        List<OriginalPost> currentPosts = this.getAllPosts();
+        this.posts.add(originalPost);
+        this.save();
     }
 }

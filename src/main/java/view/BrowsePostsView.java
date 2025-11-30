@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.text.SimpleDateFormat;
 
 /**
@@ -23,6 +24,11 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final JPanel postsPanel;
     private final JScrollPane scrollPane;
     private final JButton refreshButton;
+    private final JButton editProfileButton;
+    private final JLabel profilePictureLabel;
+    private final JPanel titlePanel;
+    private Runnable onEditProfileClick;
+    private Runnable onProfilePictureUpdate;
 
     public BrowsePostsView(BrowsePostsViewModel viewModel) {
         this.viewModel = viewModel;
@@ -31,16 +37,46 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
 
-        // Title panel
-        final JPanel titlePanel = new JPanel();
+        // Title panel with BorderLayout for left, center, right alignment
+        titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(new Color(70, 130, 180));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
+        // Title in center
         final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
         title.setFont(new Font("Arial", Font.BOLD, 26));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(Color.WHITE);
-        titlePanel.add(title);
+        titlePanel.add(title, BorderLayout.CENTER);
+
+        // Right panel for profile picture and edit profile button
+        final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightPanel.setBackground(new Color(70, 130, 180));
+        rightPanel.setOpaque(false);
+
+        // Profile picture label
+        profilePictureLabel = new JLabel();
+        profilePictureLabel.setPreferredSize(new Dimension(40, 40));
+        profilePictureLabel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        profilePictureLabel.setOpaque(false);
+        rightPanel.add(profilePictureLabel);
+
+        // Edit Profile button
+        editProfileButton = new JButton("Edit Profile");
+        editProfileButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        editProfileButton.setFocusPainted(false);
+        editProfileButton.setBackground(new Color(255, 255, 255));
+        editProfileButton.setForeground(new Color(70, 130, 180));
+        editProfileButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        editProfileButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        editProfileButton.addActionListener(e -> {
+            if (onEditProfileClick != null) {
+                onEditProfileClick.run();
+            }
+        });
+        rightPanel.add(editProfileButton);
+
+        titlePanel.add(rightPanel, BorderLayout.EAST);
 
         // Posts panel with vertical layout
         postsPanel = new JPanel();
@@ -224,6 +260,59 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     public void setPostClickListener(PostClickListener listener) {
         this.postClickListener = listener;
+    }
+
+    public void setOnEditProfileClick(Runnable onEditProfileClick) {
+        this.onEditProfileClick = onEditProfileClick;
+    }
+
+    /**
+     * Updates the profile picture display.
+     * @param profilePicturePath the path to the profile picture file, or null/empty if no picture
+     */
+    public void updateProfilePicture(String profilePicturePath) {
+        if (profilePicturePath != null && !profilePicturePath.trim().isEmpty()) {
+            try {
+                final File imageFile = new File(profilePicturePath);
+                if (imageFile.exists() && imageFile.isFile()) {
+                    // Load and scale the image
+                    final ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
+                    final Image originalImage = originalIcon.getImage();
+                    final Image scaledImage = originalImage.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                    final ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                    profilePictureLabel.setIcon(scaledIcon);
+                    profilePictureLabel.setText("");
+                } else {
+                    // File doesn't exist, show placeholder
+                    profilePictureLabel.setIcon(null);
+                    profilePictureLabel.setText("?");
+                    profilePictureLabel.setForeground(Color.WHITE);
+                    profilePictureLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                }
+            } catch (Exception e) {
+                // Error loading image, show placeholder
+                profilePictureLabel.setIcon(null);
+                profilePictureLabel.setText("?");
+                profilePictureLabel.setForeground(Color.WHITE);
+                profilePictureLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            }
+        } else {
+            // No profile picture, show placeholder
+            profilePictureLabel.setIcon(null);
+            profilePictureLabel.setText("?");
+            profilePictureLabel.setForeground(Color.WHITE);
+            profilePictureLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        titlePanel.revalidate();
+        titlePanel.repaint();
+    }
+
+    /**
+     * Sets a callback to be called when profile picture should be updated.
+     * This allows the view to refresh the profile picture when needed.
+     */
+    public void setOnProfilePictureUpdate(Runnable onProfilePictureUpdate) {
+        this.onProfilePictureUpdate = onProfilePictureUpdate;
     }
 
     /**

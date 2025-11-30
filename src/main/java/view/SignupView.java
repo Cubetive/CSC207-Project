@@ -84,12 +84,9 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         toLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(
-                    SignupView.this,
-                    "Login functionality coming soon!",
-                    "Info",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
+                if (signupController != null) {
+                    signupController.switchToLoginView();
+                }
             }
         });
 

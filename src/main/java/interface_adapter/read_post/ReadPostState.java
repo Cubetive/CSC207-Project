@@ -17,6 +17,7 @@ public class ReadPostState {
     private int downvotes = 0;
     private List<ReadPostOutputData.ReplyData> replies = new ArrayList<>();
     private ReadPostOutputData.ReferencedPostData referencedPost = null;
+    private List<ReadPostOutputData.ReferencingPostData> referencingPosts = new ArrayList<>();
     private String errorMessage;
 
     public long getId() {
@@ -89,5 +90,13 @@ public class ReadPostState {
     
     public void setReferencedPost(ReadPostOutputData.ReferencedPostData referencedPost) {
         this.referencedPost = referencedPost;
+    }
+    
+    public List<ReadPostOutputData.ReferencingPostData> getReferencingPosts() {
+        return referencingPosts;
+    }
+    
+    public void setReferencingPosts(List<ReadPostOutputData.ReferencingPostData> referencingPosts) {
+        this.referencingPosts = referencingPosts;
     }
 }

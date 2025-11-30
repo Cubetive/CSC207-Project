@@ -77,6 +77,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JLabel referencedPostAuthorLabel;
     private final JButton viewReferencedPostButton;
     private Runnable onViewReferencedPostClick;
+    private final JPanel referencingPostsContainer;
+    private final JPanel referencingPostsListPanel;
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
         this.viewModel = viewModel;
@@ -399,10 +401,34 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         referencedPostContainer.add(referencedPostInfoPanel, BorderLayout.CENTER);
         referencedPostContainer.add(viewReferencedPostButton, BorderLayout.EAST);
         
+        // Referencing posts panel (posts that reference this one)
+        referencingPostsContainer = new JPanel(new BorderLayout());
+        referencingPostsContainer.setBackground(new Color(255, 248, 240)); // Light orange background
+        referencingPostsContainer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced By"),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        referencingPostsContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        referencingPostsContainer.setVisible(false);
+        
+        referencingPostsListPanel = new JPanel();
+        referencingPostsListPanel.setLayout(new BoxLayout(referencingPostsListPanel, BoxLayout.Y_AXIS));
+        referencingPostsListPanel.setBackground(new Color(255, 248, 240));
+        
+        final JScrollPane referencingPostsScrollPane = new JScrollPane(referencingPostsListPanel);
+        referencingPostsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        referencingPostsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        referencingPostsScrollPane.setBorder(null);
+        referencingPostsScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        
+        referencingPostsContainer.add(referencingPostsScrollPane, BorderLayout.CENTER);
+        
         // Add components to main panel
         mainPanel.add(contentContainer);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(referencedPostContainer);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(referencingPostsContainer);
         // Add translation panel.
         mainPanel.add(translationPanel);
 
@@ -628,6 +654,22 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         } else {
             referencedPostContainer.setVisible(false);
         }
+        
+        // Update referencing posts display (posts that reference this one)
+        final List<ReadPostOutputData.ReferencingPostData> referencingPosts = state.getReferencingPosts();
+        referencingPostsListPanel.removeAll();
+        if (referencingPosts != null && !referencingPosts.isEmpty()) {
+            referencingPostsContainer.setVisible(true);
+            for (ReadPostOutputData.ReferencingPostData refPost : referencingPosts) {
+                final JPanel refPostPanel = createReferencingPostPanel(refPost);
+                referencingPostsListPanel.add(refPostPanel);
+                referencingPostsListPanel.add(Box.createVerticalStrut(5));
+            }
+        } else {
+            referencingPostsContainer.setVisible(false);
+        }
+        referencingPostsListPanel.revalidate();
+        referencingPostsListPanel.repaint();
 
         // Clear and update replies
         repliesPanel.removeAll();
@@ -1003,6 +1045,72 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
      */
     public void sendReply(String content, long parentId) {
         replyController.execute(content, parentId);
+    }
+    
+    /**
+     * Creates a panel for displaying a post that references this one.
+     */
+    private JPanel createReferencingPostPanel(ReadPostOutputData.ReferencingPostData refPost) {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(255, 248, 240));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 200, 150), 1),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        // Left panel with post info
+        final JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(new Color(255, 248, 240));
+        
+        final JLabel titleLabel = new JLabel(refPost.getTitle());
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        titleLabel.setForeground(new Color(50, 50, 50));
+        infoPanel.add(titleLabel);
+        
+        final String contentPreview = refPost.getContent().length() > 80 
+                ? refPost.getContent().substring(0, 80) + "..." 
+                : refPost.getContent();
+        final JLabel contentLabel = new JLabel(contentPreview);
+        contentLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        contentLabel.setForeground(new Color(100, 100, 100));
+        infoPanel.add(contentLabel);
+        
+        final JLabel authorLabel = new JLabel("By: " + refPost.getUsername());
+        authorLabel.setFont(new Font("Arial", Font.ITALIC, 10));
+        authorLabel.setForeground(new Color(120, 120, 120));
+        infoPanel.add(authorLabel);
+        
+        // Right panel with view button
+        final JButton viewButton = new JButton("View");
+        viewButton.setFont(new Font("Arial", Font.PLAIN, 11));
+        viewButton.setFocusPainted(false);
+        viewButton.setBackground(new Color(70, 130, 180));
+        viewButton.setForeground(Color.WHITE);
+        viewButton.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
+        viewButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        viewButton.addActionListener(e -> {
+            if (controller != null) {
+                loadPost(refPost.getId());
+            }
+        });
+        
+        panel.add(infoPanel, BorderLayout.CENTER);
+        panel.add(viewButton, BorderLayout.EAST);
+        
+        // Make panel clickable
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (controller != null) {
+                    loadPost(refPost.getId());
+                }
+            }
+        });
+        
+        return panel;
     }
 
 }

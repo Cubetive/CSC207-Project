@@ -14,15 +14,22 @@ public class ReadPostOutputData {
     private final int downvotes;
     private final List<ReplyData> replies;
     private final ReferencedPostData referencedPost;
+    private final List<ReferencingPostData> referencingPosts;
 
     public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies) {
-        this(id, title, content, username, upvotes, downvotes, replies, null);
+        this(id, title, content, username, upvotes, downvotes, replies, null, new ArrayList<>());
     }
     
     public ReadPostOutputData(long id, String title, String content, String username,
                               int upvotes, int downvotes, List<ReplyData> replies,
                               ReferencedPostData referencedPost) {
+        this(id, title, content, username, upvotes, downvotes, replies, referencedPost, new ArrayList<>());
+    }
+    
+    public ReadPostOutputData(long id, String title, String content, String username,
+                              int upvotes, int downvotes, List<ReplyData> replies,
+                              ReferencedPostData referencedPost, List<ReferencingPostData> referencingPosts) {
         this.id = id; // NEW
         this.title = title;
         this.content = content;
@@ -31,6 +38,7 @@ public class ReadPostOutputData {
         this.downvotes = downvotes;
         this.replies = replies;
         this.referencedPost = referencedPost;
+        this.referencingPosts = referencingPosts;
     }
     //NEW
     public long getId() {
@@ -62,6 +70,10 @@ public class ReadPostOutputData {
     
     public ReferencedPostData getReferencedPost() {
         return referencedPost;
+    }
+    
+    public List<ReferencingPostData> getReferencingPosts() {
+        return referencingPosts;
     }
 
     /**
@@ -128,6 +140,39 @@ public class ReadPostOutputData {
         private final String username;
         
         public ReferencedPostData(long id, String title, String content, String username) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.username = username;
+        }
+        
+        public long getId() {
+            return id;
+        }
+        
+        public String getTitle() {
+            return title;
+        }
+        
+        public String getContent() {
+            return content;
+        }
+        
+        public String getUsername() {
+            return username;
+        }
+    }
+    
+    /**
+     * Data holder for posts that reference this post.
+     */
+    public static class ReferencingPostData {
+        private final long id;
+        private final String title;
+        private final String content;
+        private final String username;
+        
+        public ReferencingPostData(long id, String title, String content, String username) {
             this.id = id;
             this.title = title;
             this.content = content;

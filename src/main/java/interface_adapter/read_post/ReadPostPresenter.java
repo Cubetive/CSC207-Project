@@ -26,6 +26,7 @@ public class ReadPostPresenter implements ReadPostOutputBoundary {
         state.setDownvotes(outputData.getDownvotes());
         state.setReplies(outputData.getReplies());
         state.setReferencedPost(outputData.getReferencedPost());
+        state.setReferencingPosts(outputData.getReferencingPosts());
         state.setErrorMessage(null);
 
         viewModel.setState(state);

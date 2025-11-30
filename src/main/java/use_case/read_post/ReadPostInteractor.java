@@ -52,6 +52,29 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
                         referencedPost.getCreatorUsername()
                 );
             }
+            
+            // Find posts that reference this post
+            final List<ReadPostOutputData.ReferencingPostData> referencingPosts = new ArrayList<>();
+            try {
+                final List<OriginalPost> allPosts = postDataAccess.getAllPosts();
+                for (OriginalPost otherPost : allPosts) {
+                    if (otherPost.hasReference() && otherPost.getReferencedPost() != null) {
+                        final Post referencedPost = otherPost.getReferencedPost();
+                        if (referencedPost.getId() == originalPost.getId()) {
+                            // This post references the current post
+                            referencingPosts.add(new ReadPostOutputData.ReferencingPostData(
+                                    otherPost.getId(),
+                                    otherPost.getTitle(),
+                                    otherPost.getContent(),
+                                    otherPost.getCreatorUsername()
+                            ));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // If getAllPosts is not available, just continue without referencing posts
+                System.err.println("Could not load referencing posts: " + e.getMessage());
+            }
 
             final ReadPostOutputData outputData = new ReadPostOutputData(
                     originalPost.getId(),
@@ -61,7 +84,8 @@ public class ReadPostInteractor implements ReadPostInputBoundary {
                     votes[0],  // upvotes
                     votes[1],  // downvotes
                     replyDataList,
-                    referencedPostData
+                    referencedPostData,
+                    referencingPosts
             );
 
             outputBoundary.prepareSuccessView(outputData);

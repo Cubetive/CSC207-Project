@@ -4,15 +4,15 @@ public class CreatePostInputData {
     /**
      * title of originalPost to be saved.
      */
-    private final String title;
+    private final String newTitle;
     /**
      * content of originalPost to be saved.
      */
-    private final String content;
+    private final String newContent;
     /**
      * id of referenced post, if present, of originalPost to be saved.
      */
-    private final String referencedPostId;
+    private final String newReferencedPostId;
 
     /**
      * Constructor of originalPost to be saved.
@@ -30,24 +30,32 @@ public class CreatePostInputData {
      * @param content content for new post.
      * @param referencedPostId id of referenced post, if any, for new post.
      */
-    public CreatePostInputData(final String title, final String content, final String referencedPostId) {
-        this.title = title;
-        this.content = content;
-        this.referencedPostId = referencedPostId;
+    public CreatePostInputData(final String title, final String content,
+                               final String referencedPostId) {
+        this.newTitle = title;
+        this.newContent = content;
+        this.newReferencedPostId = referencedPostId;
     }
 
     /**
      * gets title of originalPost to be saved.
+     * @return the title of new post.
      */
-    String getTitle() { return title; }
+    String getTitle() {
+        return newTitle; }
 
     /**
      * Getter of content of originalPost to be saved.
+     * @return the content of new post.
      */
-    String getContent() { return content; }
+    String getContent() {
+        return newContent; }
 
     /**
      * Getter of referenced post of originalPost to be saved.
+     * @return of new posts referenced post id as a string.
      */
-    String getReferencedPostId() { return referencedPostId; }
+    String getReferencedPostId() {
+        return newReferencedPostId;
+    }
 }

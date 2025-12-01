@@ -13,6 +13,7 @@ public class CreatePostOutputData {
 
     /**
      * Construction of Output data for presenter.
+     * @param originalPost post object to be sent to display.
      */
     public CreatePostOutputData(OriginalPost originalPost) {
         this.originalPost = originalPost;

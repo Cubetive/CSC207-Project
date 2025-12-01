@@ -16,6 +16,8 @@ public class CreatePostInputData {
 
     /**
      * Constructor of originalPost to be saved.
+     * @param content content for new post.
+     * @param title title for new post.
      */
     @SuppressWarnings("checkstyle:HiddenField")
     public CreatePostInputData(final String title, final String content) {
@@ -24,6 +26,9 @@ public class CreatePostInputData {
 
     /**
      * Long form constructor of originalPost to be saved.
+     * @param title title for new post.
+     * @param content content for new post.
+     * @param referencedPostId id of referenced post, if any, for new post.
      */
     public CreatePostInputData(final String title, final String content, final String referencedPostId) {
         this.title = title;

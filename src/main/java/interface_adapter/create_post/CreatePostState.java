@@ -23,6 +23,7 @@ public class CreatePostState {
 
     /**
      * Constructor if needed.
+     * @param failedState presumed failed to create post state.
      */
     public CreatePostState(CreatePostState failedState) {
         this.title = failedState.title;
@@ -59,6 +60,7 @@ public class CreatePostState {
     //Setters
     /**
      * Set current title.
+     * @param title to set.
      */
     public void setTitle(String title) {
         this.title = title;
@@ -66,6 +68,7 @@ public class CreatePostState {
 
     /**
      * Set current content.
+     * @param content to set.
      */
     public void setContent(String content) {
         this.content = content;
@@ -73,6 +76,7 @@ public class CreatePostState {
 
     /**
      * Set current error.
+     * @param missingError to set.
      */
     public void setMissingError(String missingError) {
         this.missingError = missingError;
@@ -87,6 +91,7 @@ public class CreatePostState {
 
     /**
      * Set current referenced post id.
+     * @param referencedPostId to set.
      */
     public void setReferencedPostId(String referencedPostId) {
         this.referencedPostId = referencedPostId;

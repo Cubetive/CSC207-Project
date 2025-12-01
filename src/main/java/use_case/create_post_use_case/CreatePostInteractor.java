@@ -26,6 +26,10 @@ public class CreatePostInteractor implements CreatePostInputBoundary {
 
     /**
      * CreatePostInteractor constructor.
+     * @param filePostAccess database access object to save the new post to.
+     * @param createPostPresenter presenter to display results.
+     * @param sessionRepository chich stores information about user currently
+     *                          using app.
      */
     public CreatePostInteractor(
             CreatePostDataAccessInterface filePostAccess,

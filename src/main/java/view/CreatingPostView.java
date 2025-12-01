@@ -50,7 +50,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     private Runnable onReferencePostClick;
 
     /**
-     * Set up provess.
+     * Set up Constructor.
+     * @param inputCreatePostViewModel create post view model to use.
      */
     public CreatingPostView(CreatePostViewModel inputCreatePostViewModel) {
         this.createPostViewModel = inputCreatePostViewModel;
@@ -65,9 +66,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
             final String referencedPostId = currentState.getReferencedPostId();
 
             if (referencedPostId != null && !referencedPostId.isEmpty()) {
-                createPostController.execute(currentState.getTitle(), currentState.getContent(), referencedPostId);
+                createPostController.execute(currentState.getTitle(),
+                        currentState.getContent(), referencedPostId);
             } else {
-                createPostController.execute(currentState.getTitle(), currentState.getContent());
+                createPostController.execute(currentState.getTitle(),
+                        currentState.getContent());
             }
 
             if (createPostController.isSuccess()) {
@@ -142,7 +145,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
         // Referenced post display panel
         referencedPostPanel = new JPanel();
-        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel, BoxLayout.Y_AXIS));
+        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel,
+                BoxLayout.Y_AXIS));
         referencedPostPanel.setBackground(new Color(245, 245, 245));
         referencedPostPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Referenced Post"),
@@ -166,6 +170,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Set up method for adding controller.
+     * @param createPostController controller to add.
      */
     public void setController(CreatePostController createPostController) {
         this.createPostController = createPostController;
@@ -173,8 +178,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Set up method for adding listeners to JTextFields.
+     * @param textField field.
+     * @param updateFunction function to update.
      */
-    private void addDocumentListener(JTextField textField, Runnable updateFunction) {
+    private void addDocumentListener(JTextField textField,
+                                     Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -195,8 +203,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Set up method for adding listeners to JTextAreas.
+     * @param textArea area.
+     * @param updateFunction function to update.
      */
-    private void addDocumentListener(JTextArea textArea, Runnable updateFunction) {
+    private void addDocumentListener(JTextArea textArea,
+                                     Runnable updateFunction) {
         textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -229,6 +240,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Debug method.
+     * @param evt event that has occurred.
      */
     public void actionPerformed(ActionEvent evt) {
         JOptionPane.showMessageDialog(this, "Most things are not implemented");
@@ -261,8 +273,10 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Retired method for button detection.
+     * @param listener listener for button.
      */
-    public void setCreatePostClickListener(CreatingPostView.CreatePostClickListener listener) {
+    public void setCreatePostClickListener(
+            CreatingPostView.CreatePostClickListener listener) {
         this.createPostClickListener = listener;
     }
 
@@ -273,6 +287,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     /**
      * Set up method for runnable item to be executed by
      * reference post use case.
+     * @param onReferencePostClick runnable item for reference post use case.
      */
     public void setOnReferencePostClick(Runnable onReferencePostClick) {
         this.onReferencePostClick = onReferencePostClick;
@@ -284,7 +299,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
      *                           (or content if no title)
      *@param referencedPostContent the content preview of the referenced post
      */
-    public void setReferencedPost(String referencedPostTitle, String referencedPostContent) {
+    public void setReferencedPost(String referencedPostTitle,
+                                  String referencedPostContent) {
         if (referencedPostTitle != null && !referencedPostTitle.isEmpty()) {
             final String displayText = "<html><b>Title:</b> " + referencedPostTitle + "<br>"
                     + "<b>Content:</b> "

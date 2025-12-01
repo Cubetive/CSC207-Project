@@ -37,6 +37,10 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
     /**
      * Constructor with necessary elements.
+     * @param createPostViewModel create post view model.
+     * @param viewManagerModel view manager model.
+     * @param readPostViewModel read post view model.
+     * @param browsePostsViewModel browse posts view model.
      */
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
                                ViewManagerModel viewManagerModel,
@@ -50,6 +54,7 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
     /**
      * Set up for the Post Reading View.
+     * @param postReadingView reading view to add.
      */
     public void setPostReadingView(PostReadingView postReadingView) {
         this.postReadingView = postReadingView;
@@ -57,6 +62,8 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
     /**
      * Prepare the post reading view given that a post was successfully created.
+     * @param createPostOutputData output data object to operate on,
+     *                             contains information about post created.
      */
     public void prepareCreatedView(CreatePostOutputData createPostOutputData) {
         // Case 2: read Post after finishing.
@@ -86,6 +93,7 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
     /**
      * Create a missing field dialog (pop up) given that improper
      * inputs were given (missing fields).
+     * @param error error to display.
      */
     public void prepareMissingFieldView(String error) {
         //TODO

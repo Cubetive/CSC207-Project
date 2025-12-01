@@ -16,6 +16,7 @@ public class CreatePostController {
 
     /**
      * A Constructor of controller with necessary elements.
+     * @param createPostInteractor interactor for use case.
      */
     public CreatePostController(CreatePostInputBoundary createPostInteractor) {
         this.createPostInteractor = createPostInteractor;

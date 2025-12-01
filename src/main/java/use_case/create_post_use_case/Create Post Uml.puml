@@ -1,0 +1,22 @@
+@startuml
+
+(CreatePostController) --> (CreatePostInputData)
+(CreatePostController) --> (CreatePostInputBoundary)
+(CreatingPostView) --> (CreatePostController)
+(CreatingPostView) --> (CreatePostViewModel)
+(CreatePostPresenter) --> (CreatePostViewModel)
+(CreatePostPresenter) --> (CreatePostOutputData)
+(CreatePostInteractor) --> (CreatePostInputData)
+(CreatePostInteractor) --|> (CreatePostInputBoundary)
+(CreatePostInteractor) --> (CreatePostOutputBoundary)
+(CreatePostPresenter) --|> (CreatePostOutputBoundary)
+(CreatePostInteractor) --> (CreatePostDataAccessInterface)
+(CreatePostInteractor) --> (OriginalPost)
+(CreatePostInteractor) --> (CreatePostOutputData)
+(OriginalPost) --|> (Post)
+(CreatePostDataAccessObject) --|> (CreatePostDataAccessInterface)
+(CreatePostDataAccessObject) --> (OriginalPost)
+(CreatePostDataAccessObject) --> Database
+
+
+@enduml

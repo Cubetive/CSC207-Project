@@ -156,6 +156,11 @@ public class AppBuilder {
                             );
                         }
                     }
+
+                    else if(sessionRepository.isLoggedIn()) {
+                        final entities.User currentUser = sessionRepository.getCurrentUser();
+                        postReadingView.loadUserData(currentUser);
+                    }
                 }
             }
         });

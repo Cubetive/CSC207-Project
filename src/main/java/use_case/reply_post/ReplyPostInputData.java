@@ -9,6 +9,11 @@ public class ReplyPostInputData {
         this.parentId = parentId;
     }
 
-    public String getContent() { return this.content; }
-    public long getParentId() { return this.parentId; }
+    public String getContent() {
+        return this.content;
+    }
+
+    public long getParentId() {
+        return this.parentId;
+    }
 }

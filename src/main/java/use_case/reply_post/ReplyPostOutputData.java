@@ -9,5 +9,7 @@ public class ReplyPostOutputData {
         this.replyPost = replyPost;
     }
 
-    public ReplyPost getReplyPost() { return this.replyPost; }
+    public ReplyPost getReplyPost() {
+        return this.replyPost;
+    }
 }

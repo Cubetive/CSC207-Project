@@ -28,12 +28,12 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
             return;
         }
 
-        // Get the username from the current logged in user
+        // Get the username from the current logged-in user
         final String username = user.getUsername();
         final String content = replyPostInputData.getContent();
         final long parentId = replyPostInputData.getParentId();
 
-        // Treat null, empty, or whitespace-only content as "missing"
+        // Remove any content with null or whitespace
         if (content == null || content.trim().isEmpty()) {
             replyPostPresenter.prepareFailureView("Fill in missing fields.");
         }
@@ -42,10 +42,10 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
             final Post parentPost = replyPostDataAccessObject.getPostById(parentId);
             // Casting to either Original Posts and Reply Posts for saving purposes
             if (parentPost instanceof OriginalPost) {
-                replyPostDataAccessObject.save(replyPost, (OriginalPost)parentPost);
+                replyPostDataAccessObject.save(replyPost, (OriginalPost) parentPost);
             }
             else if (parentPost instanceof ReplyPost) {
-                replyPostDataAccessObject.save(replyPost, (ReplyPost)parentPost);
+                replyPostDataAccessObject.save(replyPost, (ReplyPost) parentPost);
             }
             else if (parentPost == null) {
                 // Parent post doesn't exist (should not be the case for most of the time, but just as a precaution)

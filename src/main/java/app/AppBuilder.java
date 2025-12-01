@@ -1,5 +1,13 @@
 package app;
 
+import java.awt.CardLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
 import data_access.InMemorySessionRepository;
@@ -24,11 +32,11 @@ import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
-import interface_adapter.reply_post.ReplyPostController;
-import interface_adapter.reply_post.ReplyPostPresenter;
 import interface_adapter.reference_post.ReferencePostController;
 import interface_adapter.reference_post.ReferencePostPresenter;
 import interface_adapter.reference_post.ReferencePostViewModel;
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -78,11 +86,6 @@ import view.PostReadingView;
 import view.ReferencePostView;
 import view.SignupView;
 import view.ViewManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * The AppBuilder class is responsible for putting together the pieces of

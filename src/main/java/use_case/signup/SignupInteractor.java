@@ -2,6 +2,7 @@ package use_case.signup;
 
 import entities.User;
 import entities.UserFactory;
+import use_case.session.SessionRepository;
 
 /**
  * The Signup Interactor.
@@ -10,13 +11,16 @@ public class SignupInteractor implements SignupInputBoundary {
     private final SignupDataAccessInterface userDataAccessObject;
     private final SignupOutputBoundary userPresenter;
     private final UserFactory userFactory;
+    private final SessionRepository sessionRepository;
 
     public SignupInteractor(SignupDataAccessInterface signupDataAccessInterface,
-                           SignupOutputBoundary signupOutputBoundary,
-                           UserFactory userFactory) {
+                            SignupOutputBoundary signupOutputBoundary,
+                            UserFactory userFactory,
+                            SessionRepository sessionRepository) {
         this.userDataAccessObject = signupDataAccessInterface;
         this.userPresenter = signupOutputBoundary;
         this.userFactory = userFactory;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -64,17 +68,20 @@ public class SignupInteractor implements SignupInputBoundary {
 
         // Create and save the new user
         final User user = userFactory.create(
-            signupInputData.getFullName(),
-            signupInputData.getUsername(),
-            signupInputData.getEmail(),
-            signupInputData.getPassword()
+                signupInputData.getFullName(),
+                signupInputData.getUsername(),
+                signupInputData.getEmail(),
+                signupInputData.getPassword()
         );
         userDataAccessObject.save(user);
 
+        // Set the session w/ logged-in user
+        sessionRepository.setCurrentUser(user);
+
         final SignupOutputData signupOutputData = new SignupOutputData(
-            user.getUsername(),
-            user.getFullName(),
-            false
+                user.getUsername(),
+                user.getFullName(),
+                false
         );
         userPresenter.prepareSuccessView(signupOutputData);
     }

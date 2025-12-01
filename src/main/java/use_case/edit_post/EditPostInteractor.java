@@ -1,52 +1,23 @@
 package use_case.edit_post;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
+import javax.swing.*;
 
-import javax.swing.JDialog;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import data_access.FilePostDataAccessObject;
 import interface_adapter.edit_post.EditPostPresenter;
+import interface_adapter.read_post.ReadPostState;
 
 public class EditPostInteractor implements EditPostInputBoundary {
 
     private EditPostOutputBoundary editPostOutputBoundary;
 
     @Override
-    public void editPost(int id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
-        if (postToEdit.getUsername().equals(username)) {
+    public void editPost(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+        if (postToEdit.getUsername().equals(username) && contentNew.length() > 0) {
             postToEdit.setContent(contentNew);
+            contentArea.setText(contentNew);
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            try {
-                // Load the JSON file into a List of Maps
-                List<Map<String, Object>> posts = mapper.readValue(
-                        new File(".../Posts.json"), // TODO: CHECK IF DATA PERSISTS
-                        new TypeReference<List<Map<String, Object>>>() {}
-                );
-
-                // Update the matching post
-                for (Map<String, Object> post : posts) {
-                    if (((Number) post.get("id")).intValue() == id) {
-                        post.put("content", contentNew);
-                    }
-                }
-
-                // Write updated JSON back to the file
-                mapper.writerWithDefaultPrettyPrinter().writeValue(
-                        new File("posts.json"), posts
-                );
-
-                System.out.println("JSON updated successfully!");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            FilePostDataAccessObject dao = new FilePostDataAccessObject("posts.json");
+            dao.editPostContent(id, contentNew);
         }
 
         EditPostOutputData editPostOutputData = new EditPostOutputData(postToEdit);

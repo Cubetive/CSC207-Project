@@ -19,6 +19,6 @@ public class SearchPostController {
      */
     public void searchPosts() {
         searchPostInputBoundary = new SearchPostInteractor();
-        searchPostInputBoundary.searchPosts(searchPostInputData.getListModel(), searchPostInputData.getEntireOPList(), searchPostInputData.getKeyword());
+        searchPostInputBoundary.searchPosts(searchPostInputData.getJPanel(), searchPostInputData.getState(), searchPostInputData.getKeyword());
     }
 }

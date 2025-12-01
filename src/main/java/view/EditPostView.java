@@ -2,42 +2,20 @@ package view;
 import javax.swing.*;
 
 import interface_adapter.edit_post.EditPostController;
+import interface_adapter.read_post.ReadPostState;
 import use_case.edit_post.EditPostInputData;
 import entities.User;
 
 import java.awt.*;
 
 public class EditPostView {
-    private User cur_user;
 
-    public EditPostView(InMemorySessionRepository sessionRepository) {
-        this.cur_user = sessionRepository.getCurrentUser();
-    }
-
-    private void createEditButton() {
-        JButton editButton = new JButton("Edit Post");
-        editButton.setPreferredSize(new Dimension(120, 40));
-
-        editButton.addActionListener(e -> openEditPostDialog(state));
-
-        JPanel editPanel = new JPanel();
-        editPanel.setLayout(new GridBagLayout());
-        if (cur_user.getUsername().equals(state.getUsername())) {
-            editPanel.add(editButton);
-        }
-
-        mainPanel.add(editPanel);
-        mainPanel.setLocationRelativeTo(null);
-        mainPanel.setVisible(true);
-    }
-
-    private void openEditPostDialog(ReadPostState state) {
+    public EditPostView (JTextArea contentArea, ReadPostState state, User cur_user) {
         JDialog dialog = new JDialog((Frame) null, "Edit Post", true);
         dialog.setSize(550, 450);
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ---------- Body Section ----------
         JPanel bodyPanel = new JPanel();
         bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
 
@@ -59,7 +37,6 @@ public class EditPostView {
         bodyPanel.add(Box.createVerticalStrut(5));
         bodyPanel.add(scrollPane);
 
-        // ---------- Submit Button ----------
         JButton submitButton = new JButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setPreferredSize(new Dimension(100, 35));
@@ -70,13 +47,16 @@ public class EditPostView {
         submitButton.addActionListener(e -> {
             String updatedText = bodyArea.getText();
 
-            // Controller call
-            EditPostController editPostController =
-                new EditPostController(new EditPostInputData(state.getID(), cur_user.getUsername(), state, updatedText, dialog));
-            editPostController.editPost();
+            if (updatedText.length() > 0) {
+                EditPostController editPostController =
+                        new EditPostController(new EditPostInputData(contentArea, state.getId(), cur_user.getUsername(), state, updatedText, dialog));
+                editPostController.editPost();
+            }
+            else {
+                JOptionPane.showMessageDialog(dialog, "Fill in the content.", "MISSING CONTENT", JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
-        // ---------- Add Components ----------
         dialog.add(bodyPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 

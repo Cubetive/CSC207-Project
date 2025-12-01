@@ -1,22 +1,28 @@
 package use_case.edit_post;
 
-import javax.swing.JDialog;
+import interface_adapter.read_post.ReadPostState;
+
+import javax.swing.*;
 
 public class EditPostInputData {
 
-    private int id;
+    private JTextArea contentArea;
+    private long id;
     private String username;
     private ReadPostState postToEdit;
     private String contentNew;
     private JDialog dialog;
 
-    public EditPostInputData(int id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+    public EditPostInputData(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+        this.contentArea = contentArea;
         this.id = id;
         this.username = username;
         this.postToEdit = postToEdit;
         this.contentNew = contentNew;
         this.dialog = dialog;
     }
+
+    public JTextArea getContentArea() {return this.contentArea;}
 
     public String getUsername() {
         return this.username;
@@ -34,7 +40,7 @@ public class EditPostInputData {
         return this.dialog;
     }
 
-    public int getID() {
+    public long getID() {
         return this.id;
     }
 

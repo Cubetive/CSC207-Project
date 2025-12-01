@@ -1,6 +1,6 @@
 package interface_adapter.search_post;
 
-import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 
 import use_case.search_post.SearchPostOutputBoundary;
 import use_case.search_post.SearchPostOutputData;
@@ -13,8 +13,8 @@ public class SearchPostPresenter implements SearchPostOutputBoundary {
     }
 
     @Override
-    public void prepareSuccessView(DefaultListModel<String> listModel) {
+    public void prepareSuccessView(JPanel postsPanel) {
         SearchPostViewModel searchPostViewModel = new SearchPostViewModel();
-        searchPostViewModel.updatePostList(listModel, searchPostOutputData.getSearchedList());
+        searchPostViewModel.updatePostList(postsPanel, searchPostOutputData.getState());
     }
 }

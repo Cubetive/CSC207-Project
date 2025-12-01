@@ -1,10 +1,8 @@
 package use_case.search_post;
 
-import java.util.List;
+import interface_adapter.browse_posts.BrowsePostsState;
 
-import javax.swing.DefaultListModel;
-
-import entities.OriginalPost;
+import javax.swing.JPanel;
 
 /**
  * Input Boundary for Search Post use case.
@@ -12,9 +10,9 @@ import entities.OriginalPost;
 public interface SearchPostInputBoundary {
     /**
      * Executes the Search Post use case.
-     * @param listModel the viewed list before the search
-     * @param entire_op_list the whole OriginalPost list
+     * @param postsPanel the viewed panel before the search
+     * @param state the whole post list
      * @param keyword the search bar keyword inputted
      */
-    void searchPosts(DefaultListModel<String> listModel, List<OriginalPost> entire_op_list, String keyword);
+    void searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword);
 }

@@ -1,19 +1,17 @@
 package use_case.search_post;
 
-import java.util.List;
-
-import entities.OriginalPost;
+import interface_adapter.browse_posts.BrowsePostsState;
 
 public class SearchPostOutputData {
     
-    private List<OriginalPost> searched_list;
+    private BrowsePostsState state;
 
-    public SearchPostOutputData(List<OriginalPost> searched_list) {
-        this.searched_list = searched_list;
+    public SearchPostOutputData(BrowsePostsState state) {
+        this.state = state;
     }
 
-    public List<OriginalPost> getSearchedList() {
-        return this.searched_list;
+    public BrowsePostsState getState() {
+        return this.state;
     }
 
 }

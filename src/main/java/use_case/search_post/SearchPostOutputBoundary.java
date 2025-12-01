@@ -1,6 +1,6 @@
 package use_case.search_post;
 
-import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 
 /**
  * Output Boundary for Search Post use case.
@@ -9,7 +9,7 @@ public interface SearchPostOutputBoundary {
 
     /**
      * Prepares the success view for the Search Post use case.
-     * @param listModel the list to be viewed after the search
+     * @param postsPanel the panel to be viewed after the search
      */
-    void prepareSuccessView(DefaultListModel<String> listModel);
+    void prepareSuccessView(JPanel postsPanel);
 }

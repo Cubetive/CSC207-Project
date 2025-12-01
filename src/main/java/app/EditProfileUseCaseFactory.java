@@ -13,7 +13,7 @@ import use_case.session.SessionRepository;
 /**
  * Factory for creating the Edit Profile use case.
  */
-public class EditProfileUseCaseFactory {
+public final class EditProfileUseCaseFactory {
 
     /** Prevent instantiation. */
     private EditProfileUseCaseFactory() {

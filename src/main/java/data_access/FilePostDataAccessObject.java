@@ -28,7 +28,10 @@ import java.io.File;
 public class FilePostDataAccessObject implements
         BrowsePostsDataAccessInterface,
         ReadPostDataAccessInterface,
-        ReplyPostDataAccessInterface, VoteDataAccessInterface,  CreatePostDataAccessInterface{
+        ReplyPostDataAccessInterface, 
+        VoteDataAccessInterface,  
+        CreatePostDataAccessInterface,
+        use_case.reference_post.ReferencePostDataAccessInterface {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
@@ -82,6 +85,20 @@ public class FilePostDataAccessObject implements
                     }
 
                     posts.add(post);
+                }
+                
+                // Second pass: restore references after all posts are loaded
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    final JsonElement element = jsonArray.get(i);
+                    final JsonObject postObj = element.getAsJsonObject();
+                    
+                    if (postObj.has("referencedPostId") && !postObj.get("referencedPostId").isJsonNull()) {
+                        final long referencedPostId = postObj.get("referencedPostId").getAsLong();
+                        final Post referencedPost = postIdMap.get(referencedPostId);
+                        if (referencedPost != null) {
+                            posts.get(i).setReferencedPost(referencedPost);
+                        }
+                    }
                 }
             }
         } catch (IOException | ParseException e) {
@@ -187,6 +204,11 @@ public class FilePostDataAccessObject implements
                 repliesArray.add(replyObj);
             }
             postObj.add("replies", repliesArray);
+            
+            // Referenced post ID (if this post references another post)
+            if (post.hasReference() && post.getReferencedPost() != null) {
+                postObj.addProperty("referencedPostId", post.getReferencedPost().getId());
+            }
 
             jsonArray.add(postObj);
         }
@@ -294,5 +316,103 @@ public class FilePostDataAccessObject implements
         List<OriginalPost> currentPosts = this.getAllPosts();
         this.posts.add(originalPost);
         this.save();
+    }
+    
+    // ReferencePostDataAccessInterface methods
+    @Override
+    public List<Post> searchPostsByKeyword(String keyword) {
+        final List<Post> results = new ArrayList<>();
+        final String lowerKeyword = keyword.toLowerCase();
+        
+        // Ensure posts are loaded
+        getAllPosts();
+        
+        // Search through all posts (including replies)
+        for (OriginalPost post : posts) {
+            searchPostRecursive(post, lowerKeyword, results);
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Recursively searches through a post and its replies.
+     */
+    private void searchPostRecursive(Post post, String lowerKeyword, List<Post> results) {
+        boolean matches = false;
+        
+        // Search in content
+        if (post.getContent() != null &&
+                post.getContent().toLowerCase().contains(lowerKeyword)) {
+            matches = true;
+        }
+        
+        // Search in title for OriginalPost
+        if (post instanceof OriginalPost) {
+            final OriginalPost originalPost = (OriginalPost) post;
+            if (originalPost.getTitle() != null &&
+                    originalPost.getTitle().toLowerCase().contains(lowerKeyword)) {
+                matches = true;
+            }
+        }
+        
+        // Search in creator username
+        if (post.getCreatorUsername() != null &&
+                post.getCreatorUsername().toLowerCase().contains(lowerKeyword)) {
+            matches = true;
+        }
+        
+        if (matches) {
+            results.add(post);
+        }
+        
+        // Search in replies
+        if (post instanceof OriginalPost) {
+            for (ReplyPost reply : ((OriginalPost) post).getReplies()) {
+                searchPostRecursive(reply, lowerKeyword, results);
+            }
+        } else if (post instanceof ReplyPost) {
+            for (ReplyPost reply : ((ReplyPost) post).getReplies()) {
+                searchPostRecursive(reply, lowerKeyword, results);
+            }
+        }
+    }
+    
+    @Override
+    public Post getPostById(String postId) {
+        try {
+            final long id = Long.parseLong(postId);
+            return getPostById(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+    
+    @Override
+    public void savePost(Post post) {
+        if (post instanceof OriginalPost) {
+            // Check if post already exists
+            final OriginalPost originalPost = (OriginalPost) post;
+            final List<OriginalPost> allPosts = getAllPosts();
+            
+            // Find and update existing post or add new one
+            boolean found = false;
+            for (int i = 0; i < allPosts.size(); i++) {
+                if (allPosts.get(i).getId() == post.getId()) {
+                    allPosts.set(i, originalPost);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                allPosts.add(originalPost);
+            }
+            
+            this.posts = allPosts;
+            this.save();
+        }
+        // For ReplyPost, we'd need to find the parent and update it
+        // This is more complex and may require additional logic
     }
 }

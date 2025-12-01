@@ -1,10 +1,8 @@
 package use_case.create_post;
 
-import view.PostReadingView;
-
 import javax.swing.*;
 
-public class TestCreatePostComplex {
+public class CreatePostComplexTest {
 
 
     public static void main(String[] args) {

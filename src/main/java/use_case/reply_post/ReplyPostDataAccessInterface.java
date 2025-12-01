@@ -23,7 +23,7 @@ public interface ReplyPostDataAccessInterface {
     void save(ReplyPost replyPost, ReplyPost parentPost);
 
     /**
-     * Get a post through id
+     * Get a post through id.
      * @param id post id
      * @return the post by id
      */

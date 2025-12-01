@@ -1,9 +1,6 @@
 package use_case.create_post_use_case;
 
 import entities.OriginalPost;
-import entities.Post;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public interface CreatePostDataAccessInterface {
@@ -12,8 +9,14 @@ public interface CreatePostDataAccessInterface {
     //Boolean existsWithName(String name);
 
     // Saves a post to database.
+    /**
+     * @param originalPost to be saved
+     */
     void save(OriginalPost originalPost);
 
+    /**
+     * @return All posts.
+     */
     List<OriginalPost> getAllPosts();
 
 }

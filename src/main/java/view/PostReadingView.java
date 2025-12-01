@@ -1,33 +1,51 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
 import entities.User;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
-import interface_adapter.upvote_downvote.VoteController;
 import interface_adapter.translate.TranslationController;
-import interface_adapter.translate.TranslationViewModel;
 import interface_adapter.translate.TranslationState;
+import interface_adapter.translate.TranslationViewModel;
+import interface_adapter.upvote_downvote.VoteController;
 import use_case.read_post.ReadPostOutputData;
-import use_case.session.SessionRepository;
-
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The View for reading a post and its replies.
  */
 public class PostReadingView extends JPanel implements PropertyChangeListener {
-    public static final String CONFIRM_CANCEL_TITLE = "Cancel Reply";
-    public static final String CONFIRM_CANCEL_MESSAGE = "Are you sure? This draft will not be saved.";
 
     private final ReadPostViewModel viewModel;
     private TranslationViewModel translationViewModel;
@@ -47,6 +65,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private String lastTextTranslatedKey = null;
     private final Set<String> translationsInProgress = new HashSet<>();
     private static final String MAIN_POST_KEY = "MAIN_POST";
+    private static final String CONFIRM_CANCEL_MESSAGE = "You have unsaved changes. Are you sure you want to cancel?";
+    private static final String CONFIRM_CANCEL_TITLE = "Confirm Cancel";
 
     private final JButton backButton;
     private final JLabel titleLabel;
@@ -61,7 +81,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private JLabel translationStatusLabel;
     private final JScrollPane translatedContentScrollPane;
     // Supported languages for the dropdown
-    private static final String[] SUPPORTED_LANGUAGES = {"ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru"};
+    private static final String[] SUPPORTED_LANGUAGES = {
+        "ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru",
+    };
 
     private final JButton upvoteButton;
     private final JButton downvoteButton;
@@ -70,8 +92,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JButton commentButton;
     private final JPanel repliesPanel;
     private final JScrollPane scrollPane;
+    private final JPanel referencedPostContainer;
+    private final JLabel referencedPostTitleLabel;
+    private final JTextArea referencedPostContentArea;
+    private final JLabel referencedPostAuthorLabel;
+    private final JButton viewReferencedPostButton;
+    private Runnable onViewReferencedPostClick;
+    private final JPanel referencingPostsContainer;
+    private final JPanel referencingPostsListPanel;
+    private final JPanel referenceBannerPanel;
+    private final JButton referenceBannerButton;
 
-    private User cur_user;
+    private User curUser;
     private JButton editButton;
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
@@ -105,7 +137,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        backButton.addActionListener(e -> {
+        backButton.addActionListener(evt -> {
             if (onBackAction != null) {
                 onBackAction.run();
             }
@@ -154,6 +186,56 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         contentContainer.add(contentArea, BorderLayout.CENTER);
 
+        // Reference banner (shown when this post references another post)
+        referenceBannerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        referenceBannerPanel.setBackground(new Color(240, 248, 255)); // Light blue background
+        referenceBannerPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 4, 1, 1, new Color(70, 130, 180)),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        referenceBannerPanel.setVisible(false);
+        referenceBannerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        referenceBannerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        
+        final JLabel referenceBannerLabel = new JLabel("🔗 This post references:");
+        referenceBannerLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        referenceBannerLabel.setForeground(new Color(50, 50, 50));
+        
+        referenceBannerButton = new JButton();
+        referenceBannerButton.setFont(new Font("Arial", Font.PLAIN, 13));
+        referenceBannerButton.setForeground(new Color(70, 130, 180));
+        referenceBannerButton.setBackground(new Color(240, 248, 255));
+        referenceBannerButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        referenceBannerButton.setFocusPainted(false);
+        referenceBannerButton.setContentAreaFilled(false);
+        referenceBannerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        referenceBannerButton.addActionListener(evt -> {
+            if (onViewReferencedPostClick != null) {
+                onViewReferencedPostClick.run();
+            }
+            else if (controller != null) {
+                // Get referenced post ID from state
+                final ReadPostState readPostState = viewModel.getState();
+                if (readPostState.getReferencedPost() != null) {
+                    loadPost(readPostState.getReferencedPost().getId());
+                }
+            }
+        });
+        // Add hover effect
+        referenceBannerButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                referenceBannerButton.setForeground(new Color(50, 100, 150));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                referenceBannerButton.setForeground(new Color(70, 130, 180));
+            }
+        });
+        
+        referenceBannerPanel.add(referenceBannerLabel);
+        referenceBannerPanel.add(referenceBannerButton);
+
         // Translation Controls and Display
         final JPanel translationPanel = new JPanel();
         translationPanel.setLayout(new BoxLayout(translationPanel, BoxLayout.Y_AXIS));
@@ -186,40 +268,35 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Inline ActionListener for the translate button
-        translateButton.addActionListener(e -> {
+        translateButton.addActionListener(evt -> {
             if (translationController == null) {
                 JOptionPane.showMessageDialog(this, "Translation service is not configured.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            try {
-                translateButton.setEnabled(false);
-                translationStatusLabel.setText("Translating...");
-                translatedContentArea.setText("Loading translation...");
+            translateButton.setEnabled(false);
+            translationStatusLabel.setText("Translating...");
+            translatedContentArea.setText("Loading translation...");
 
-                translationsInProgress.add(MAIN_POST_KEY);
+            translationsInProgress.add(MAIN_POST_KEY);
 
-                String targetLanguage = (String) languageDropdown.getSelectedItem();
-                final long postId = currentPostId;
-                final String content = textContent;
+            final String targetLanguage = (String) languageDropdown.getSelectedItem();
+            final long postIdToTranslate = currentPostId;
+            final String contentToTranslate = textContent;
 
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        translationController.execute(postId, content, targetLanguage);
-                        return null;
-                    }
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    translationController.execute(postIdToTranslate, contentToTranslate, targetLanguage);
+                    return null;
+                }
 
-                    @Override
-                    protected void done() {
-                        translationViewModel.firePropertyChanged();
-                    }
-                }.execute();
-            } catch (Exception ex) {
-                System.err.println("CRASH: Main Post Translation failed on EDT!");
-                ex.printStackTrace();
-            }
+                @Override
+                protected void done() {
+                    translationViewModel.firePropertyChanged();
+                }
+            }.execute();
         });
 
         controlPanel.add(translateLabel);
@@ -257,7 +334,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         final JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         votePanel.setBackground(new Color(245, 245, 245));
 
-        upvoteButton = new JButton("\u25B2");
+        upvoteButton = new JButton("\u25B2");  // Up triangle
         upvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         upvoteButton.setFocusPainted(false);
         upvoteButton.setBackground(new Color(240, 240, 240));
@@ -270,7 +347,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         upvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        downvoteButton = new JButton("\u25BC");
+        downvoteButton = new JButton("\u25BC");  // Down triangle
         downvoteButton.setFont(new Font("Arial", Font.PLAIN, 16));
         downvoteButton.setFocusPainted(false);
         downvoteButton.setBackground(new Color(240, 240, 240));
@@ -291,14 +368,16 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         votePanel.add(downvoteButton);
         votePanel.add(voteCountLabel);
 
-        upvoteButton.addActionListener(e -> {
+        upvoteButton.addActionListener(evt -> {
             if (voteController != null) {
+                // true = upvote
                 voteController.execute(true, currentPostId);
             }
         });
 
-        downvoteButton.addActionListener(e -> {
+        downvoteButton.addActionListener(evt -> {
             if (voteController != null) {
+                // false = downvote
                 voteController.execute(false, currentPostId);
             }
         });
@@ -313,6 +392,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         // Comment input panel
         final JPanel commentInputPanel = new JPanel(new BorderLayout(10, 0));
         commentInputPanel.setBackground(new Color(245, 245, 245));
+        commentInputPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
         commentField = new JTextField();
         commentField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -334,24 +414,103 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        commentButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            final String content = commentField.getText();
-            final long parentId = readPostState.getId();
-            sendReply(content, parentId);
-        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
+
+        // Add action listener for comment button (single source of truth)
+        commentButton.addActionListener(evt -> {
+            if (replyController == null) {
+                return;
+            }
+            final String commentText = commentField.getText();
+            final long parentId = currentPostId;
+            sendReply(commentText, parentId);
+        });
 
         // Replies panel
         repliesPanel = new JPanel();
         repliesPanel.setLayout(new BoxLayout(repliesPanel, BoxLayout.Y_AXIS));
         repliesPanel.setBackground(new Color(245, 245, 245));
 
+        // Referenced post panel (initially hidden)
+        referencedPostContainer = new JPanel(new BorderLayout());
+        referencedPostContainer.setBackground(new Color(240, 248, 255)); // Light blue background
+        referencedPostContainer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced Post"),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        referencedPostContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        referencedPostContainer.setVisible(false);
+        
+        referencedPostTitleLabel = new JLabel();
+        referencedPostTitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        referencedPostTitleLabel.setForeground(new Color(50, 50, 50));
+        
+        referencedPostContentArea = new JTextArea(3, 30);
+        referencedPostContentArea.setFont(new Font("Arial", Font.PLAIN, 13));
+        referencedPostContentArea.setLineWrap(true);
+        referencedPostContentArea.setWrapStyleWord(true);
+        referencedPostContentArea.setEditable(false);
+        referencedPostContentArea.setBackground(new Color(240, 248, 255));
+        referencedPostContentArea.setForeground(new Color(80, 80, 80));
+        
+        referencedPostAuthorLabel = new JLabel();
+        referencedPostAuthorLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        referencedPostAuthorLabel.setForeground(new Color(120, 120, 120));
+        
+        viewReferencedPostButton = new JButton("View Referenced Post");
+        viewReferencedPostButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        viewReferencedPostButton.setFocusPainted(false);
+        viewReferencedPostButton.setBackground(new Color(70, 130, 180));
+        viewReferencedPostButton.setForeground(Color.WHITE);
+        viewReferencedPostButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        viewReferencedPostButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        final JPanel referencedPostInfoPanel = new JPanel();
+        referencedPostInfoPanel.setLayout(new BoxLayout(referencedPostInfoPanel, BoxLayout.Y_AXIS));
+        referencedPostInfoPanel.setBackground(new Color(240, 248, 255));
+        referencedPostInfoPanel.add(referencedPostTitleLabel);
+        referencedPostInfoPanel.add(Box.createVerticalStrut(5));
+        referencedPostInfoPanel.add(new JScrollPane(referencedPostContentArea));
+        referencedPostInfoPanel.add(Box.createVerticalStrut(5));
+        referencedPostInfoPanel.add(referencedPostAuthorLabel);
+        
+        referencedPostContainer.add(referencedPostInfoPanel, BorderLayout.CENTER);
+        referencedPostContainer.add(viewReferencedPostButton, BorderLayout.EAST);
+        
+        // Referencing posts panel (posts that reference this one)
+        referencingPostsContainer = new JPanel(new BorderLayout());
+        referencingPostsContainer.setBackground(new Color(255, 248, 240)); // Light orange background
+        referencingPostsContainer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced By"),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        referencingPostsContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        referencingPostsContainer.setVisible(false);
+        
+        referencingPostsListPanel = new JPanel();
+        referencingPostsListPanel.setLayout(new BoxLayout(referencingPostsListPanel, BoxLayout.Y_AXIS));
+        referencingPostsListPanel.setBackground(new Color(255, 248, 240));
+        
+        final JScrollPane referencingPostsScrollPane = new JScrollPane(referencingPostsListPanel);
+        referencingPostsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        referencingPostsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        referencingPostsScrollPane.setBorder(null);
+        referencingPostsScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        
+        referencingPostsContainer.add(referencingPostsScrollPane, BorderLayout.CENTER);
+        
         // Add components to main panel
+        mainPanel.add(referenceBannerPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(contentContainer);
-        mainPanel.add(translationPanel); // Translation panel added
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(referencedPostContainer);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(referencingPostsContainer);
+        // Add translation panel.
+        mainPanel.add(translationPanel);
 
         mainPanel.add(Box.createVerticalStrut(15));
         mainPanel.add(votePanel);
@@ -374,8 +533,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void loadUserData(User cur_user) {
-        this.cur_user = cur_user;
+    /**
+     * Loads the current user data for permission checks.
+     *
+     * @param currentUser the current logged-in user
+     */
+    public void loadUserData(User currentUser) {
+        this.curUser = currentUser;
     }
 
     @Override
@@ -416,13 +580,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 translateButton.setEnabled(true);
             }
 
-            JTextArea targetArea = translatedContentArea;
-            JLabel statusLabel = translationStatusLabel;
+            final JTextArea targetArea = translatedContentArea;
+            final JLabel statusLabel = translationStatusLabel;
 
             if (targetArea != null && statusLabel != null) {
                 if (state.isTranslationSuccessful()) {
                     targetArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
-                    String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                    final String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                     statusLabel.setText(
                             String.format("Translated to %s%s. %s",
                                     state.getTargetLanguage().toUpperCase(),
@@ -440,24 +604,26 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 }
                 translationsInProgress.remove(MAIN_POST_KEY);
             }
-        } else {
-            String lookupKey = lastTextTranslatedKey.trim();
+        }
+        else {
+            final String lookupKey = lastTextTranslatedKey.trim();
 
             try {
-                JTextArea commentArea = commentTranslationAreas.get(lookupKey);
-                JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
-                JButton commentButton = commentTranslationButtons.get(lookupKey);
+                final JTextArea commentArea = commentTranslationAreas.get(lookupKey);
+                final JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
+                final JButton commentBtn = commentTranslationButtons.get(lookupKey);
 
-                if (commentButton != null) {
-                    commentButton.setEnabled(true);
+                if (commentBtn != null) {
+                    commentBtn.setEnabled(true);
                 }
 
                 if (commentArea != null && commentStatus != null) {
                     if (state.isTranslationSuccessful()) {
-                        String text = state.getTranslatedText() != null ? state.getTranslatedText() : "";
+                        final String text = state.getTranslatedText() != null
+                                ? state.getTranslatedText() : "";
                         commentArea.setText(text);
 
-                        String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                        final String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                         commentStatus.setText(
                                 String.format("Translated to %s%s. %s",
                                         state.getTargetLanguage().toUpperCase(),
@@ -474,7 +640,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                         commentArea.setPreferredSize(null);
                         commentArea.setSize(commentArea.getPreferredSize());
 
-                        JScrollPane parentScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
+                        final JScrollPane parentScrollPane = (JScrollPane)
+                                SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
                         if (parentScrollPane != null) {
                             parentScrollPane.setViewportView(commentArea);
                             parentScrollPane.revalidate();
@@ -512,6 +679,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.repaint();
     }
 
+    /**
+     * Resets the main post translation display area.
+     */
     private void clearTranslationDisplay() {
         if (translatedContentArea != null) {
             translatedContentArea.setText("");
@@ -524,12 +694,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Clears all comment translation areas and internal trackers.
+     */
     private void clearCommentTranslationDisplays() {
         commentTranslationAreas.clear();
         commentTranslationStatusLabels.clear();
         commentTranslationButtons.clear();
     }
 
+    /**
+     * Updates the view based on the current state.
+     */
     private void updateView(ReadPostState state) {
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage(),
@@ -551,20 +727,85 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         authorLabel.setText(state.getUsername());
         contentArea.setText(state.getContent());
         voteCountLabel.setText(String.valueOf(state.getUpvotes() - state.getDownvotes()));
+        
+        // Update referenced post display
+        final ReadPostOutputData.ReferencedPostData referencedPost = state.getReferencedPost();
+        if (referencedPost != null) {
+            // Show reference banner at top
+            final String referencedTitle = referencedPost.getTitle() != null && !referencedPost.getTitle().isEmpty()
+                    ? referencedPost.getTitle()
+                    : "Original Post";
+            referenceBannerButton.setText(referencedTitle);
+            referenceBannerPanel.setVisible(true);
+            // Force revalidation to ensure banner is displayed
+            referenceBannerPanel.revalidate();
+            referenceBannerPanel.repaint();
+            
+            // Update referenced post container
+            referencedPostTitleLabel.setText(
+                    referencedPost.getTitle().isEmpty() ? "Referenced Post" : referencedPost.getTitle());
+            referencedPostContentArea.setText(referencedPost.getContent());
+            referencedPostAuthorLabel.setText("By: " + referencedPost.getUsername());
+            referencedPostContainer.setVisible(true);
+            
+            // Set up button to view referenced post
+            // Remove all existing action listeners
+            for (java.awt.event.ActionListener al : viewReferencedPostButton.getActionListeners()) {
+                viewReferencedPostButton.removeActionListener(al);
+            }
+            viewReferencedPostButton.addActionListener(evt -> {
+                if (onViewReferencedPostClick != null) {
+                    onViewReferencedPostClick.run();
+                }
+                else if (controller != null) {
+                    // Fallback: load the referenced post directly
+                    loadPost(referencedPost.getId());
+                }
+            });
+        }
+        else {
+            // Hide reference banner and container if no reference
+            referenceBannerPanel.setVisible(false);
+            referencedPostContainer.setVisible(false);
+        }
+        
+        // Update referencing posts display (posts that reference this one)
+        final List<ReadPostOutputData.ReferencingPostData> referencingPosts = state.getReferencingPosts();
+        referencingPostsListPanel.removeAll();
+        if (referencingPosts != null && !referencingPosts.isEmpty()) {
+            referencingPostsContainer.setVisible(true);
+            for (ReadPostOutputData.ReferencingPostData refPost : referencingPosts) {
+                final JPanel refPostPanel = createReferencingPostPanel(refPost);
+                referencingPostsListPanel.add(refPostPanel);
+                referencingPostsListPanel.add(Box.createVerticalStrut(5));
+            }
+        } else {
+            referencingPostsContainer.setVisible(false);
+        }
+        referencingPostsListPanel.revalidate();
+        referencingPostsListPanel.repaint();
 
-        if (cur_user.getUsername().equals(state.getUsername())) {
+        if (curUser != null && curUser.getUsername().equals(state.getUsername())) {
             editButton.setVisible(true);
-            editButton.addActionListener(e -> new EditPostView(contentArea, state, cur_user));
+            for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
+                editButton.removeActionListener(listener);
+            }
+            editButton.addActionListener(ev -> new EditPostView(contentArea, state, curUser));
         }
         else {
             editButton.setVisible(false);
+            for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
+                editButton.removeActionListener(listener);
+            }
         }
 
+        // Clear and update replies
         repliesPanel.removeAll();
         if (!state.getReplies().isEmpty()) {
             for (ReadPostOutputData.ReplyData reply : state.getReplies()) {
-                final JPanel replyPanel = createReplyPanel(reply);
+                final JPanel replyPanel = createReplyPanel(reply, 0);
 
+                // Wrapper to force full width
                 final JPanel fullWidthWrapper = new JPanel(new BorderLayout());
                 fullWidthWrapper.setBackground(new Color(245, 245, 245));
                 fullWidthWrapper.add(replyPanel, BorderLayout.CENTER);
@@ -579,18 +820,28 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         repliesPanel.repaint();
     }
 
-    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply) {
+    /**
+     * Creates a panel for displaying a single reply.
+     * @param reply the reply data
+     * @param indentLevel the indentation level for nested replies
+     */
+    private JPanel createReplyPanel(ReadPostOutputData.ReplyData reply, int indentLevel) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
         // Add left indent for nested replies
+        final int leftIndent = indentLevel * 15;
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
-                BorderFactory.createEmptyBorder(12, 15, 12, 15)
+                BorderFactory.createEmptyBorder(12, 15 + leftIndent, 12, 15)
         ));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
+        // --- Unique Key for this comment (original content) ---
+        // Used to map the translation result back to this specific JTextArea
+        final String commentKey = reply.getContent().trim();
 
         // Reply header
         final JPanel headerPanel = new JPanel(new BorderLayout());
@@ -598,13 +849,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        final String commentKey = reply.getContent().trim();
-
         final JLabel usernameLabel = new JLabel(reply.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 13));
         usernameLabel.setForeground(new Color(70, 130, 180));
-
-        headerPanel.add(usernameLabel, BorderLayout.WEST);
 
         // Reply content
         final JTextArea replyContent = new JTextArea(reply.getContent());
@@ -618,7 +865,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyContent.setAlignmentX(Component.LEFT_ALIGNMENT);
         replyContent.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // --- Comment Translation UI ---
+        // --- Comment Translation Controls and Display ---
         final JPanel commentTranslationPanel = new JPanel();
         commentTranslationPanel.setLayout(new BoxLayout(commentTranslationPanel, BoxLayout.Y_AXIS));
         commentTranslationPanel.setBackground(Color.WHITE);
@@ -637,6 +884,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslateButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         commentTranslateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        // Output elements for this specific comment
         final JLabel commentTranslationStatusLabel = new JLabel("Select language and translate.");
         commentTranslationStatusLabel.setFont(new Font("Arial", Font.ITALIC, 11));
         commentTranslationStatusLabel.setForeground(new Color(150, 150, 150));
@@ -653,20 +901,26 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translatedReplyContentScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         translatedReplyContentScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
+        // Store references for later updating in propertyChange
         commentTranslationAreas.put(commentKey, translatedReplyContentArea);
         commentTranslationStatusLabels.put(commentKey, commentTranslationStatusLabel);
+
         commentTranslationButtons.put(commentKey, commentTranslateButton);
 
-        commentTranslateButton.addActionListener(e -> {
+        // Action Listener for Comment Translation
+        commentTranslateButton.addActionListener(evt -> {
             if (translationController == null) {
                 commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
                 return;
             }
+
             commentTranslateButton.setEnabled(false);
             commentTranslationStatusLabel.setText("Translating...");
             translatedReplyContentArea.setText("Loading translation...");
 
+            // Set the tracking key to this comment's content
             lastTextTranslatedKey = commentKey;
+
             translationsInProgress.add(lastTextTranslatedKey);
 
             final String targetLanguage = (String) commentLanguageDropdown.getSelectedItem();
@@ -674,7 +928,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
             new SwingWorker<Void, Void>() {
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected Void doInBackground() {
                     translationController.execute(replyContentText, targetLanguage);
                     return null;
                 }
@@ -693,7 +947,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslationPanel.add(Box.createVerticalStrut(5));
         commentTranslationPanel.add(translatedReplyContentScrollPane);
 
-        // Vote and Reply buttons
+        // Vote and reply buttons
         final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         actionsPanel.setOpaque(false);
         actionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -725,7 +979,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         ));
         replyDownvoteButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        final JLabel replyVoteCount = new JLabel(String.valueOf(reply.getUpvotes() - reply.getDownvotes()));
+        final JLabel replyVoteCount = new JLabel(String.valueOf(
+                reply.getUpvotes() - reply.getDownvotes()));
         replyVoteCount.setFont(new Font("Arial", Font.BOLD, 13));
         replyVoteCount.setForeground(new Color(100, 100, 100));
 
@@ -749,13 +1004,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         actionsPanel.add(Box.createHorizontalStrut(8));
         actionsPanel.add(replyButton);
 
-        replyUpvoteButton.addActionListener(e -> {
+        replyUpvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 voteController.execute(true, reply.getId());
             }
         });
 
-        replyDownvoteButton.addActionListener(e -> {
+        replyDownvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 voteController.execute(false, reply.getId());
             }
@@ -817,48 +1072,46 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyPanel.setVisible(false);
 
         // Functionality for the buttons
-        replyButton.addActionListener(e -> {
+        replyButton.addActionListener(evt -> {
             replyPanel.setVisible(true);
         });
 
-        replyCancelButton.addActionListener(e -> {
+        replyCancelButton.addActionListener(evt -> {
             if (!replyTextField.getText().isEmpty()) {
                 // Prompt a confirmation message if there's a draft.
-                int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
+                final int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
                         CONFIRM_CANCEL_TITLE, JOptionPane.YES_NO_OPTION);
 
                 // Return if the user does not choose yes.
-                if (userAnswer != JOptionPane.YES_OPTION) return;
+                if (userAnswer != JOptionPane.YES_OPTION) {
+                    return;
+                }
             }
 
             replyPanel.setVisible(false);
             replyTextField.setText("");
         });
 
-        sendReplyButton.addActionListener(e -> {
+        sendReplyButton.addActionListener(evt -> {
             final String replyText = replyTextField.getText();
             final long parentId = reply.getId();
             sendReply(replyText, parentId);
         });
 
         // Adding everything in
+        headerPanel.add(usernameLabel, BorderLayout.WEST);
         panel.add(headerPanel);
         panel.add(Box.createVerticalStrut(8));
         panel.add(replyContent);
         panel.add(Box.createVerticalStrut(10));
-
         panel.add(commentTranslationPanel);
-        panel.add(Box.createVerticalStrut(10));
-
         panel.add(actionsPanel);
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(replyPanel);
 
         // Add nested replies directly to panel
         if (!reply.getNestedReplies().isEmpty()) {
             panel.add(Box.createVerticalStrut(12));
             for (ReadPostOutputData.ReplyData nestedReply : reply.getNestedReplies()) {
-                final JPanel nestedPanel = createReplyPanel(nestedReply);
+                final JPanel nestedPanel = createReplyPanel(nestedReply, indentLevel + 1);
                 panel.add(nestedPanel);
                 panel.add(Box.createVerticalStrut(8));
             }
@@ -867,42 +1120,165 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
-    public String getViewName() {
-        return viewModel.getViewName();
-    }
-
-    public void setController(ReadPostController controller) {
-        this.controller = controller;
-    }
-
-    public void setReadPostController(ReadPostController controller) {
-        this.controller = controller;
-    }
-
-    public void setTranslationController(TranslationController controller) {
-        this.translationController = controller;
-    }
-
-    public void setVoteController(VoteController voteController) {
-        this.voteController = voteController;
-    }
-
-    public void setOnBackAction(Runnable onBackAction) {
-        this.onBackAction = onBackAction;
-    }
-
+    /**
+     * Loads a post by its ID.
+     * This method is responsible for storing the postId, which is required for subsequent
+     * actions like translation that are not handled by ReadPostState.
+     * @param postId the unique identifier of the post to load
+     */
     public void loadPost(long postId) {
         this.currentPostId = postId;
+
         if (controller != null) {
             controller.execute(postId);
         }
     }
 
+    /**
+     * Returns the name of this view.
+     *
+     * @return the view name
+     */
+    public String getViewName() {
+        return viewModel.getViewName();
+    }
+
+    /**
+     * Sets the controller for this view.
+     *
+     * @param controller the read post controller
+     */
+    public void setController(ReadPostController controller) {
+        this.controller = controller;
+    }
+
+    /**
+     * Sets the read post controller.
+     *
+     * @param controller the read post controller
+     */
+    public void setReadPostController(ReadPostController controller) {
+        this.controller = controller;
+    }
+
+    /**
+     * Sets the translation controller.
+     *
+     * @param controller the translation controller
+     */
+    public void setTranslationController(TranslationController controller) {
+        this.translationController = controller;
+    }
+
+    /**
+     * Sets the action to execute when viewing a referenced post.
+     *
+     * @param onViewReferencedPostClick the action to execute
+     */
+    public void setOnViewReferencedPostClick(Runnable onViewReferencedPostClick) {
+        this.onViewReferencedPostClick = onViewReferencedPostClick;
+    }
+
+    /**
+     * Sets the vote controller.
+     *
+     * @param voteController the vote controller
+     */
+    public void setVoteController(VoteController voteController) {
+        this.voteController = voteController;
+    }
+
+    /**
+     * Sets the reply controller.
+     *
+     * @param replyController the reply post controller
+     */
     public void setReplyController(ReplyPostController replyController) {
         this.replyController = replyController;
     }
 
+    /**
+     * Sets the action to execute when back button is clicked.
+     *
+     * @param onBackAction the back action
+     */
+    public void setOnBackAction(Runnable onBackAction) {
+        this.onBackAction = onBackAction;
+    }
+
+    /**
+     * Sends a comment/reply
+     * @param content The content of the reply
+     * @param parentId The id of the reply's parent
+     */
     public void sendReply(String content, long parentId) {
         replyController.execute(content, parentId);
     }
+
+    /**
+     * Creates a panel for displaying a post that references this one.
+     */
+    private JPanel createReferencingPostPanel(ReadPostOutputData.ReferencingPostData refPost) {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(255, 248, 240));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 200, 150), 1),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        // Left panel with post info
+        final JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(new Color(255, 248, 240));
+        
+        final JLabel titleLabel = new JLabel(refPost.getTitle());
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        titleLabel.setForeground(new Color(50, 50, 50));
+        infoPanel.add(titleLabel);
+        
+        final String contentPreview = refPost.getContent().length() > 80 
+                ? refPost.getContent().substring(0, 80) + "..." 
+                : refPost.getContent();
+        final JLabel contentLabel = new JLabel(contentPreview);
+        contentLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        contentLabel.setForeground(new Color(100, 100, 100));
+        infoPanel.add(contentLabel);
+        
+        final JLabel authorLabel = new JLabel("By: " + refPost.getUsername());
+        authorLabel.setFont(new Font("Arial", Font.ITALIC, 10));
+        authorLabel.setForeground(new Color(120, 120, 120));
+        infoPanel.add(authorLabel);
+        
+        // Right panel with view button
+        final JButton viewButton = new JButton("view");
+        viewButton.setFont(new Font("Arial", Font.PLAIN, 11));
+        viewButton.setFocusPainted(false);
+        viewButton.setBackground(new Color(70, 130, 180));
+        viewButton.setForeground(Color.WHITE);
+        viewButton.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
+        viewButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        viewButton.addActionListener(evt -> {
+            if (controller != null) {
+                loadPost(refPost.getId());
+            }
+        });
+
+        panel.add(infoPanel, BorderLayout.CENTER);
+        panel.add(viewButton, BorderLayout.EAST);
+
+        // Make panel clickable
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (controller != null) {
+                    loadPost(refPost.getId());
+                }
+            }
+        });
+        
+        return panel;
+    }
+
 }

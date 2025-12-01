@@ -1,17 +1,27 @@
 package view;
 
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginState;
-import interface_adapter.login.LoginViewModel;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginState;
+import interface_adapter.login.LoginViewModel;
 
 /**
  * The View for the Login Use Case.
@@ -55,7 +65,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
         // Set up button actions
         loginButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (loginController != null) {
                     final LoginState currentState = loginViewModel.getState();
                     loginController.execute(
@@ -68,7 +78,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
         toSignupButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (loginController != null) {
                     loginController.switchToSignupView();
                 }
@@ -127,17 +137,17 @@ public class LoginView extends JPanel implements PropertyChangeListener {
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
         });
@@ -184,10 +194,20 @@ public class LoginView extends JPanel implements PropertyChangeListener {
         isUpdatingFromState = false;
     }
 
+    /**
+     * Returns the name of this view.
+     *
+     * @return the view name
+     */
     public String getViewName() {
         return loginViewModel.getViewName();
     }
 
+    /**
+     * Sets the login controller for this view.
+     *
+     * @param loginController the login controller
+     */
     public void setLoginController(LoginController loginController) {
         this.loginController = loginController;
     }

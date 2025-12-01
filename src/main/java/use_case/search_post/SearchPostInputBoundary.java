@@ -13,6 +13,7 @@ public interface SearchPostInputBoundary {
      * @param postsPanel the viewed panel before the search
      * @param state the whole post list
      * @param keyword the search bar keyword inputted
+     * @return final search result list state
      */
-    void searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword);
+    BrowsePostsState searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword);
 }

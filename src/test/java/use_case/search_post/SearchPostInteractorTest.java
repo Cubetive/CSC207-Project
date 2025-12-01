@@ -2,12 +2,14 @@ package use_case.search_post;
 
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
+import interface_adapter.search_post.SearchPostController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import use_case.browse_posts.BrowsePostsOutputData;
 
 import javax.swing.*;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,11 +44,21 @@ public class SearchPostInteractorTest {
         String keyword = "game 2";
         JPanel postsPanel = new JPanel();
         BrowsePostsViewModel viewModel = createSamplePosts();
-        SearchPostInteractor searchPostInteractor = new SearchPostInteractor();
-        BrowsePostsState result = searchPostInteractor.searchPosts(postsPanel, viewModel.getState(), keyword);
+        SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(postsPanel, viewModel.getState(), keyword));
+        searchPostController.searchPosts();
+
         List<String> actualList = new ArrayList<>();
-        for (int i = 0; i < result.getPosts().size(); i++) {
-            actualList.add(result.getPosts().get(i).getTitle());
+
+        for (Component postPanel : postsPanel.getComponents()) {
+            if (postPanel instanceof JPanel) {
+                JPanel posting = (JPanel) postPanel;
+                for (Component titles : posting.getComponents()) {
+                    if (titles instanceof JLabel && (titles.getName() != null && titles.getName().equals("titlePost"))) {
+                        JLabel title = (JLabel) titles;
+                        actualList.add(title.getText());
+                    }
+                }
+            }
         }
 
         List<String> expectedList = List.of("game 2");
@@ -58,11 +70,21 @@ public class SearchPostInteractorTest {
         String keyword = "game";
         JPanel postsPanel = new JPanel();
         BrowsePostsViewModel viewModel = createSamplePosts();
-        SearchPostInteractor searchPostInteractor = new SearchPostInteractor();
-        BrowsePostsState result = searchPostInteractor.searchPosts(postsPanel, viewModel.getState(), keyword);
+        SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(postsPanel, viewModel.getState(), keyword));
+        searchPostController.searchPosts();
+
         List<String> actualList = new ArrayList<>();
-        for (int i = 0; i < result.getPosts().size(); i++) {
-            actualList.add(result.getPosts().get(i).getTitle());
+
+        for (Component postPanel : postsPanel.getComponents()) {
+            if (postPanel instanceof JPanel) {
+                JPanel posting = (JPanel) postPanel;
+                for (Component titles : posting.getComponents()) {
+                    if (titles instanceof JLabel && (titles.getName() != null && titles.getName().equals("titlePost"))) {
+                        JLabel title = (JLabel) titles;
+                        actualList.add(title.getText());
+                    }
+                }
+            }
         }
 
         List<String> expectedList = List.of("game 1", "game 2", "game 4");
@@ -74,11 +96,21 @@ public class SearchPostInteractorTest {
         String keyword = "sleep";
         JPanel postsPanel = new JPanel();
         BrowsePostsViewModel viewModel = createSamplePosts();
-        SearchPostInteractor searchPostInteractor = new SearchPostInteractor();
-        BrowsePostsState result = searchPostInteractor.searchPosts(postsPanel, viewModel.getState(), keyword);
+        SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(postsPanel, viewModel.getState(), keyword));
+        searchPostController.searchPosts();
+
         List<String> actualList = new ArrayList<>();
-        for (int i = 0; i < result.getPosts().size(); i++) {
-            actualList.add(result.getPosts().get(i).getTitle());
+
+        for (Component postPanel : postsPanel.getComponents()) {
+            if (postPanel instanceof JPanel) {
+                JPanel posting = (JPanel) postPanel;
+                for (Component titles : posting.getComponents()) {
+                    if (titles instanceof JLabel && (titles.getName() != null && titles.getName().equals("titlePost"))) {
+                        JLabel title = (JLabel) titles;
+                        actualList.add(title.getText());
+                    }
+                }
+            }
         }
 
         List<String> expectedList = List.of();

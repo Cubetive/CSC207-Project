@@ -54,7 +54,7 @@ public class TranslationInteractor implements TranslationInputBoundary {
                     return;
                 }
 
-                String cachedTranslation = post.getTranslation(targetLanguageCode);
+                String cachedTranslation = "";
 
                 if (cachedTranslation != null && !cachedTranslation.trim().isEmpty()) {
                     // Cache Hit
@@ -97,11 +97,5 @@ public class TranslationInteractor implements TranslationInputBoundary {
         } catch (Exception e) {
             outputBoundary.presentFailure("A translation error occurred: " + e.getMessage());
         }
-    }
-
-    /**
-     * FIX: Method body removed as Executor is gone.
-     */
-    public void shutdown() {
     }
 }

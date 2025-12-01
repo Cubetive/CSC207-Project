@@ -73,25 +73,12 @@ public abstract class Post {
         return this.id;
     }
 
-    public String getTranslation(String language) {
-        // TODO
-        return "";
-    }
-
     public void setUpvotes(int upvotes) {
         this.votes[0] = upvotes;
     }
 
     public void setDownvotes(int downvotes) {
         this.votes[1] = downvotes;
-    }
-
-    public void upvote() {
-        //TODO
-    }
-
-    public void downvote() {
-       // TODO
     }
 
     public Post getReferencedPost() {

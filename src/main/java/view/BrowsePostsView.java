@@ -5,7 +5,6 @@ import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.create_post.CreatePostState;
 import interface_adapter.create_post.CreatePostViewModel;
-import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
 import use_case.browse_posts.BrowsePostsOutputData;
 
@@ -320,6 +319,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
         // Title
         final JLabel titleLabel = new JLabel(post.getTitle());
+        titleLabel.setName("titlePost");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(50, 50, 50));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

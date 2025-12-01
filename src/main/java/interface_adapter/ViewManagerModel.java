@@ -27,6 +27,10 @@ public class ViewManagerModel {
         support.firePropertyChange("state", null, this.state);
     }
 
+    /**
+     * Add a new property change listener to the support.
+     * @param listener The new listener
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }

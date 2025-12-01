@@ -1,4 +1,5 @@
 package entities;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +15,15 @@ public class ReplyPost extends Post {
         super(username, content);
     }
 
-    public List<ReplyPost> getReplies() { return this.replies; }
+    public List<ReplyPost> getReplies() {
+        return this.replies;
+    }
 
-    public void addReply(ReplyPost replyPost) { this.replies.add(replyPost); }
+    /**
+     * Adds a reply to the reply list of this post object.
+     * @param replyPost The reply post to be added
+     */
+    public void addReply(ReplyPost replyPost) {
+        this.replies.add(replyPost);
+    }
 }

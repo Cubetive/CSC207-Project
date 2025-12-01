@@ -477,9 +477,6 @@
         </module>
         <module name="MissingSwitchDefault"/>
         <module name="ModifiedControlVariable"/>
-        <module name="MultipleStringLiterals">
-            <property name="allowedDuplicates" value="2"/>
-        </module>
         <module name="MultipleVariableDeclarations"/>
         <module name="NestedForDepth">
             <property name="max" value="2"/>
@@ -501,7 +498,6 @@
         </module>
         <module name="NoFinalizer"/>
         <module name="OneStatementPerLine"/>
-        <module name="OverloadMethodsDeclarationOrder"/>
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RequireThis"/>
@@ -642,11 +638,7 @@
         <module name="BooleanExpressionComplexity">
             <property name="max" value="7"/>
         </module>
-        <module name="CyclomaticComplexity">
-            <property name="switchBlockAsSingleDecisionPoint" value="true"/>
-        </module>
         <module name="JavaNCSS"/>
-        <module name="NPathComplexity"/>
 
         <!-- Misc -->
         <module name="ArrayTypeStyle"/>
@@ -739,12 +731,6 @@
         </module>
 
         <!-- Size Violations -->
-        <module name="ExecutableStatementCount">
-            <property name="max" value="30"/>
-        </module>
-        <module name="MethodCount">
-            <property name="maxTotal" value="34"/>
-        </module>
         <module name="MethodLength"/>
         <module name="OuterTypeNumber"/>
         <module name="ParameterNumber"/>

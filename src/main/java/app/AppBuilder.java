@@ -92,18 +92,23 @@ import view.ViewManager;
  * the application. It uses the builder pattern to construct the application.
  */
 public class AppBuilder {
+    // Screen resolution
+    private static final int SCREEN_WIDTH = 800;
+    private static final int SCREEN_HEIGHT = 600;
+
+    // Javax stuff
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
-    final UserFactory userFactory = new CommonUserFactory();
-    final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
+    private final UserFactory userFactory = new CommonUserFactory();
+    private final ViewManagerModel viewManagerModel = new ViewManagerModel();
+    private ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
     // Data access objects
-    final FileUserDataAccessObject userDataAccessObject =
+    private final FileUserDataAccessObject userDataAccessObject =
             new FileUserDataAccessObject("users.csv");
-    final FilePostDataAccessObject postDataAccessObject =
+    private final FilePostDataAccessObject postDataAccessObject =
             new FilePostDataAccessObject("posts.json");
-    final SessionRepository sessionRepository = new InMemorySessionRepository();
+    private final SessionRepository sessionRepository = new InMemorySessionRepository();
 
     // View models
     private SignupViewModel signupViewModel;
@@ -161,7 +166,8 @@ public class AppBuilder {
                                     currentUser.getProfilePicture()
                             );
                         }
-                    } else if (sessionRepository.isLoggedIn() && postReadingView != null) {
+                    }
+                    else if (sessionRepository.isLoggedIn() && postReadingView != null) {
                         final entities.User currentUser = sessionRepository.getCurrentUser();
                         postReadingView.loadUserData(currentUser);
                     }
@@ -372,6 +378,10 @@ public class AppBuilder {
         return this;
     }
 
+    /**
+     * Adds the Logout Use Case to the application.
+     * @return this builder
+     */
     public AppBuilder addLogoutUseCase() {
         final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(
                 loginViewModel, viewManagerModel);
@@ -468,6 +478,10 @@ public class AppBuilder {
         return this;
     }
 
+    /**
+     * Adds the Reply Post Use Case to the application.
+     * @return this builder
+     */
     public AppBuilder addReplyPostUseCase() {
         final ReplyPostOutputBoundary replyPostOutputBoundary =
                 new ReplyPostPresenter(readPostViewModel);
@@ -572,7 +586,7 @@ public class AppBuilder {
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
-        application.setSize(800, 600);
+        application.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         application.setLocationRelativeTo(null);
 
         // Set initial view

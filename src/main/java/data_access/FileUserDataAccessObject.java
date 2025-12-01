@@ -1,14 +1,19 @@
 package data_access;
 
-import entities.User;
-import entities.CommonUserFactory;
-import use_case.signup.SignupDataAccessInterface;
-import use_case.edit_profile.EditProfileDataAccessInterface;
-import use_case.login.LoginDataAccessInterface;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import entities.CommonUserFactory;
+import entities.User;
+import use_case.edit_profile.EditProfileDataAccessInterface;
+import use_case.login.LoginDataAccessInterface;
+import use_case.signup.SignupDataAccessInterface;
 
 /**
  * File-based implementation of the DAO for storing user data.
@@ -19,6 +24,7 @@ public class FileUserDataAccessObject implements
         SignupDataAccessInterface,
         EditProfileDataAccessInterface,
         LoginDataAccessInterface {
+    private static final String COMMA_DELIMITER = ",";
 
     private final Map<String, User> usersByUsername = new HashMap<>();
     private final Map<String, User> usersByEmail = new HashMap<>();
@@ -41,13 +47,15 @@ public class FileUserDataAccessObject implements
     private void loadUsers() {
         final File file = new File(filePath);
         if (!file.exists()) {
-            return; // No file yet, start with empty storage
+            // No file yet, start with empty storage
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                final String[] parts = line.split(",", -1); // -1 to include empty strings
+                // -1 to include empty strings
+                final String[] parts = line.split(COMMA_DELIMITER, -1);
                 if (parts.length >= 4) {
                     final String username = parts[0];
                     final String fullName = parts[1];
@@ -68,8 +76,9 @@ public class FileUserDataAccessObject implements
                     usersByEmail.put(email, user);
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error loading users from file: " + e.getMessage());
+        }
+        catch (IOException ex) {
+            System.err.println("Error loading users from file: " + ex.getMessage());
         }
     }
 
@@ -88,29 +97,34 @@ public class FileUserDataAccessObject implements
                     escapeCsv(user.getProfilePicture())
                 ));
             }
-        } catch (IOException e) {
-            System.err.println("Error saving users to file: " + e.getMessage());
+        }
+        catch (IOException ex) {
+            System.err.println("Error saving users to file: " + ex.getMessage());
         }
     }
 
     /**
      * Escapes commas and newlines in CSV values.
+     * @param value The string to escape
+     * @return Return the new escaped string
      */
     private String escapeCsv(String value) {
         if (value == null) {
             return "";
         }
-        return value.replace(",", "\\,").replace("\n", "\\n");
+        return value.replace(COMMA_DELIMITER, "\\,").replace("\n", "\\n");
     }
 
     /**
      * Unescapes CSV values (reverses escapeCsv).
+     * @param value The string to reverse escape
+     * @return Return the reversed escape string of the csv
      */
     private String unescapeCsv(String value) {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        return value.replace("\\,", ",").replace("\\n", "\n");
+        return value.replace("\\,", COMMA_DELIMITER).replace("\\n", "\n");
     }
 
     @Override
@@ -127,7 +141,8 @@ public class FileUserDataAccessObject implements
     public void save(User user) {
         usersByUsername.put(user.getUsername(), user);
         usersByEmail.put(user.getEmail(), user);
-        saveUsers(); // Persist to file immediately
+        // Persist to file immediately
+        saveUsers();
     }
 
     /**
@@ -177,7 +192,7 @@ public class FileUserDataAccessObject implements
     @Override
     public void updateUserProfile(String currentUsername, String newUsername, String fullName, 
                                   String bio, String profilePicture) {
-        User user = usersByUsername.get(currentUsername);
+        final User user = usersByUsername.get(currentUsername);
         if (user != null) {
             user.setFullName(fullName);
             user.setBio(bio);
@@ -190,8 +205,8 @@ public class FileUserDataAccessObject implements
                 usersByUsername.put(newUsername, user);
                 // Email map doesn't need updating since email didn't change
             }
-            
-            saveUsers(); // Persist changes
+            // Persist changes
+            saveUsers();
         }
     }
 
@@ -202,10 +217,11 @@ public class FileUserDataAccessObject implements
      */
     @Override
     public void updatePassword(String username, String newPassword) {
-        User user = usersByUsername.get(username);
+        final User user = usersByUsername.get(username);
         if (user != null) {
             user.setPassword(newPassword);
-            saveUsers(); // Persist changes
+            // Persist changes
+            saveUsers();
         }
     }
 }

@@ -1,44 +1,46 @@
 package entities;
+
 import java.util.Date;
 
 public abstract class Post {
 
     private static long nextId = 1;
-    private long id;
-    private Date creation_date;
-    private String creator_username;
+    private final long id;
+    private final Date creationDate;
+    private final String creatorUsername;
     private String content;
-    private int[] votes;
+    private final int[] votes;
     private Post referencedPost;
 
     /**
      * Constructor for creating new posts. Auto-generates ID and sets creation date to now.
-     * @param creator_username the username of the post creator
+     * @param creatorUsername the username of the post creator
      * @param content the content of the post
      */
-    protected Post(String creator_username, String content) {
+    protected Post(String creatorUsername, String content) {
         this.id = nextId++;
-        this.creator_username = creator_username;
+        this.creatorUsername = creatorUsername;
         this.content = content;
-        this.creation_date = new Date();
-        this.votes = new int[2]; // [upvotes, downvotes] - both initialized to 0
+        this.creationDate = new Date();
+        // [upvotes, downvotes] - both initialized to 0
+        this.votes = new int[2];
         this.referencedPost = null;
     }
 
     /**
      * Constructor for loading posts from storage with existing creation date and votes.
      * @param id the unique identifier of the post
-     * @param creator_username the username of the post creator
+     * @param creatorUsername the username of the post creator
      * @param content the content of the post
-     * @param creation_date the creation date of the post
+     * @param creationDate the creation date of the post
      * @param upvotes the number of upvotes
      * @param downvotes the number of downvotes
      */
-    protected Post(long id, String creator_username, String content, Date creation_date, int upvotes, int downvotes) {
+    protected Post(long id, String creatorUsername, String content, Date creationDate, int upvotes, int downvotes) {
         this.id = id;
-        this.creator_username = creator_username;
+        this.creatorUsername = creatorUsername;
         this.content = content;
-        this.creation_date = creation_date;
+        this.creationDate = creationDate;
         this.votes = new int[2];
         this.votes[0] = upvotes;
         this.votes[1] = downvotes;
@@ -50,11 +52,7 @@ public abstract class Post {
     }
 
     public Date getCreationDate() {
-        return this.creation_date;
-    }
-
-    public void editText(String text) {
-        this.content = text;
+        return this.creationDate;
     }
 
     public int[] getVotes() {
@@ -66,7 +64,7 @@ public abstract class Post {
     }
 
     public String getCreatorUsername() {
-        return this.creator_username;
+        return this.creatorUsername;
     }
 
     public long getId() {
@@ -89,6 +87,10 @@ public abstract class Post {
         this.referencedPost = referencedPost;
     }
 
+    /**
+     * Returns whether this post has a reference to another post or not.
+     * @return true if post has reference, false otherwise
+     */
     public boolean hasReference() {
         return this.referencedPost != null;
     }

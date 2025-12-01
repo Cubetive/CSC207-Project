@@ -99,6 +99,15 @@ class BrowsePostsInteractorTest {
         assertEquals(1L, posts.get(2).getId()); // lowScore last
     }
 
+    @Test
+    void testSwitchToCreatePostView() {
+        // Act
+        interactor.switchToCreatePostView();
+
+        // Assert
+        assertTrue(outputBoundary.switchToCreatePostViewCalled);
+    }
+
     // Test helper classes
 
     private static class TestBrowsePostsDataAccess implements BrowsePostsDataAccessInterface {
@@ -121,6 +130,7 @@ class BrowsePostsInteractorTest {
     private static class TestBrowsePostsOutputBoundary implements BrowsePostsOutputBoundary {
         boolean successCalled = false;
         boolean failCalled = false;
+        boolean switchToCreatePostViewCalled = false;
         BrowsePostsOutputData outputData;
         String errorMessage;
 
@@ -138,7 +148,7 @@ class BrowsePostsInteractorTest {
 
         @Override
         public void switchToCreatePostView() {
-            // Not needed for these tests
+            this.switchToCreatePostViewCalled = true;
         }
 
         @Override

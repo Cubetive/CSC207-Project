@@ -64,13 +64,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.setBackground(new Color(70, 130, 180));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 35, 20));
 
-        // Title in center
-        final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
-        title.setFont(new Font("Arial", Font.BOLD, 26));
-        title.setHorizontalAlignment(SwingConstants.LEFT);
-        title.setForeground(Color.WHITE);
-        titlePanel.add(title, BorderLayout.WEST);
-
         searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
         searchPanel.setOpaque(false);

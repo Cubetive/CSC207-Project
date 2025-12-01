@@ -7,6 +7,7 @@ public class CreatePostState {
     private String title = "";
     private String content = "";
     private String missingError = "";
+    private String referencedPostId = null; // ID of the post being referenced
 
     public CreatePostState(CreatePostState failedState) {
         this.title = failedState.title;
@@ -42,6 +43,14 @@ public class CreatePostState {
 
     public void setMissingError(String missingError) {
         this.missingError = missingError;
+    }
+    
+    public String getReferencedPostId() {
+        return referencedPostId;
+    }
+    
+    public void setReferencedPostId(String referencedPostId) {
+        this.referencedPostId = referencedPostId;
     }
 
 }

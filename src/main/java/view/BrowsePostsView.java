@@ -3,13 +3,17 @@ package view;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
-import interface_adapter.create_post.CreatePostState;
 import interface_adapter.create_post.CreatePostViewModel;
-import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.search_post.SearchPostController;
 import use_case.browse_posts.BrowsePostsOutputData;
+import use_case.search_post.SearchPostInputData;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,15 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
-
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import interface_adapter.search_post.SearchPostController;
-import use_case.search_post.SearchPostInputData;
 
 /**
  * The View for browsing posts.
@@ -47,6 +42,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final JPanel titlePanel;
     private Runnable onEditProfileClick;
     private Runnable onProfilePictureUpdate;
+    private Runnable onCreatePostClick;
 
     private static JTextField searchField;
     private JPanel searchPanel;
@@ -64,6 +60,13 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.setBackground(new Color(70, 130, 180));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 35, 20));
 
+        // Title in left
+        final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
+        title.setFont(new Font("Arial", Font.BOLD, 26));
+        title.setHorizontalAlignment(SwingConstants.LEFT);
+        title.setForeground(Color.WHITE);
+
+        // Search panel
         searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
         searchPanel.setOpaque(false);
@@ -71,7 +74,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         // Search field
         searchField = new JTextField();
         searchField.setOpaque(false);
-
         searchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
         int borderThickness = 3;
@@ -88,7 +90,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         );
 
         searchField.setBorder(titledBorder);
-
         searchPanel.add(searchField);
 
         searchFieldListener();
@@ -122,10 +123,18 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         });
         rightPanel.add(editProfileButton);
 
-        // Left panel for logout button
-        final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        // Left panel for title and logout button
+        final JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(new Color(70, 130, 180));
         leftPanel.setOpaque(false);
+        
+        // Add title to left panel
+        leftPanel.add(title, BorderLayout.WEST);
+
+        // Logout button panel
+        final JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        logoutPanel.setBackground(new Color(70, 130, 180));
+        logoutPanel.setOpaque(false);
 
         // Logout button
         final JButton logoutButton = new JButton(LogoutPresenter.LOGOUT_BUTTON);
@@ -146,7 +155,8 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
                 onLogoutAction.run();
             }
         });
-        leftPanel.add(logoutButton);
+        logoutPanel.add(logoutButton);
+        leftPanel.add(logoutPanel, BorderLayout.SOUTH);
 
         titlePanel.add(leftPanel, BorderLayout.WEST);
         titlePanel.add(rightPanel, BorderLayout.EAST);
@@ -178,31 +188,26 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             }
         });
 
-        //Create Post button
+        // Create Post button
         createPostButton = new JButton(CreatePostViewModel.CREATE_BUTTON_LABEL);
         createPostButton.setFont(new Font("Arial", Font.PLAIN, 14));
         createPostButton.setFocusPainted(false);
-        createPostButton.setBackground(new Color(70, 130, 180));
+        createPostButton.setBackground(new Color(34, 139, 34));
         createPostButton.setForeground(Color.WHITE);
         createPostButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         createPostButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        createPostButton.addActionListener(
-                // Button Logic
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(createPostButton)) {
-                            final CreatePostState currentState = createPostViewModel.getState();
-                            //Go to create page. Make use Controller.
-                            controller.switchToCreatePostView();
-                        }
-                    }
-
-                }
-        );
+        createPostButton.addActionListener(e -> {
+            if (onCreatePostClick != null) {
+                onCreatePostClick.run();
+            } else if (controller != null) {
+                controller.switchToCreatePostView();
+            }
+        });
 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(245, 245, 245));
         buttonPanel.add(refreshButton);
+        buttonPanel.add(Box.createHorizontalStrut(10));
         buttonPanel.add(createPostButton);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
 
@@ -213,7 +218,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     }
 
     public void searchFieldListener() {
-
         // Add search listener
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { searchPosts(); }
@@ -294,7 +298,12 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (postClickListener != null) {
-                    searchField.setText("");
+                    // Clear search field when clicking a post
+                    if (searchField != null) {
+                        searchField.setText("");
+                    }
+                    // Always navigate to the clicked post (not the referenced one)
+                    // The referenced post will be shown in the PostReadingView
                     postClickListener.onPostClicked(post.getId());
                 }
             }
@@ -318,11 +327,63 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             }
         });
 
-        // Title
+        // Title with reference indicator
+        final JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        titlePanel.setBackground(Color.WHITE);
+        titlePanel.setOpaque(false);
+        
         final JLabel titleLabel = new JLabel(post.getTitle());
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(50, 50, 50));
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titlePanel.add(titleLabel);
+        
+        // Add clickable reference indicator if post has a reference
+        if (post.hasReference()) {
+            // If referencedPostId is null, we can't navigate, but still show the indicator
+            final boolean canNavigate = post.getReferencedPostId() != null;
+            
+            final JButton referenceButton = new JButton("🔗 References: " + 
+                    (post.getReferencedPostTitle() != null && !post.getReferencedPostTitle().isEmpty() 
+                            ? post.getReferencedPostTitle() 
+                            : "Another Post"));
+            referenceButton.setFont(new Font("Arial", Font.ITALIC, 12));
+            referenceButton.setForeground(new Color(70, 130, 180));
+            referenceButton.setBackground(Color.WHITE);
+            referenceButton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(70, 130, 180), 1),
+                    BorderFactory.createEmptyBorder(2, 6, 2, 6)
+            ));
+            referenceButton.setFocusPainted(false);
+            referenceButton.setContentAreaFilled(false);
+            referenceButton.setOpaque(true);
+            referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            if (canNavigate) {
+                referenceButton.addActionListener(e -> {
+                    if (postClickListener != null) {
+                        postClickListener.onPostClicked(post.getReferencedPostId());
+                    }
+                });
+            } else {
+                // Disable button if we can't navigate
+                referenceButton.setEnabled(false);
+                referenceButton.setToolTipText("Referenced post ID not available");
+            }
+            // Add hover effect
+            referenceButton.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    referenceButton.setBackground(new Color(240, 248, 255));
+                    referenceButton.setForeground(new Color(50, 100, 150));
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    referenceButton.setBackground(Color.WHITE);
+                    referenceButton.setForeground(new Color(70, 130, 180));
+                }
+            });
+            titlePanel.add(referenceButton);
+        }
+        titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Username and creation date
         final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a");
@@ -345,7 +406,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         contentArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentArea.setRows(2);
 
-        panel.add(titleLabel);
+        panel.add(titlePanel);
         panel.add(Box.createVerticalStrut(6));
         panel.add(usernameLabel);
         panel.add(Box.createVerticalStrut(10));
@@ -385,6 +446,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     public void setOnEditProfileClick(Runnable onEditProfileClick) {
         this.onEditProfileClick = onEditProfileClick;
+    }
+    
+    public void setOnCreatePostClick(Runnable onCreatePostClick) {
+        this.onCreatePostClick = onCreatePostClick;
     }
 
     /**

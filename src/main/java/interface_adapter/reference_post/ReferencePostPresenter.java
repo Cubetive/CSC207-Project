@@ -52,7 +52,7 @@ public class ReferencePostPresenter implements ReferencePostOutputBoundary {
         referencePostViewModel.firePropertyChanged("referenceSuccess");
         
         // Return to the create post view
-        viewManagerModel.setState("createPost");
+        viewManagerModel.setState("CreatePost");
         viewManagerModel.firePropertyChanged();
     }
 
@@ -77,7 +77,7 @@ public class ReferencePostPresenter implements ReferencePostOutputBoundary {
         referencePostViewModel.firePropertyChanged();
         
         // Return to the create post view
-        viewManagerModel.setState("createPost");
+        viewManagerModel.setState("CreatePost");
         viewManagerModel.firePropertyChanged();
     }
 }

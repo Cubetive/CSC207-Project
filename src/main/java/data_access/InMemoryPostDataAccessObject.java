@@ -85,7 +85,12 @@ public class InMemoryPostDataAccessObject implements ReplyPostDataAccessInterfac
 
     @Override
     public Post getPostById(String postId) {
-        return postsById.get(postId);
+        try {
+            final long id = Long.parseLong(postId);
+            return postsById.get(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     @Override

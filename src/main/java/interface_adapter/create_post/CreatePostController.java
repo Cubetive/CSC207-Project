@@ -19,8 +19,12 @@ public class CreatePostController {
      * @param password2 the password repeated
      */
     public void execute(String title, String content) {
-        // TODO: need to obtain current user from inMemorySessionRepository
-        final CreatePostInputData createPostInputData = new CreatePostInputData(title, content);
+        execute(title, content, null);
+    }
+    
+    public void execute(String title, String content, String referencedPostId) {
+        final CreatePostInputData createPostInputData =
+                new CreatePostInputData(title, content, referencedPostId);
 
         createPostInteractor.execute(createPostInputData);
         this.success = createPostInteractor.isSuccess();

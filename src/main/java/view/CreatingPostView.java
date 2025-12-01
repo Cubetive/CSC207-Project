@@ -21,8 +21,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     private final JTextArea contentTextField = new  JTextArea(10, 30);
     private final JTextField titleTextField = new  JTextField(30);
+    private final JPanel referencedPostPanel;
+    private final JLabel referencedPostLabel;
 
     private CreatePostController createPostController;
+    private Runnable onReferencePostClick;
 
     public CreatingPostView(CreatePostViewModel inputCreatePostViewModel) {
         this.createPostViewModel = inputCreatePostViewModel;
@@ -31,50 +34,42 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         final JLabel header = new JLabel("Create New Post");
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JButton createPostButton = new  JButton("Create Post");
-        createPostButton.addActionListener(
-                // Button Logic
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(createPostButton)) {
-                            final CreatePostState currentState = createPostViewModel.getState();
+        final JButton createPostButton = new JButton(CreatePostViewModel.CREATE_BUTTON_LABEL);
+        createPostButton.addActionListener(evt -> {
+            final CreatePostState currentState = createPostViewModel.getState();
+            final String referencedPostId = currentState.getReferencedPostId();
 
-                            createPostController.execute(currentState.getTitle(),
-                                    currentState.getContent()
-                            );
-                            boolean succeeded = createPostController.isSuccess();
-                            if (succeeded) {
-                                setVisible(false);
-                                contentTextField.setText("");
-                                titleTextField.setText("");
-                                createPostController.resetSuccess();
-                            }
-                        }
-                    }
+            if (referencedPostId != null && !referencedPostId.isEmpty()) {
+                createPostController.execute(currentState.getTitle(), currentState.getContent(), referencedPostId);
+            } else {
+                createPostController.execute(currentState.getTitle(), currentState.getContent());
+            }
 
-                }
-        );
+            if (createPostController.isSuccess()) {
+                clearForm();
+                createPostController.resetSuccess();
+                setVisible(false);
+            }
+        });
 
-        //Placeholder Labels for future buttons
         final JButton backToBrowse = new JButton("Back");
+        backToBrowse.addActionListener(evt -> {
+            clearForm();
+            createPostController.resetSuccess();
+            createPostController.switchToBrowseView();
+        });
+
+        final JButton referencePostButton = new JButton("Reference Post");
+        referencePostButton.addActionListener(e -> {
+            if (onReferencePostClick != null) {
+                onReferencePostClick.run();
+            }
+        });
+
         final JPanel buttons = new JPanel();
         buttons.add(backToBrowse);
+        buttons.add(referencePostButton);
         buttons.add(createPostButton);
-        backToBrowse.addActionListener(
-                // Button Logic
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(backToBrowse)) {
-                            setVisible(false);
-                            contentTextField.setText("");
-                            titleTextField.setText("");
-                            createPostController.resetSuccess();
-                            createPostController.switchToBrowseView();
-                        }
-                    }
-
-                }
-        );
 
         //Grid Setup
         JPanel grid = new JPanel();
@@ -120,10 +115,26 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         addDocumentListener(titleTextField, this::updateTitle);
         addDocumentListener(contentTextField, this::updateContent);
 
+        // Referenced post display panel
+        referencedPostPanel = new JPanel();
+        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel, BoxLayout.Y_AXIS));
+        referencedPostPanel.setBackground(new Color(245, 245, 245));
+        referencedPostPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Referenced Post"),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        referencedPostPanel.setVisible(false);
+
+        referencedPostLabel = new JLabel();
+        referencedPostLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        referencedPostLabel.setForeground(new Color(80, 80, 80));
+        referencedPostPanel.add(referencedPostLabel);
+
         //Final Self Setup (This is a JPanel)
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(header);
         this.add(grid);
+        this.add(referencedPostPanel);
         this.add(buttons);
 
     }
@@ -194,6 +205,12 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         createPostViewModel.setState(currentState);
     }
 
+    private void clearForm() {
+        contentTextField.setText("");
+        titleTextField.setText("");
+        clearReferencedPost();
+    }
+
     public String getViewName() {
         return this.createPostViewModel.getViewName();
     }
@@ -204,5 +221,40 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     public interface CreatePostClickListener {
         void onCreatePostClicked(long postId);
+    }
+    public void setOnReferencePostClick(Runnable onReferencePostClick) {
+        this.onReferencePostClick = onReferencePostClick;
+    }
+    
+    /**
+     * Updates the display of the referenced post.
+     * @param referencedPostTitle the title of the referenced post (or content if no title)
+     * @param referencedPostContent the content preview of the referenced post
+     */
+    public void setReferencedPost(String referencedPostTitle, String referencedPostContent) {
+        if (referencedPostTitle != null && !referencedPostTitle.isEmpty()) {
+            final String displayText = "<html><b>Title:</b> " + referencedPostTitle + "<br>" +
+                    "<b>Content:</b> " + 
+                    (referencedPostContent.length() > 100 
+                            ? referencedPostContent.substring(0, 100) + "..." 
+                            : referencedPostContent) + 
+                    "</html>";
+            referencedPostLabel.setText(displayText);
+            referencedPostPanel.setVisible(true);
+        } else {
+            referencedPostPanel.setVisible(false);
+        }
+        this.revalidate();
+        this.repaint();
+    }
+    
+    /**
+     * Clears the referenced post display.
+     */
+    public void clearReferencedPost() {
+        referencedPostPanel.setVisible(false);
+        referencedPostLabel.setText("");
+        this.revalidate();
+        this.repaint();
     }
 }

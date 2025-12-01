@@ -1,10 +1,10 @@
 package use_case.create_post_use_case;
 
 import entities.OriginalPost;
+import entities.Post;
+import entities.User;
+import use_case.reference_post.ReferencePostDataAccessInterface;
 import use_case.session.SessionRepository;
-
-import java.util.Date;
-import java.util.List;
 
 public class CreatePostInteractor implements CreatePostInputBoundary{
     private final CreatePostDataAccessInterface filePostAccess;
@@ -24,23 +24,38 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
 
     @Override
     public void execute(CreatePostInputData createPostInputData) {
-        // TODO: Get the next original post id.
-        String content = createPostInputData.getContent();
-        String title = createPostInputData.getTitle();
-        String username = sessionRepository.getCurrentUser().getUsername();
+        final String content = createPostInputData.getContent();
+        final String title = createPostInputData.getTitle();
+        final String referencedPostId = createPostInputData.getReferencedPostId();
+        final User currentUser = sessionRepository.getCurrentUser();
+        final String username = currentUser != null ? currentUser.getUsername() : null;
+
+        if (username == null) {
+            createPostPresenter.prepareMissingFieldView("You must be logged in to create a post.");
+            return;
+        }
 
         if (content.isEmpty() || title.isEmpty()) {
             createPostPresenter.prepareMissingFieldView("Missing content or title.");
-        }
-        else {
-            List<OriginalPost> list = filePostAccess.getAllPosts();
-            OriginalPost originalPost = new OriginalPost(username, title, content); // Create Post object.
+        } else {
+            final OriginalPost originalPost = new OriginalPost(username, title, content);
 
-            filePostAccess.save(originalPost); //saves the Post to Database.
+            // Attach referenced post if provided
+            if (referencedPostId != null && !referencedPostId.trim().isEmpty()) {
+                if (filePostAccess instanceof ReferencePostDataAccessInterface) {
+                    final ReferencePostDataAccessInterface referenceAccess =
+                            (ReferencePostDataAccessInterface) filePostAccess;
+                    final Post referencedPost = referenceAccess.getPostById(referencedPostId);
+                    if (referencedPost != null) {
+                        originalPost.setReferencedPost(referencedPost);
+                    }
+                }
+            }
 
-            CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
-            //Create the output object for display.
-            createPostPresenter.prepareCreatedView(createPostOutputData); //Send output to presenter.
+            filePostAccess.save(originalPost);
+
+            final CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
+            createPostPresenter.prepareCreatedView(createPostOutputData);
             this.success = true;
         }
     }

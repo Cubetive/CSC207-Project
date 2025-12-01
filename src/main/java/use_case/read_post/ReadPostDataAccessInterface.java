@@ -6,6 +6,8 @@ import entities.Post;
 /**
  * Data Access Interface for reading a specific post.
  */
+import java.util.List;
+
 public interface ReadPostDataAccessInterface {
 
     /**
@@ -14,4 +16,10 @@ public interface ReadPostDataAccessInterface {
      * @return the post with the given ID, or null if not found
      */
     Post getPostById(long id);
+    
+    /**
+     * Gets all posts. Used to find posts that reference a specific post.
+     * @return list of all original posts
+     */
+    List<OriginalPost> getAllPosts();
 }

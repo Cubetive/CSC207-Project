@@ -14,30 +14,50 @@ import java.util.List;
 
 public class CreatePostPresenter implements CreatePostOutputBoundary {
 
+    /**
+     * Create Post view model.
+     */
     private CreatePostViewModel createPostViewModel;
+    /**
+     * Read Post view model.
+     */
     private ReadPostViewModel readPostViewModel;
-    //TODO BrowseViewModel
-    //TODO SearchViewModel
-    //private SignupViewModel signupViewModel;
+    /**
+     * view manager model.
+     */
     private ViewManagerModel viewManagerModel;
+    /**
+     * Read Post view.
+     */
     private PostReadingView postReadingView;
+    /**
+     * Browse Posts view model.
+     */
     private BrowsePostsViewModel browsePostsViewModel;
 
+    /**
+     * Constructor with necessary elements.
+     */
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
                                ViewManagerModel viewManagerModel,
                                ReadPostViewModel readPostViewModel,
                                BrowsePostsViewModel browsePostsViewModel) {
         this.createPostViewModel = createPostViewModel;
-        //this.signupViewModel = signupViewModel;
         this.viewManagerModel = viewManagerModel;
         this.readPostViewModel = readPostViewModel;
         this.browsePostsViewModel = browsePostsViewModel;
     }
 
+    /**
+     * Set up for the Post Reading View.
+     */
     public void setPostReadingView(PostReadingView postReadingView) {
         this.postReadingView = postReadingView;
     }
 
+    /**
+     * Prepare the post reading view given that a post was successfully created.
+     */
     public void prepareCreatedView(CreatePostOutputData createPostOutputData) {
         // Case 2: read Post after finishing.
         System.out.println("Post created, move to reading it.");
@@ -63,6 +83,10 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         this.viewManagerModel.firePropertyChanged();
     }
 
+    /**
+     * Create a missing field dialog (pop up) given that improper
+     * inputs were given (missing fields).
+     */
     public void prepareMissingFieldView(String error) {
         //TODO
         final CreatePostState createPostState = createPostViewModel.getState();
@@ -70,6 +94,9 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         createPostViewModel.firePropertyChange();
     }
 
+    /**
+     * Back button has been pressed, switch to browse posts view.
+     */
     public void switchToBrowseView() {
         //TODO
         browsePostsViewModel.setState(new BrowsePostsState());

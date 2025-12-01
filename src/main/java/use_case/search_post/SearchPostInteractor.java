@@ -14,7 +14,7 @@ public class SearchPostInteractor implements SearchPostInputBoundary {
     private SearchPostOutputBoundary searchPostOutputBoundary;
 
     @Override
-    public void searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword) {
+    public BrowsePostsState searchPosts(JPanel postsPanel, BrowsePostsState state, String keyword) {
         List<BrowsePostsOutputData.PostData> search_list = new ArrayList<>();
         for(int i = 0; i < state.getPosts().size(); i++) {
             if (state.getPosts().get(i).getTitle().toLowerCase().contains(keyword.toLowerCase())) {
@@ -29,6 +29,8 @@ public class SearchPostInteractor implements SearchPostInputBoundary {
         
         searchPostOutputBoundary = new SearchPostPresenter(searchPostOutputData);
         searchPostOutputBoundary.prepareSuccessView(postsPanel);
+
+        return search_state;
     }
 
 }

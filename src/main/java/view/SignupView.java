@@ -77,7 +77,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         // Set up button actions
         signUpButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (signupController != null) {
                     final SignupState currentState = signupViewModel.getState();
                     signupController.execute(
@@ -93,7 +93,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
         toLoginButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (signupController != null) {
                     signupController.switchToLoginView();
                 }
@@ -155,17 +155,17 @@ public class SignupView extends JPanel implements PropertyChangeListener {
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
         });
@@ -237,7 +237,8 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         usernameErrorField.setText(state.getUsernameError() != null ? state.getUsernameError() : "");
         emailErrorField.setText(state.getEmailError() != null ? state.getEmailError() : "");
         passwordErrorField.setText(state.getPasswordError() != null ? state.getPasswordError() : "");
-        repeatPasswordErrorField.setText(state.getRepeatPasswordError() != null ? state.getRepeatPasswordError() : "");
+        final String repeatPwdError = state.getRepeatPasswordError();
+        repeatPasswordErrorField.setText(repeatPwdError != null ? repeatPwdError : "");
 
         isUpdatingFromState = false;
     }

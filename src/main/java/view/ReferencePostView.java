@@ -80,6 +80,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         searchButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         searchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         searchButton.addActionListener(this);
+        searchButton.setOpaque(true);
         searchPanel.add(searchButton);
         
         // Allow Enter key to trigger search
@@ -294,6 +295,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         referenceButton.setForeground(Color.WHITE);
         referenceButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        referenceButton.setOpaque(true);
         referenceButton.addActionListener(e -> {
             if (controller != null && currentPostId != null) {
                 controller.referencePost(currentPostId, result.getPostId());

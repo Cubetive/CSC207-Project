@@ -68,7 +68,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private static final String CONFIRM_CANCEL_MESSAGE = "You have unsaved changes. Are you sure you want to cancel?";
     private static final String CONFIRM_CANCEL_TITLE = "Confirm Cancel";
 
-
     private final JButton backButton;
     private final JLabel titleLabel;
     private final JLabel authorLabel;
@@ -82,8 +81,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private JLabel translationStatusLabel;
     private final JScrollPane translatedContentScrollPane;
     // Supported languages for the dropdown
-    private static final String[] SUPPORTED_LANGUAGES = {"ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru"};
-
+    private static final String[] SUPPORTED_LANGUAGES = {
+        "ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru",
+    };
 
     private final JButton upvoteButton;
     private final JButton downvoteButton;
@@ -103,7 +103,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JPanel referenceBannerPanel;
     private final JButton referenceBannerButton;
 
-    private User cur_user;
+    private User curUser;
     private JButton editButton;
 
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
@@ -137,7 +137,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        backButton.addActionListener(e -> {
+        backButton.addActionListener(evt -> {
             if (onBackAction != null) {
                 onBackAction.run();
             }
@@ -209,14 +209,15 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         referenceBannerButton.setFocusPainted(false);
         referenceBannerButton.setContentAreaFilled(false);
         referenceBannerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        referenceBannerButton.addActionListener(e -> {
+        referenceBannerButton.addActionListener(evt -> {
             if (onViewReferencedPostClick != null) {
                 onViewReferencedPostClick.run();
-            } else if (controller != null) {
+            }
+            else if (controller != null) {
                 // Get referenced post ID from state
-                final ReadPostState state = viewModel.getState();
-                if (state.getReferencedPost() != null) {
-                    loadPost(state.getReferencedPost().getId());
+                final ReadPostState readPostState = viewModel.getState();
+                if (readPostState.getReferencedPost() != null) {
+                    loadPost(readPostState.getReferencedPost().getId());
                 }
             }
         });
@@ -267,40 +268,35 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         translateButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Inline ActionListener for the translate button
-        translateButton.addActionListener(e -> {
-            if (translationController == null) { // 💡 NEW: Check for controller existence
+        translateButton.addActionListener(evt -> {
+            if (translationController == null) {
                 JOptionPane.showMessageDialog(this, "Translation service is not configured.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            try {
-                translateButton.setEnabled(false);
-                translationStatusLabel.setText("Translating...");
-                translatedContentArea.setText("Loading translation...");
+            translateButton.setEnabled(false);
+            translationStatusLabel.setText("Translating...");
+            translatedContentArea.setText("Loading translation...");
 
-                translationsInProgress.add(MAIN_POST_KEY);
+            translationsInProgress.add(MAIN_POST_KEY);
 
-                final String targetLanguage = (String) languageDropdown.getSelectedItem();
-                final long postId = currentPostId;
-                final String content = textContent;
+            final String targetLanguage = (String) languageDropdown.getSelectedItem();
+            final long postIdToTranslate = currentPostId;
+            final String contentToTranslate = textContent;
 
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        translationController.execute(postId, content, targetLanguage);
-                        return null;
-                    }
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    translationController.execute(postIdToTranslate, contentToTranslate, targetLanguage);
+                    return null;
+                }
 
-                    @Override
-                    protected void done() {
-                        translationViewModel.firePropertyChanged();
-                    }
-                }.execute();
-            } catch (Exception ex) {
-                System.err.println("CRASH: Main Post Translation failed on EDT!");
-                ex.printStackTrace();
-            }
+                @Override
+                protected void done() {
+                    translationViewModel.firePropertyChanged();
+                }
+            }.execute();
         });
 
         controlPanel.add(translateLabel);
@@ -372,14 +368,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         votePanel.add(downvoteButton);
         votePanel.add(voteCountLabel);
 
-        upvoteButton.addActionListener(e -> {
+        upvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 // true = upvote
                 voteController.execute(true, currentPostId);
             }
         });
 
-        downvoteButton.addActionListener(e -> {
+        downvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 // false = downvote
                 voteController.execute(false, currentPostId);
@@ -421,9 +417,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
-        
+
         // Add action listener for comment button (single source of truth)
-        commentButton.addActionListener(e -> {
+        commentButton.addActionListener(evt -> {
             if (replyController == null) {
                 return;
             }
@@ -540,10 +536,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     /**
      * Loads the current user data for permission checks.
      *
-     * @param curUser the current logged-in user
+     * @param currentUser the current logged-in user
      */
-    public void loadUserData(User curUser) {
-        this.cur_user = curUser;
+    public void loadUserData(User currentUser) {
+        this.curUser = currentUser;
     }
 
     @Override
@@ -757,15 +753,17 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             for (java.awt.event.ActionListener al : viewReferencedPostButton.getActionListeners()) {
                 viewReferencedPostButton.removeActionListener(al);
             }
-            viewReferencedPostButton.addActionListener(e -> {
+            viewReferencedPostButton.addActionListener(evt -> {
                 if (onViewReferencedPostClick != null) {
                     onViewReferencedPostClick.run();
-                } else if (controller != null) {
+                }
+                else if (controller != null) {
                     // Fallback: load the referenced post directly
                     loadPost(referencedPost.getId());
                 }
             });
-        } else {
+        }
+        else {
             // Hide reference banner and container if no reference
             referenceBannerPanel.setVisible(false);
             referencedPostContainer.setVisible(false);
@@ -787,13 +785,14 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         referencingPostsListPanel.revalidate();
         referencingPostsListPanel.repaint();
 
-        if (cur_user != null && cur_user.getUsername().equals(state.getUsername())) {
+        if (curUser != null && curUser.getUsername().equals(state.getUsername())) {
             editButton.setVisible(true);
             for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
                 editButton.removeActionListener(listener);
             }
-            editButton.addActionListener(e -> new EditPostView(contentArea, state, cur_user));
-        } else {
+            editButton.addActionListener(ev -> new EditPostView(contentArea, state, curUser));
+        }
+        else {
             editButton.setVisible(false);
             for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
                 editButton.removeActionListener(listener);
@@ -909,7 +908,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         commentTranslationButtons.put(commentKey, commentTranslateButton);
 
         // Action Listener for Comment Translation
-        commentTranslateButton.addActionListener(e -> {
+        commentTranslateButton.addActionListener(evt -> {
             if (translationController == null) {
                 commentTranslationStatusLabel.setText("Error: Translation controller is missing.");
                 return;
@@ -929,7 +928,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
             new SwingWorker<Void, Void>() {
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected Void doInBackground() {
                     translationController.execute(replyContentText, targetLanguage);
                     return null;
                 }
@@ -1005,13 +1004,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         actionsPanel.add(Box.createHorizontalStrut(8));
         actionsPanel.add(replyButton);
 
-        replyUpvoteButton.addActionListener(e -> {
+        replyUpvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 voteController.execute(true, reply.getId());
             }
         });
 
-        replyDownvoteButton.addActionListener(e -> {
+        replyDownvoteButton.addActionListener(evt -> {
             if (voteController != null) {
                 voteController.execute(false, reply.getId());
             }
@@ -1073,25 +1072,27 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyPanel.setVisible(false);
 
         // Functionality for the buttons
-        replyButton.addActionListener(e -> {
+        replyButton.addActionListener(evt -> {
             replyPanel.setVisible(true);
         });
 
-        replyCancelButton.addActionListener(e -> {
+        replyCancelButton.addActionListener(evt -> {
             if (!replyTextField.getText().isEmpty()) {
                 // Prompt a confirmation message if there's a draft.
                 final int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
                         CONFIRM_CANCEL_TITLE, JOptionPane.YES_NO_OPTION);
 
                 // Return if the user does not choose yes.
-                if (userAnswer != JOptionPane.YES_OPTION) return;
+                if (userAnswer != JOptionPane.YES_OPTION) {
+                    return;
+                }
             }
 
             replyPanel.setVisible(false);
             replyTextField.setText("");
         });
 
-        sendReplyButton.addActionListener(e -> {
+        sendReplyButton.addActionListener(evt -> {
             final String replyText = replyTextField.getText();
             final long parentId = reply.getId();
             sendReply(replyText, parentId);
@@ -1118,7 +1119,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
         return panel;
     }
-
 
     /**
      * Loads a post by its ID.
@@ -1206,7 +1206,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.onBackAction = onBackAction;
     }
 
-
     /**
      * Sends a comment/reply
      * @param content The content of the reply
@@ -1215,7 +1214,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     public void sendReply(String content, long parentId) {
         replyController.execute(content, parentId);
     }
-    
+
     /**
      * Creates a panel for displaying a post that references this one.
      */
@@ -1260,15 +1259,15 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         viewButton.setForeground(Color.WHITE);
         viewButton.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
         viewButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        viewButton.addActionListener(e -> {
+        viewButton.addActionListener(evt -> {
             if (controller != null) {
                 loadPost(refPost.getId());
             }
         });
-        
+
         panel.add(infoPanel, BorderLayout.CENTER);
         panel.add(viewButton, BorderLayout.EAST);
-        
+
         // Make panel clickable
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override

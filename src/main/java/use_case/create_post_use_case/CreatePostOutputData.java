@@ -6,12 +6,21 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 public class CreatePostOutputData {
+    /**
+     * The post successfully created.
+     */
     private OriginalPost originalPost;
 
+    /**
+     * Construction of Output data for presenter.
+     */
     public CreatePostOutputData(OriginalPost originalPost) {
         this.originalPost = originalPost;
     }
 
+    /**
+     * Getter for stored data.
+     */
     public OriginalPost getOriginalPost() {
         return originalPost;
     }

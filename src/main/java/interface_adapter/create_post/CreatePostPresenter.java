@@ -5,15 +5,10 @@ import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
-import interface_adapter.signup.SignupViewModel;
-import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.create_post_use_case.CreatePostOutputData;
 import use_case.read_post.ReadPostOutputData;
-import view.BrowsePostsView;
 import view.PostReadingView;
-
-import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.List;
 

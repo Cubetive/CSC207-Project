@@ -6,10 +6,7 @@ import entities.ReplyPost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -172,6 +169,10 @@ class ReadPostInteractorTest {
                 throw new RuntimeException("Database error");
             }
             return posts.get(id);
+        }
+
+        public List<OriginalPost> getAllPosts() {
+            return null;
         }
     }
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
+import java.util.List;
 
 class TranslationInteractorTest {
 
@@ -19,6 +20,10 @@ class TranslationInteractorTest {
         ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
             public OriginalPost getPostById(long id) {
+                return null;
+            }
+
+            public List<OriginalPost> getAllPosts() {
                 return null;
             }
         };
@@ -70,6 +75,10 @@ class TranslationInteractorTest {
                 // Return a dummy post
                 return new OriginalPost(1L, "Title", "Hello", "User", new Date(), 0, 0);
             }
+
+            public List<OriginalPost> getAllPosts() {
+                return null;
+            }
         };
 
         // Fake Translation DAO
@@ -115,7 +124,13 @@ class TranslationInteractorTest {
         // DAOs can be null or minimal since we expect fail before calling them
         ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
-            public OriginalPost getPostById(long id) { return null; }
+            public OriginalPost getPostById(long id) {
+                return null;
+            }
+
+            public List<OriginalPost> getAllPosts() {
+                return null;
+            }
         };
         TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
             @Override

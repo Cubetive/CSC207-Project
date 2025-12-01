@@ -328,7 +328,6 @@
         <!-- Coding -->
         <module name="ArrayTrailingComma"/>
         <module name="AvoidDoubleBraceInitialization"/>
-        <module name="AvoidInlineConditionals"/>
         <module name="AvoidNoArgumentSuperConstructorCall"/>
         <module name="CovariantEquals"/>
         <module name="DeclarationOrder"/>
@@ -378,7 +377,6 @@
                        java.lang.StringBuffer, StringBuffer"/>
         </module>
         <module name="InnerAssignment"/>
-        <module name="MagicNumber"/>
         <module name="MatchXpath">
             <property name="query" value="//CLASS_DEF[@text!='Checker' and @text!='Main']
       //LITERAL_CATCH//METHOD_CALL[.//IDENT[@text = 'printStackTrace']]/.."/>
@@ -507,11 +505,6 @@
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RequireThis"/>
-        <module name="ReturnCount">
-            <property name="max" value="1"/>
-            <property name="maxForVoid" value="0"/>
-            <property name="format" value="^create"/>
-        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="StringLiteralEquality"/>
@@ -560,10 +553,6 @@
         <module name="SuppressionXpathSingleFilter">
             <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
             <property name="checks" value="JavadocType"/>
-        </module>
-        <module name="SuppressionXpathSingleFilter">
-            <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
-            <property name="checks" value="MagicNumber"/>
         </module>
         <module name="SuppressionXpathSingleFilter">
             <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
@@ -653,41 +642,6 @@
         <module name="BooleanExpressionComplexity">
             <property name="max" value="7"/>
         </module>
-        <module name="ClassDataAbstractionCoupling">
-            <!-- Default classes are also listed -->
-            <property name="excludedClasses"
-                      value="boolean, byte, char, double, float, int, long, short, void,
-                       Boolean, Byte, Character, Double, Float, Integer, Long, Short, Void,
-                       Object, Class, String, StringBuffer, StringBuilder,
-                       ArrayIndexOutOfBoundsException, Exception, RuntimeException,
-                       IllegalArgumentException, IllegalStateException,
-                       IndexOutOfBoundsException, NullPointerException, Throwable,
-                       SecurityException, UnsupportedOperationException, List, ArrayList,
-                       Deque, Queue, LinkedList, Set, HashSet, SortedSet, TreeSet, Map,
-                       HashMap, SortedMap, TreeMap, DetailsAST, CheckstyleException,
-                       UnsupportedEncodingException, BuildException, ConversionException,
-                       FileNotFoundException, TestException"/>
-        </module>
-        <module name="ClassFanOutComplexity">
-            <property name="max" value="25"/>
-            <!-- Default classes are also listed -->
-            <property name="excludedClasses"
-                      value="boolean, byte, char, double, float, int, long, short,
-                       void, Boolean, Byte, Character, Double, Float, Integer,
-                       Long, Short, Void, Object, Class, String, StringBuffer,
-                       StringBuilder, ArrayIndexOutOfBoundsException, Exception,
-                       RuntimeException, IllegalArgumentException, IllegalStateException,
-                       IndexOutOfBoundsException, NullPointerException, Throwable,
-                       SecurityException, UnsupportedOperationException, List, ArrayList,
-                       Deque, Queue, LinkedList, Set, HashSet, SortedSet, TreeSet, Map,
-                       HashMap, SortedMap, TreeMap, DetailsAST, CheckstyleException,
-                       UnsupportedEncodingException, BuildException, ConversionException,
-                       FileNotFoundException, TestException, Log, Sets, Multimap,
-                       TokenStreamRecognitionException, RecognitionException,
-                       TokenStreamException, IOException, Override, Deprecated, SafeVarargs,
-                       SuppressWarnings, FunctionalInterface, NoSuchMethodException,
-                       InvocationTargetException, IllegalAccessException"/>
-        </module>
         <module name="CyclomaticComplexity">
             <property name="switchBlockAsSingleDecisionPoint" value="true"/>
         </module>
@@ -740,7 +694,6 @@
             <property name="allowedAbbreviationLength" value="0"/>
             <property name="allowedAbbreviations" value="AST,HTML,ID,JSON"/>
         </module>
-        <module name="AbstractClassName"/>
         <module name="ClassTypeParameterName"/>
         <module name="RecordTypeParameterName"/>
         <module name="RecordComponentName"/>
@@ -786,11 +739,9 @@
         </module>
 
         <!-- Size Violations -->
-        <module name="AnonInnerLength"/>
         <module name="ExecutableStatementCount">
             <property name="max" value="30"/>
         </module>
-        <module name="LambdaBodyLength"/>
         <module name="MethodCount">
             <property name="maxTotal" value="34"/>
         </module>

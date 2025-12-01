@@ -1,5 +1,17 @@
 package view;
 
+import interface_adapter.browse_posts.BrowsePostsController;
+import interface_adapter.browse_posts.BrowsePostsState;
+import interface_adapter.browse_posts.BrowsePostsViewModel;
+import interface_adapter.create_post.CreatePostState;
+import interface_adapter.create_post.CreatePostViewModel;
+import interface_adapter.logout.LogoutPresenter;
+import use_case.browse_posts.BrowsePostsOutputData;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -406,6 +418,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.setOpaque(false);
 
         final JLabel titleLabel = new JLabel(post.getTitle());
+        titleLabel.setName("titlePost");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(50, 50, 50));
         titlePanel.add(titleLabel);

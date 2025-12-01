@@ -399,23 +399,18 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        commentButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            final String content = commentField.getText();
-            final long parentId = readPostState.getId();
-            sendReply(content, parentId);
-        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
         
-        // Add action listener for comment button
+        // Add action listener for comment button (single source of truth)
         commentButton.addActionListener(e -> {
-            final String commentText = commentField.getText().trim();
-            if (!commentText.isEmpty() && replyController != null) {
-                replyController.execute(commentText, currentPostId);
-                commentField.setText(""); // Clear the field after submitting
+            if (replyController == null) {
+                return;
             }
+            final String commentText = commentField.getText();
+            final long parentId = currentPostId;
+            sendReply(commentText, parentId);
         });
 
         // Replies panel

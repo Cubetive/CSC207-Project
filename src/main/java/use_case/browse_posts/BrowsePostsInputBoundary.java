@@ -9,4 +9,6 @@ public interface BrowsePostsInputBoundary {
      * Executes the browse posts use case.
      */
     void execute();
+
+    void switchToCreatePostView();
 }

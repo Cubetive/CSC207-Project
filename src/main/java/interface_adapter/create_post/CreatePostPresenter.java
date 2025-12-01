@@ -1,6 +1,8 @@
 package interface_adapter.create_post;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.browse_posts.BrowsePostsState;
+import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.signup.SignupViewModel;
@@ -8,6 +10,8 @@ import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.create_post_use_case.CreatePostOutputData;
 import use_case.read_post.ReadPostOutputData;
+import view.BrowsePostsView;
+import view.PostReadingView;
 
 import javax.swing.text.View;
 import java.util.ArrayList;
@@ -21,14 +25,22 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
     //TODO SearchViewModel
     //private SignupViewModel signupViewModel;
     private ViewManagerModel viewManagerModel;
+    private PostReadingView postReadingView;
+    private BrowsePostsViewModel browsePostsViewModel;
 
     public CreatePostPresenter(CreatePostViewModel createPostViewModel,
                                ViewManagerModel viewManagerModel,
-                               ReadPostViewModel readPostViewModel) {
+                               ReadPostViewModel readPostViewModel,
+                               BrowsePostsViewModel browsePostsViewModel) {
         this.createPostViewModel = createPostViewModel;
         //this.signupViewModel = signupViewModel;
         this.viewManagerModel = viewManagerModel;
         this.readPostViewModel = readPostViewModel;
+        this.browsePostsViewModel = browsePostsViewModel;
+    }
+
+    public void setPostReadingView(PostReadingView postReadingView) {
+        this.postReadingView = postReadingView;
     }
 
     public void prepareCreatedView(CreatePostOutputData createPostOutputData) {
@@ -49,6 +61,11 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
 
         this.viewManagerModel.setState(readPostViewModel.getViewName());
         this.viewManagerModel.firePropertyChanged();
+        this.postReadingView.loadPost(createPostOutputData.getOriginalPost().getId());
+        this.postReadingView.revalidate();
+        this.postReadingView.repaint();
+        this.postReadingView.setVisible(true);
+        this.viewManagerModel.firePropertyChanged();
     }
 
     public void prepareMissingFieldView(String error) {
@@ -58,22 +75,13 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         createPostViewModel.firePropertyChange();
     }
 
-    public void switchToSignUpView() {
-        //TODO
-        //viewManagerModel.setState(signupViewModel.getViewName);
-        viewManagerModel.firePropertyChanged();
-    }
-
     public void switchToBrowseView() {
         //TODO
-        //viewManagerModel.setState(BrowseViewModel.getViewName);
+        browsePostsViewModel.setState(new BrowsePostsState());
+        viewManagerModel.setState(browsePostsViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
+        System.out.println("DEBUG: should switch to BrowsePostsView");
     }
 
-    public void switchToSearchView() {
-        //TODO
-        //viewManagerModel.setState(SearchViewModel.getViewName);
-        viewManagerModel.firePropertyChanged();
-    }
 
 }

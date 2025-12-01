@@ -19,4 +19,8 @@ public class BrowsePostsController {
     public void execute() {
         browsePostsInteractor.execute();
     }
+
+    public void switchToCreatePostView() {
+        this.browsePostsInteractor.switchToCreatePostView();
+    }
 }

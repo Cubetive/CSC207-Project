@@ -1,8 +1,8 @@
-package CreatePostTest;
+package use_case.create_post;
 
-import app.AppBuilder;
 import data_access.FilePostDataAccessObject;
 import data_access.InMemorySessionRepository;
+import entities.User;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.create_post.CreatePostController;
@@ -69,6 +69,8 @@ public class CreatePostTestBuilder {
                 new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
         final CreatePostInputBoundary createPostInteractor =
                 new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
+        sessionRepository.setCurrentUser(new User("Personable", "username", "bopbop@mail.com",
+                "somethingsomething"));
 
         final CreatePostController controller = new CreatePostController(createPostInteractor);
         creatingPostView.setController(controller);

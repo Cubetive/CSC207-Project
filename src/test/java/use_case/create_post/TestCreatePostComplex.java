@@ -1,12 +1,5 @@
-package CreatePostTest;
+package use_case.create_post;
 
-import app.AppBuilder;
-import interface_adapter.read_post.ReadPostController;
-import interface_adapter.read_post.ReadPostPresenter;
-import interface_adapter.read_post.ReadPostViewModel;
-import use_case.read_post.ReadPostInputBoundary;
-import use_case.read_post.ReadPostInteractor;
-import use_case.read_post.ReadPostOutputBoundary;
 import view.PostReadingView;
 
 import javax.swing.*;

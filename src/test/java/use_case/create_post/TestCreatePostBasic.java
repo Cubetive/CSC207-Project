@@ -1,4 +1,4 @@
-package CreatePostTest;
+package use_case.create_post;
 
 import data_access.InMemorySessionRepository;
 import interface_adapter.browse_posts.BrowsePostsViewModel;

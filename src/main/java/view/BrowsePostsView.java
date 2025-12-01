@@ -1,5 +1,34 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.text.SimpleDateFormat;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
@@ -8,19 +37,6 @@ import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.search_post.SearchPostController;
 import use_case.browse_posts.BrowsePostsOutputData;
 import use_case.search_post.SearchPostInputData;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.text.SimpleDateFormat;
 
 /**
  * The View for browsing posts.
@@ -60,12 +76,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.setBackground(new Color(70, 130, 180));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 35, 20));
 
-        // Title in left
-        final JLabel title = new JLabel(BrowsePostsViewModel.TITLE_LABEL);
-        title.setFont(new Font("Arial", Font.BOLD, 26));
-        title.setHorizontalAlignment(SwingConstants.LEFT);
-        title.setForeground(Color.WHITE);
-
         // Search panel
         searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
@@ -76,11 +86,11 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         searchField.setOpaque(false);
         searchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        int borderThickness = 3;
-        Border thickLineBorder = BorderFactory.createLineBorder(Color.WHITE, borderThickness);
+        final int borderThickness = 3;
+        final Border thickLineBorder = BorderFactory.createLineBorder(Color.WHITE, borderThickness);
 
         // Add a titled border around search box
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+        final TitledBorder titledBorder = BorderFactory.createTitledBorder(
                 thickLineBorder,
                 "Search Posts",
                 TitledBorder.LEADING,
@@ -114,6 +124,9 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         editProfileButton.setFocusPainted(false);
         editProfileButton.setBackground(new Color(255, 255, 255));
         editProfileButton.setForeground(new Color(70, 130, 180));
+        editProfileButton.setOpaque(true);
+        editProfileButton.setBorderPainted(false);
+        editProfileButton.setContentAreaFilled(true);
         editProfileButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         editProfileButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         editProfileButton.addActionListener(e -> {
@@ -127,9 +140,6 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         final JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(new Color(70, 130, 180));
         leftPanel.setOpaque(false);
-        
-        // Add title to left panel
-        leftPanel.add(title, BorderLayout.WEST);
 
         // Logout button panel
         final JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -217,16 +227,29 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Adds a listener to the search field to filter posts as the user types.
+     */
     public void searchFieldListener() {
         // Add search listener
         searchField.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { searchPosts(); }
-            public void removeUpdate(DocumentEvent e) { searchPosts(); }
-            public void changedUpdate(DocumentEvent e) { searchPosts(); }
+            public void insertUpdate(DocumentEvent e) {
+                searchPosts();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                searchPosts();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                searchPosts();
+            }
 
             private void searchPosts() {
-                String keyword = searchField.getText();
-                SearchPostController searchPostController = new SearchPostController(new SearchPostInputData(postsPanel, viewModel.getState(), keyword));
+                final String keyword = searchField.getText();
+                final SearchPostController searchPostController =
+                        new SearchPostController(new SearchPostInputData(postsPanel,
+                                viewModel.getState(), keyword));
                 searchPostController.searchPosts();
             }
         });
@@ -415,14 +438,29 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         return panel;
     }
 
+    /**
+     * Returns the name of this view.
+     *
+     * @return the view name
+     */
     public String getViewName() {
         return viewModel.getViewName();
     }
 
+    /**
+     * Sets the controller for this view.
+     *
+     * @param controller the browse posts controller
+     */
     public void setController(BrowsePostsController controller) {
         this.controller = controller;
     }
 
+    /**
+     * Sets the action to be executed when logout is triggered.
+     *
+     * @param onLogoutAction the logout action
+     */
     public void setOnLogoutAction(Runnable onLogoutAction) {
         this.onLogoutAction = onLogoutAction;
     }
@@ -440,14 +478,29 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Sets the listener for post click events.
+     *
+     * @param listener the post click listener
+     */
     public void setPostClickListener(PostClickListener listener) {
-        this.postClickListener = listener;
+        BrowsePostsView.postClickListener = listener;
     }
 
+    /**
+     * Sets the action to be executed when edit profile is clicked.
+     *
+     * @param onEditProfileClick the edit profile action
+     */
     public void setOnEditProfileClick(Runnable onEditProfileClick) {
         this.onEditProfileClick = onEditProfileClick;
     }
-    
+
+    /**
+     * Sets the action to be executed when create post is clicked.
+     *
+     * @param onCreatePostClick the create post action
+     */
     public void setOnCreatePostClick(Runnable onCreatePostClick) {
         this.onCreatePostClick = onCreatePostClick;
     }

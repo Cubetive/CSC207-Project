@@ -33,8 +33,8 @@ public class ReplyPostInteractor implements ReplyPostInputBoundary {
         final String content = replyPostInputData.getContent();
         final long parentId = replyPostInputData.getParentId();
 
-        // Treat null, empty, or whitespace-only content as "missing"
-        if (content == null || content.trim().isEmpty()) {
+        // Remove any content with null or whitespace
+        if (content != null || content.trim().isEmpty()) {
             replyPostPresenter.prepareFailureView("Fill in missing fields.");
         }
         else {

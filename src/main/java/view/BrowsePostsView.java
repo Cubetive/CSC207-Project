@@ -43,11 +43,58 @@ import use_case.search_post.SearchPostInputData;
  */
 public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
+    // Color constants
+    private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
+    private static final Color HEADER_COLOR = new Color(70, 130, 180);
+    private static final Color BUTTON_GRAY = new Color(166, 166, 166);
+    private static final Color BORDER_DARK = new Color(50, 100, 150);
+    private static final Color ERROR_COLOR = new Color(220, 53, 69);
+    private static final Color TEXT_GRAY = new Color(120, 120, 120);
+    private static final Color BORDER_LIGHT = new Color(220, 220, 220);
+    private static final Color DARK_TEXT = new Color(50, 50, 50);
+    private static final Color CONTENT_GRAY = new Color(80, 80, 80);
+    private static final Color HOVER_BG = new Color(248, 250, 252);
+    private static final Color LIGHT_BLUE_BG = new Color(240, 248, 255);
+    private static final Color GREEN_BUTTON = new Color(34, 139, 34);
+
+    // Size constants
+    private static final int PADDING_SMALL = 5;
+    private static final int PADDING_MEDIUM = 10;
+    private static final int PADDING_LARGE = 15;
+    private static final int PADDING_XLARGE = 20;
+    private static final int PADDING_HEADER = 35;
+    private static final int PROFILE_PIC_SIZE = 40;
+    private static final int SEARCH_FIELD_HEIGHT = 50;
+    private static final int SCROLL_INCREMENT = 16;
+    private static final int POST_PANEL_HEIGHT = 160;
+    private static final int BORDER_THICKNESS = 3;
+    private static final int CONTENT_PREVIEW_ROWS = 2;
+
+    // Font size constants
+    private static final int FONT_SMALL = 12;
+    private static final int FONT_MEDIUM = 13;
+    private static final int FONT_REGULAR = 14;
+    private static final int FONT_LARGE = 16;
+    private static final int FONT_TITLE = 18;
+
+    // Padding constants for borders
+    private static final int BORDER_PAD_SMALL = 6;
+    private static final int BORDER_PAD_MEDIUM = 8;
+    private static final int BORDER_PAD_LARGE = 14;
+    private static final int BORDER_PAD_XLARGE = 17;
+    private static final int BORDER_PAD_POST = 18;
+
+    // Font name constant
+    private static final String FONT_ARIAL = "Arial";
+
     private final BrowsePostsViewModel viewModel;
     private final CreatePostViewModel createPostViewModel;
     private BrowsePostsController controller;
     private static PostClickListener postClickListener;
     private Runnable onLogoutAction;
+    private Runnable onEditProfileClick;
+    private Runnable onProfilePictureUpdate;
+    private Runnable onCreatePostClick;
 
     private final JPanel postsPanel;
     private final JScrollPane scrollPane;
@@ -56,12 +103,9 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final JButton createPostButton;
     private final JLabel profilePictureLabel;
     private final JPanel titlePanel;
-    private Runnable onEditProfileClick;
-    private Runnable onProfilePictureUpdate;
-    private Runnable onCreatePostClick;
+    private final JPanel searchPanel;
 
     private static JTextField searchField;
-    private JPanel searchPanel;
 
     public BrowsePostsView(BrowsePostsViewModel viewModel, CreatePostViewModel createPostViewModel) {
         this.viewModel = viewModel;
@@ -77,7 +121,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 35, 20));
 
         // Search panel
-        searchPanel = new JPanel();
+        this.searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
         searchPanel.setOpaque(false);
 
@@ -129,7 +173,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         editProfileButton.setContentAreaFilled(true);
         editProfileButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         editProfileButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        editProfileButton.addActionListener(e -> {
+        editProfileButton.addActionListener(evt -> {
             if (onEditProfileClick != null) {
                 onEditProfileClick.run();
             }
@@ -160,7 +204,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         logoutButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        logoutButton.addActionListener(e -> {
+        logoutButton.addActionListener(evt -> {
             if (onLogoutAction != null) {
                 onLogoutAction.run();
             }
@@ -192,7 +236,8 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         refreshButton.setForeground(Color.WHITE);
         refreshButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         refreshButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        refreshButton.addActionListener(e -> {
+        refreshButton.setOpaque(true);
+        refreshButton.addActionListener(evt -> {
             if (controller != null) {
                 controller.execute();
             }
@@ -206,10 +251,12 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         createPostButton.setForeground(Color.WHITE);
         createPostButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         createPostButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        createPostButton.addActionListener(e -> {
+        createPostButton.setOpaque(true);
+        createPostButton.addActionListener(evt -> {
             if (onCreatePostClick != null) {
                 onCreatePostClick.run();
-            } else if (controller != null) {
+            }
+            else if (controller != null) {
                 controller.switchToCreatePostView();
             }
         });
@@ -233,15 +280,18 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     public void searchFieldListener() {
         // Add search listener
         searchField.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
+            @Override
+            public void insertUpdate(DocumentEvent evt) {
                 searchPosts();
             }
 
-            public void removeUpdate(DocumentEvent e) {
+            @Override
+            public void removeUpdate(DocumentEvent evt) {
                 searchPosts();
             }
 
-            public void changedUpdate(DocumentEvent e) {
+            @Override
+            public void changedUpdate(DocumentEvent evt) {
                 searchPosts();
             }
 
@@ -354,17 +404,17 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
         final JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         titlePanel.setBackground(Color.WHITE);
         titlePanel.setOpaque(false);
-        
+
         final JLabel titleLabel = new JLabel(post.getTitle());
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(50, 50, 50));
         titlePanel.add(titleLabel);
-        
+
         // Add clickable reference indicator if post has a reference
         if (post.hasReference()) {
             // If referencedPostId is null, we can't navigate, but still show the indicator
             final boolean canNavigate = post.getReferencedPostId() != null;
-            
+
             final JButton referenceButton = new JButton("🔗 References: " + 
                     (post.getReferencedPostTitle() != null && !post.getReferencedPostTitle().isEmpty() 
                             ? post.getReferencedPostTitle() 
@@ -381,12 +431,13 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
             referenceButton.setOpaque(true);
             referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if (canNavigate) {
-                referenceButton.addActionListener(e -> {
+                referenceButton.addActionListener(evt -> {
                     if (postClickListener != null) {
                         postClickListener.onPostClicked(post.getReferencedPostId());
                     }
                 });
-            } else {
+            }
+            else {
                 // Disable button if we can't navigate
                 referenceButton.setEnabled(false);
                 referenceButton.setToolTipText("Referenced post ID not available");

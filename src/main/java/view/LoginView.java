@@ -65,7 +65,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
         // Set up button actions
         loginButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (loginController != null) {
                     final LoginState currentState = loginViewModel.getState();
                     loginController.execute(
@@ -78,7 +78,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
         toSignupButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (loginController != null) {
                     loginController.switchToSignupView();
                 }
@@ -137,17 +137,17 @@ public class LoginView extends JPanel implements PropertyChangeListener {
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
         });

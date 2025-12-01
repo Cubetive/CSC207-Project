@@ -41,7 +41,6 @@ class BrowsePostsInteractorTest {
         assertNotNull(outputBoundary.outputData);
         assertEquals(2, outputBoundary.outputData.getPosts().size());
 
-        // Verify OutputData and PostData getters (covers BrowsePostsOutputData)
         BrowsePostsOutputData.PostData firstPost = outputBoundary.outputData.getPosts().get(0);
         assertEquals(2L, firstPost.getId()); // post2 comes first due to higher score (10-3=7 vs 5-2=3)
         assertEquals("Title 2", firstPost.getTitle());
@@ -108,6 +107,172 @@ class BrowsePostsInteractorTest {
         assertTrue(outputBoundary.switchToCreatePostViewCalled);
     }
 
+    @Test
+    void testPostWithReferenceToOriginalPost() {
+        // Arrange - create a post that references another original post
+        Date date = new Date();
+        OriginalPost referencedPost = new OriginalPost(1L, "Referenced Title", "Referenced Content", "user1", date, 5, 2);
+        OriginalPost postWithReference = new OriginalPost(2L, "Title 2", "Content 2", "user2", date, 3, 1);
+        postWithReference.setReferencedPost(referencedPost);
+        dataAccess.addPost(referencedPost);
+        dataAccess.addPost(postWithReference);
+
+        // Act
+        interactor.execute();
+
+        // Assert
+        assertTrue(outputBoundary.successCalled);
+        assertEquals(2, outputBoundary.outputData.getPosts().size());
+
+        BrowsePostsOutputData.PostData refPost = outputBoundary.outputData.getPosts().stream()
+                .filter(p -> p.getId() == 2L)
+                .findFirst()
+                .orElse(null);
+        assertNotNull(refPost);
+        assertTrue(refPost.hasReference());
+        assertEquals("Referenced Title", refPost.getReferencedPostTitle());
+        assertEquals(Long.valueOf(1L), refPost.getReferencedPostId());
+    }
+
+    @Test
+    void testPostWithReferenceToReplyPost() {
+        // Arrange - create a post that references a reply post
+        Date date = new Date();
+        OriginalPost originalPost = new OriginalPost(1L, "Original Title", "Original Content", "user1", date, 5, 2);
+        entities.ReplyPost replyPost = new entities.ReplyPost(10L, "replyUser", "This is a reply content that is quite long", date, 1, 0);
+        originalPost.addReply(replyPost);
+
+        OriginalPost postWithReference = new OriginalPost(2L, "Title 2", "Content 2", "user2", date, 3, 1);
+        postWithReference.setReferencedPost(replyPost);
+        dataAccess.addPost(originalPost);
+        dataAccess.addPost(postWithReference);
+
+        // Act
+        interactor.execute();
+
+        // Assert
+        assertTrue(outputBoundary.successCalled);
+        BrowsePostsOutputData.PostData refPost = outputBoundary.outputData.getPosts().stream()
+                .filter(p -> p.getId() == 2L)
+                .findFirst()
+                .orElse(null);
+        assertNotNull(refPost);
+        assertTrue(refPost.hasReference());
+        // For reply posts, the title should be the content (or truncated content)
+        assertNotNull(refPost.getReferencedPostTitle());
+        assertEquals(Long.valueOf(10L), refPost.getReferencedPostId());
+    }
+
+    @Test
+    void testPostWithReferenceToReplyPostLongContent() {
+        // Arrange - create a post that references a reply with content > 50 chars
+        Date date = new Date();
+        String longContent = "This is a very long reply content that exceeds fifty characters and should be truncated";
+        entities.ReplyPost replyPost = new entities.ReplyPost(10L, "replyUser", longContent, date, 1, 0);
+
+        OriginalPost postWithReference = new OriginalPost(2L, "Title 2", "Content 2", "user2", date, 3, 1);
+        postWithReference.setReferencedPost(replyPost);
+        dataAccess.addPost(postWithReference);
+
+        // Act
+        interactor.execute();
+
+        // Assert
+        BrowsePostsOutputData.PostData refPost = outputBoundary.outputData.getPosts().get(0);
+        assertTrue(refPost.hasReference());
+        // Should be truncated to 50 chars + "..."
+        assertTrue(refPost.getReferencedPostTitle().endsWith("..."));
+        assertEquals(53, refPost.getReferencedPostTitle().length());
+    }
+
+    @Test
+    void testPostWithReferenceToReplyPostShortContent() {
+        // Arrange - create a post that references a reply with content <= 50 chars
+        Date date = new Date();
+        String shortContent = "Short reply";
+        entities.ReplyPost replyPost = new entities.ReplyPost(10L, "replyUser", shortContent, date, 1, 0);
+
+        OriginalPost postWithReference = new OriginalPost(2L, "Title 2", "Content 2", "user2", date, 3, 1);
+        postWithReference.setReferencedPost(replyPost);
+        dataAccess.addPost(postWithReference);
+
+        // Act
+        interactor.execute();
+
+        // Assert
+        BrowsePostsOutputData.PostData refPost = outputBoundary.outputData.getPosts().get(0);
+        assertTrue(refPost.hasReference());
+        // Should NOT be truncated
+        assertEquals(shortContent, refPost.getReferencedPostTitle());
+        assertFalse(refPost.getReferencedPostTitle().endsWith("..."));
+    }
+
+    @Test
+    void testPostDataConstructorWithoutReference() {
+        Date date = new Date();
+        BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
+                1L, "Title", "Content", "user", date, 5, 2
+        );
+
+        assertEquals(1L, postData.getId());
+        assertEquals("Title", postData.getTitle());
+        assertEquals("Content", postData.getContent());
+        assertEquals("user", postData.getUsername());
+        assertEquals(date, postData.getCreationDate());
+        assertEquals(5, postData.getUpvotes());
+        assertEquals(2, postData.getDownvotes());
+        assertFalse(postData.hasReference());
+        assertNull(postData.getReferencedPostTitle());
+        assertNull(postData.getReferencedPostId());
+    }
+
+    @Test
+    void testPostWithNoReference() {
+        // Arrange - post where hasReference() returns false
+        Date date = new Date();
+        OriginalPost postWithoutRef = new OriginalPost(1L, "Title", "Content", "user", date, 5, 2);
+        // Don't set any reference - hasReference() should return false
+        dataAccess.addPost(postWithoutRef);
+
+        // Act
+        interactor.execute();
+
+        // Assert - covers the branch where hasReference is false
+        assertTrue(outputBoundary.successCalled);
+        BrowsePostsOutputData.PostData post = outputBoundary.outputData.getPosts().get(0);
+        assertFalse(post.hasReference());
+        assertNull(post.getReferencedPostTitle());
+        assertNull(post.getReferencedPostId());
+    }
+
+    @Test
+    void testPostWithHasReferenceTrueButNullReferencedPost() {
+        // Arrange - covers the branch where hasReference=true but getReferencedPost()=null
+        Date date = new Date();
+        OriginalPost postWithNullRef = new OriginalPost(1L, "Title", "Content", "user", date, 5, 2) {
+            @Override
+            public boolean hasReference() {
+                return true;
+            }
+
+            @Override
+            public entities.Post getReferencedPost() {
+                return null;
+            }
+        };
+        dataAccess.addPost(postWithNullRef);
+
+        // Act
+        interactor.execute();
+
+        // Assert
+        assertTrue(outputBoundary.successCalled);
+        BrowsePostsOutputData.PostData post = outputBoundary.outputData.getPosts().get(0);
+        assertTrue(post.hasReference());
+        assertNull(post.getReferencedPostTitle());
+        assertNull(post.getReferencedPostId());
+    }
+
     // Test helper classes
 
     private static class TestBrowsePostsDataAccess implements BrowsePostsDataAccessInterface {
@@ -153,12 +318,10 @@ class BrowsePostsInteractorTest {
 
         @Override
         public void setCreatePostViewModel(interface_adapter.create_post.CreatePostViewModel createPostViewModel) {
-            // Not needed for these tests
         }
 
         @Override
         public void setViewManagerModel(interface_adapter.ViewManagerModel viewManagerModel) {
-            // Not needed for these tests
         }
     }
 }

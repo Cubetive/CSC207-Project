@@ -1,21 +1,12 @@
 package view;
 
-import entities.User;
-import interface_adapter.read_post.ReadPostController;
-import interface_adapter.read_post.ReadPostState;
-import interface_adapter.read_post.ReadPostViewModel;
-import interface_adapter.reply_post.ReplyPostController;
-import interface_adapter.reply_post.ReplyPostPresenter;
-import interface_adapter.upvote_downvote.VoteController;
-import interface_adapter.upvote_downvote.VotePresenter;
-import interface_adapter.translate.TranslationController; // NEW
-import interface_adapter.translate.TranslationViewModel; // NEW
-import interface_adapter.translate.TranslationState;
-import use_case.read_post.ReadPostOutputData;
-import use_case.session.SessionRepository;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -23,6 +14,33 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
+import entities.User;
+import interface_adapter.read_post.ReadPostController;
+import interface_adapter.read_post.ReadPostState;
+import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationState;
+import interface_adapter.translate.TranslationViewModel;
+import interface_adapter.upvote_downvote.VoteController;
+import use_case.read_post.ReadPostOutputData;
 
 /**
  * The View for reading a post and its replies.
@@ -263,7 +281,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
 
                 translationsInProgress.add(MAIN_POST_KEY);
 
-                String targetLanguage = (String) languageDropdown.getSelectedItem();
+                final String targetLanguage = (String) languageDropdown.getSelectedItem();
                 final long postId = currentPostId;
                 final String content = textContent;
 
@@ -378,6 +396,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         // Comment input panel
         final JPanel commentInputPanel = new JPanel(new BorderLayout(10, 0));
         commentInputPanel.setBackground(new Color(245, 245, 245));
+        commentInputPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
         commentField = new JTextField();
         commentField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -518,8 +537,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void loadUserData(User cur_user) {
-        this.cur_user = cur_user;
+    /**
+     * Loads the current user data for permission checks.
+     *
+     * @param curUser the current logged-in user
+     */
+    public void loadUserData(User curUser) {
+        this.cur_user = curUser;
     }
 
     @Override
@@ -560,13 +584,13 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 translateButton.setEnabled(true);
             }
 
-            JTextArea targetArea = translatedContentArea;
-            JLabel statusLabel = translationStatusLabel;
+            final JTextArea targetArea = translatedContentArea;
+            final JLabel statusLabel = translationStatusLabel;
 
             if (targetArea != null && statusLabel != null) {
                 if (state.isTranslationSuccessful()) {
                     targetArea.setText(state.getTranslatedText() != null ? state.getTranslatedText() : "");
-                    String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                    final String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                     statusLabel.setText(
                             String.format("Translated to %s%s. %s",
                                     state.getTargetLanguage().toUpperCase(),
@@ -586,24 +610,24 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             }
         }
         else {
-            String lookupKey = lastTextTranslatedKey.trim();
+            final String lookupKey = lastTextTranslatedKey.trim();
 
             try {
-                JTextArea commentArea = commentTranslationAreas.get(lookupKey);
-                JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
-                JButton commentButton = commentTranslationButtons.get(lookupKey);
+                final JTextArea commentArea = commentTranslationAreas.get(lookupKey);
+                final JLabel commentStatus = commentTranslationStatusLabels.get(lookupKey);
+                final JButton commentBtn = commentTranslationButtons.get(lookupKey);
 
-                if (commentButton != null) {
-                    commentButton.setEnabled(true);
+                if (commentBtn != null) {
+                    commentBtn.setEnabled(true);
                 }
 
                 if (commentArea != null && commentStatus != null) {
                     if (state.isTranslationSuccessful()) {
-                        // Ensure text is not null
-                        String text = state.getTranslatedText() != null ? state.getTranslatedText() : "";
+                        final String text = state.getTranslatedText() != null
+                                ? state.getTranslatedText() : "";
                         commentArea.setText(text);
 
-                        String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
+                        final String cacheIndicator = state.isFromCache() ? " (Cached)" : " (API)";
                         commentStatus.setText(
                                 String.format("Translated to %s%s. %s",
                                         state.getTargetLanguage().toUpperCase(),
@@ -620,7 +644,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                         commentArea.setPreferredSize(null);
                         commentArea.setSize(commentArea.getPreferredSize());
 
-                        JScrollPane parentScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
+                        final JScrollPane parentScrollPane = (JScrollPane)
+                                SwingUtilities.getAncestorOfClass(JScrollPane.class, commentArea);
                         if (parentScrollPane != null) {
                             parentScrollPane.setViewportView(commentArea);
                             parentScrollPane.revalidate();
@@ -1055,7 +1080,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         replyCancelButton.addActionListener(e -> {
             if (!replyTextField.getText().isEmpty()) {
                 // Prompt a confirmation message if there's a draft.
-                int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
+                final int userAnswer = JOptionPane.showConfirmDialog(this, CONFIRM_CANCEL_MESSAGE,
                         CONFIRM_CANCEL_TITLE, JOptionPane.YES_NO_OPTION);
 
                 // Return if the user does not choose yes.
@@ -1109,34 +1134,74 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Returns the name of this view.
+     *
+     * @return the view name
+     */
     public String getViewName() {
         return viewModel.getViewName();
     }
 
+    /**
+     * Sets the controller for this view.
+     *
+     * @param controller the read post controller
+     */
     public void setController(ReadPostController controller) {
         this.controller = controller;
     }
 
+    /**
+     * Sets the read post controller.
+     *
+     * @param controller the read post controller
+     */
     public void setReadPostController(ReadPostController controller) {
         this.controller = controller;
     }
 
+    /**
+     * Sets the translation controller.
+     *
+     * @param controller the translation controller
+     */
     public void setTranslationController(TranslationController controller) {
         this.translationController = controller;
     }
 
+    /**
+     * Sets the action to execute when viewing a referenced post.
+     *
+     * @param onViewReferencedPostClick the action to execute
+     */
     public void setOnViewReferencedPostClick(Runnable onViewReferencedPostClick) {
         this.onViewReferencedPostClick = onViewReferencedPostClick;
     }
-    
+
+    /**
+     * Sets the vote controller.
+     *
+     * @param voteController the vote controller
+     */
     public void setVoteController(VoteController voteController) {
         this.voteController = voteController;
     }
 
+    /**
+     * Sets the reply controller.
+     *
+     * @param replyController the reply post controller
+     */
     public void setReplyController(ReplyPostController replyController) {
         this.replyController = replyController;
     }
 
+    /**
+     * Sets the action to execute when back button is clicked.
+     *
+     * @param onBackAction the back action
+     */
     public void setOnBackAction(Runnable onBackAction) {
         this.onBackAction = onBackAction;
     }
@@ -1188,7 +1253,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         infoPanel.add(authorLabel);
         
         // Right panel with view button
-        final JButton viewButton = new JButton("View");
+        final JButton viewButton = new JButton("view");
         viewButton.setFont(new Font("Arial", Font.PLAIN, 11));
         viewButton.setFocusPainted(false);
         viewButton.setBackground(new Color(70, 130, 180));

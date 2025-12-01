@@ -21,6 +21,11 @@ class TranslationInteractorTest {
             public OriginalPost getPostById(long id) {
                 return null;
             }
+
+            @Override
+            public java.util.List<OriginalPost> getAllPosts() {
+                return new java.util.ArrayList<>();
+            }
         };
 
         // Fake Translation DAO (Simulates the API)
@@ -70,6 +75,11 @@ class TranslationInteractorTest {
                 // Return a dummy post
                 return new OriginalPost(1L, "Title", "Hello", "User", new Date(), 0, 0);
             }
+
+            @Override
+            public java.util.List<OriginalPost> getAllPosts() {
+                return new java.util.ArrayList<>();
+            }
         };
 
         // Fake Translation DAO
@@ -117,6 +127,11 @@ class TranslationInteractorTest {
             @Override
             public OriginalPost getPostById(long id) {
                 return null;
+            }
+
+            @Override
+            public java.util.List<OriginalPost> getAllPosts() {
+                return new java.util.ArrayList<>();
             }
         };
         TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {

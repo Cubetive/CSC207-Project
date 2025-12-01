@@ -3,8 +3,6 @@ package view;
 import interface_adapter.create_post.CreatePostController;
 import interface_adapter.create_post.CreatePostState;
 import interface_adapter.create_post.CreatePostViewModel;
-import interface_adapter.login.LoginState;
-import interface_adapter.signup.SignupState;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -16,17 +14,45 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class CreatingPostView extends JPanel implements ActionListener, PropertyChangeListener {
+    /**
+     * Create post view model.
+     */
     private final CreatePostViewModel createPostViewModel;
+    /**
+     * Retired (but possibly useful) click listener.
+     */
     private CreatingPostView.CreatePostClickListener createPostClickListener;
 
+    /**
+     * Content input field.
+     */
     private final JTextArea contentTextField = new  JTextArea(10, 30);
+    /**
+     * Content title field.
+     */
     private final JTextField titleTextField = new  JTextField(30);
+    /**
+     * referenced post panel for display.
+     */
     private final JPanel referencedPostPanel;
+    /**
+     * referenced post label.
+     */
     private final JLabel referencedPostLabel;
 
+    /**
+     * Create post controller.
+     */
     private CreatePostController createPostController;
+    /**
+     * referenced post click runnable.
+     */
     private Runnable onReferencePostClick;
 
+    /**
+     * Set up Constructor.
+     * @param inputCreatePostViewModel create post view model to use.
+     */
     public CreatingPostView(CreatePostViewModel inputCreatePostViewModel) {
         this.createPostViewModel = inputCreatePostViewModel;
         this.createPostViewModel.addPropertyChangeListener(this);
@@ -40,9 +66,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
             final String referencedPostId = currentState.getReferencedPostId();
 
             if (referencedPostId != null && !referencedPostId.isEmpty()) {
-                createPostController.execute(currentState.getTitle(), currentState.getContent(), referencedPostId);
+                createPostController.execute(currentState.getTitle(),
+                        currentState.getContent(), referencedPostId);
             } else {
-                createPostController.execute(currentState.getTitle(), currentState.getContent());
+                createPostController.execute(currentState.getTitle(),
+                        currentState.getContent());
             }
 
             if (createPostController.isSuccess()) {
@@ -117,7 +145,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
         // Referenced post display panel
         referencedPostPanel = new JPanel();
-        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel, BoxLayout.Y_AXIS));
+        referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel,
+                BoxLayout.Y_AXIS));
         referencedPostPanel.setBackground(new Color(245, 245, 245));
         referencedPostPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Referenced Post"),
@@ -139,11 +168,21 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     }
 
+    /**
+     * Set up method for adding controller.
+     * @param createPostController controller to add.
+     */
     public void setController(CreatePostController createPostController) {
         this.createPostController = createPostController;
     }
 
-    private void addDocumentListener(JTextField textField, Runnable updateFunction) {
+    /**
+     * Set up method for adding listeners to JTextFields.
+     * @param textField field.
+     * @param updateFunction function to update.
+     */
+    private void addDocumentListener(JTextField textField,
+                                     Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -162,7 +201,13 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         });
     }
 
-    private void addDocumentListener(JTextArea textArea, Runnable updateFunction) {
+    /**
+     * Set up method for adding listeners to JTextAreas.
+     * @param textArea area.
+     * @param updateFunction function to update.
+     */
+    private void addDocumentListener(JTextArea textArea,
+                                     Runnable updateFunction) {
         textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -181,6 +226,10 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         });
     }
 
+    /**
+     * property change method reacting to an error having occurred and
+     * recorded in the state.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final CreatePostState state = (CreatePostState) evt.getNewValue();
@@ -189,6 +238,10 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         }
     }
 
+    /**
+     * Debug method.
+     * @param evt event that has occurred.
+     */
     public void actionPerformed(ActionEvent evt) {
         JOptionPane.showMessageDialog(this, "Most things are not implemented");
     }
@@ -211,33 +264,49 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         clearReferencedPost();
     }
 
+    /**
+     * Getter for the view name.
+     */
     public String getViewName() {
         return this.createPostViewModel.getViewName();
     }
 
-    public void setCreatePostClickListener(CreatingPostView.CreatePostClickListener listener) {
+    /**
+     * Retired method for button detection.
+     * @param listener listener for button.
+     */
+    public void setCreatePostClickListener(
+            CreatingPostView.CreatePostClickListener listener) {
         this.createPostClickListener = listener;
     }
 
     public interface CreatePostClickListener {
         void onCreatePostClicked(long postId);
     }
+
+    /**
+     * Set up method for runnable item to be executed by
+     * reference post use case.
+     * @param onReferencePostClick runnable item for reference post use case.
+     */
     public void setOnReferencePostClick(Runnable onReferencePostClick) {
         this.onReferencePostClick = onReferencePostClick;
     }
     
     /**
-     * Updates the display of the referenced post.
-     * @param referencedPostTitle the title of the referenced post (or content if no title)
-     * @param referencedPostContent the content preview of the referenced post
+     *Updates the display of the referenced post.
+     *@param referencedPostTitle the title of the referenced post
+     *                           (or content if no title)
+     *@param referencedPostContent the content preview of the referenced post
      */
-    public void setReferencedPost(String referencedPostTitle, String referencedPostContent) {
+    public void setReferencedPost(String referencedPostTitle,
+                                  String referencedPostContent) {
         if (referencedPostTitle != null && !referencedPostTitle.isEmpty()) {
-            final String displayText = "<html><b>Title:</b> " + referencedPostTitle + "<br>" +
-                    "<b>Content:</b> " + 
-                    (referencedPostContent.length() > 100 
-                            ? referencedPostContent.substring(0, 100) + "..." 
-                            : referencedPostContent) + 
+            final String displayText = "<html><b>Title:</b> " + referencedPostTitle + "<br>"
+                    + "<b>Content:</b> "
+                    + (referencedPostContent.length() > 100
+                            ? referencedPostContent.substring(0, 100) + "..."
+                            : referencedPostContent) +
                     "</html>";
             referencedPostLabel.setText(displayText);
             referencedPostPanel.setVisible(true);

@@ -1,74 +1,5 @@
 [
   {
-    "id": 1,
-    "title": "SomeTitle",
-    "username": "SomeUsername",
-    "date": "11/20/2025",
-    "content": "Some random description and extra words",
-    "votes": [
-      7,
-      5
-    ],
-    "replies": [
-      {
-        "id": 2,
-        "username": "Commenter1",
-        "date": "11/17/2025",
-        "content": "Some random first comment.",
-        "votes": [
-          5,
-          4
-        ],
-        "replies": []
-      },
-      {
-        "id": 3,
-        "username": "Commenter2",
-        "date": "11/17/2025",
-        "content": "Some random second comment.",
-        "votes": [
-          8,
-          4
-        ],
-        "replies": [
-          {
-            "id": 4,
-            "username": "Responder_To_Commenter2",
-            "date": "11/17/2025",
-            "content": "Some random response to the second comment",
-            "votes": [
-              13,
-              11
-            ],
-            "replies": []
-          },
-          {
-            "id": 14,
-            "username": "SomeUsername",
-            "date": "11/21/2025",
-            "content": "2nd random response to the second comment",
-            "votes": [
-              18,
-              13
-            ],
-            "replies": []
-          }
-        ]
-      },
-      {
-        "id": 17,
-        "username": "luciole",
-        "date": "11/26/2025",
-        "content": "Testing",
-        "votes": [
-          3,
-          2
-        ],
-        "replies": []
-      }
-    ]
-  },
-  {
     "id": 5,
     "title": "I Love Clash Royale",
     "username": "Clash Royale",
@@ -198,6 +129,75 @@
     ]
   },
   {
+    "id": 1,
+    "title": "SomeTitle",
+    "username": "SomeUsername",
+    "date": "11/20/2025",
+    "content": "Some random description and extra words",
+    "votes": [
+      7,
+      5
+    ],
+    "replies": [
+      {
+        "id": 2,
+        "username": "Commenter1",
+        "date": "11/17/2025",
+        "content": "Some random first comment.",
+        "votes": [
+          5,
+          4
+        ],
+        "replies": []
+      },
+      {
+        "id": 3,
+        "username": "Commenter2",
+        "date": "11/17/2025",
+        "content": "Some random second comment.",
+        "votes": [
+          8,
+          4
+        ],
+        "replies": [
+          {
+            "id": 4,
+            "username": "Responder_To_Commenter2",
+            "date": "11/17/2025",
+            "content": "Some random response to the second comment",
+            "votes": [
+              13,
+              11
+            ],
+            "replies": []
+          },
+          {
+            "id": 14,
+            "username": "SomeUsername",
+            "date": "11/21/2025",
+            "content": "2nd random response to the second comment",
+            "votes": [
+              18,
+              13
+            ],
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "username": "luciole",
+        "date": "11/26/2025",
+        "content": "Testing",
+        "votes": [
+          3,
+          2
+        ],
+        "replies": []
+      }
+    ]
+  },
+  {
     "id": 18,
     "title": "Some Post made by new_username",
     "username": "new_username",
@@ -219,7 +219,31 @@
       0,
       0
     ],
-    "replies": []
+    "replies": [
+      {
+        "id": 21,
+        "username": "luciole",
+        "date": "11/30/2025",
+        "content": "testing comment",
+        "votes": [
+          0,
+          0
+        ],
+        "replies": [
+          {
+            "id": 22,
+            "username": "luciole",
+            "date": "11/30/2025",
+            "content": "testing reply",
+            "votes": [
+              0,
+              0
+            ],
+            "replies": []
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 20,
@@ -243,6 +267,18 @@
       0,
       0
     ],
-    "replies": []
+    "replies": [
+      {
+        "id": 23,
+        "username": "elysia",
+        "date": "11/30/2025",
+        "content": "Hiii~",
+        "votes": [
+          0,
+          0
+        ],
+        "replies": []
+      }
+    ]
   }
 ]

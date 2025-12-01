@@ -334,12 +334,6 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        commentButton.addActionListener(e -> {
-            final ReadPostState readPostState = viewModel.getState();
-            final String content = commentField.getText();
-            final long parentId = readPostState.getId();
-            sendReply(content, parentId);
-        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
@@ -397,9 +391,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             SwingUtilities.invokeLater(() -> {
                 handleTranslationChange(state);
             });
-        }
-
-        if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
+        } else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
             // Clear comment field
             commentField.setText("");
             // "Refresh" page

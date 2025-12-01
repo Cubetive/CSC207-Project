@@ -77,4 +77,8 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         }
         return postDataList;
     }
+
+    public void switchToCreatePostView() {
+        this.outputBoundary.switchToCreatePostView();
+    }
 }

@@ -1,90 +1,79 @@
 package app;
 
-import interface_adapter.logout.LogoutController;
-import interface_adapter.logout.LogoutPresenter;
-import interface_adapter.reply_post.ReplyPostController;
-import interface_adapter.reply_post.ReplyPostPresenter;
-import use_case.logout.LogoutDataAccessInterface;
-import use_case.logout.LogoutInputBoundary;
-import use_case.logout.LogoutInteractor;
-import use_case.logout.LogoutOutputBoundary;
-import use_case.reply_post.ReplyPostInputBoundary;
-import use_case.reply_post.ReplyPostInteractor;
-import use_case.reply_post.ReplyPostOutputBoundary;
-import view.*;
-import view.BrowsePostsView;
-import view.EditProfileView;
-import view.LoginView;
-import view.PostReadingView;
-import view.SignupView;
-import view.ViewManager;
 import data_access.FilePostDataAccessObject;
 import data_access.FileUserDataAccessObject;
 import data_access.InMemorySessionRepository;
 import data_access.TranslationDataAccessObject;
 import entities.CommonUserFactory;
 import entities.UserFactory;
-import use_case.session.SessionRepository;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsPresenter;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.upvote_downvote.VoteController;
-import interface_adapter.upvote_downvote.VotePresenter;
-import interface_adapter.upvote_downvote.VoteViewModel;
-import interface_adapter.translate.TranslationController;
-import interface_adapter.translate.TranslationPresenter;
-import interface_adapter.translate.TranslationViewModel;
-import interface_adapter.read_post.ReadPostController;
-import interface_adapter.read_post.ReadPostPresenter;
-import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.create_post.CreatePostController;
+import interface_adapter.create_post.CreatePostPresenter;
+import interface_adapter.create_post.CreatePostViewModel;
 import interface_adapter.edit_profile.EditProfileController;
 import interface_adapter.edit_profile.EditProfilePresenter;
 import interface_adapter.edit_profile.EditProfileViewModel;
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupPresenter;
-import interface_adapter.signup.SignupViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.edit_profile.EditProfileController;
-import interface_adapter.edit_profile.EditProfileViewModel;
-import use_case.login.LoginInputBoundary;
-import use_case.login.LoginInteractor;
-import use_case.login.LoginOutputBoundary;
-import interface_adapter.upvote_downvote.VoteController; // NEW
-import interface_adapter.upvote_downvote.VotePresenter; // NEW
-import interface_adapter.upvote_downvote.VoteViewModel; // NEW
-import interface_adapter.translate.TranslationController; // NEW IMPORT
-import interface_adapter.translate.TranslationPresenter; // NEW IMPORT
-import interface_adapter.translate.TranslationViewModel; // NEW
+import interface_adapter.logout.LogoutController;
+import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.read_post.ReadPostController;
+import interface_adapter.read_post.ReadPostPresenter;
+import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.reply_post.ReplyPostController;
+import interface_adapter.reply_post.ReplyPostPresenter;
+import interface_adapter.signup.SignupController;
+import interface_adapter.signup.SignupPresenter;
+import interface_adapter.signup.SignupViewModel;
+import interface_adapter.translate.TranslationController;
+import interface_adapter.translate.TranslationPresenter;
+import interface_adapter.translate.TranslationViewModel;
+import interface_adapter.upvote_downvote.VoteController;
+import interface_adapter.upvote_downvote.VotePresenter;
 import use_case.browse_posts.BrowsePostsInputBoundary;
 import use_case.browse_posts.BrowsePostsInteractor;
 import use_case.browse_posts.BrowsePostsOutputBoundary;
-import use_case.login.LoginInputBoundary;
-import use_case.login.LoginInteractor;
-import use_case.login.LoginOutputBoundary;
-
-import use_case.read_post.ReadPostInputBoundary;
-import use_case.read_post.ReadPostInteractor;
-import use_case.read_post.ReadPostOutputBoundary;
-import use_case.read_post.ReadPostDataAccessInterface;
+import use_case.create_post_use_case.CreatePostInputBoundary;
+import use_case.create_post_use_case.CreatePostInteractor;
+import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.edit_profile.EditProfileInputBoundary;
 import use_case.edit_profile.EditProfileInteractor;
 import use_case.edit_profile.EditProfileOutputBoundary;
+import use_case.login.LoginInputBoundary;
+import use_case.login.LoginInteractor;
+import use_case.login.LoginOutputBoundary;
+import use_case.logout.LogoutDataAccessInterface;
+import use_case.logout.LogoutInputBoundary;
+import use_case.logout.LogoutInteractor;
+import use_case.logout.LogoutOutputBoundary;
+import use_case.read_post.ReadPostInputBoundary;
+import use_case.read_post.ReadPostInteractor;
+import use_case.read_post.ReadPostOutputBoundary;
+import use_case.reply_post.ReplyPostInputBoundary;
+import use_case.reply_post.ReplyPostInteractor;
+import use_case.reply_post.ReplyPostOutputBoundary;
+import use_case.session.SessionRepository;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.upvote_downvote.VoteInputBoundary;
-import use_case.upvote_downvote.VoteInteractor;
-import use_case.upvote_downvote.VoteOutputBoundary;
+import use_case.translate.TranslationDataAccessInterface;
 import use_case.translate.TranslationInputBoundary;
 import use_case.translate.TranslationInteractor;
 import use_case.translate.TranslationOutputBoundary;
-import use_case.translate.TranslationDataAccessInterface;
+import use_case.upvote_downvote.VoteInputBoundary;
+import use_case.upvote_downvote.VoteInteractor;
+import use_case.upvote_downvote.VoteOutputBoundary;
+import view.BrowsePostsView;
+import view.CreatingPostView;
+import view.EditProfileView;
+import view.LoginView;
+import view.PostReadingView;
+import view.SignupView;
+import view.ViewManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -114,11 +103,9 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private BrowsePostsViewModel browsePostsViewModel;
     private ReadPostViewModel readPostViewModel;
-    private TranslationViewModel translationViewModel; // NEW
-    private LoginViewModel loginViewModel;
+    private TranslationViewModel translationViewModel;
     private EditProfileViewModel editProfileViewModel;
-    private interface_adapter.create_post.CreatePostViewModel createPostViewModel;
-    private interface_adapter.reference_post.ReferencePostViewModel referencePostViewModel;
+    private CreatePostViewModel createPostViewModel;
 
     // Views
     private SignupView signupView;
@@ -126,15 +113,11 @@ public class AppBuilder {
     private BrowsePostsView browsePostsView;
     private PostReadingView postReadingView;
     private EditProfileView editProfileView;
-    private view.CreatingPostView creatingPostView;
-    private view.ReferencePostView referencePostView;
+    private CreatingPostView creatingPostView;
 
-    // Translation Controller (needed for post reading view)
-    private TranslationController translationController; // NEW
-    private interface_adapter.reference_post.ReferencePostController referencePostController;
-
-    // For setting up TranslationInteractor
-    private ReadPostDataAccessInterface readPostDataAccessInterface;
+    // Translation components
+    private TranslationController translationController;
+    private TranslationDataAccessInterface translationDataAccessObject;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -166,21 +149,13 @@ public class AppBuilder {
                                     currentUser.getProfilePicture()
                             );
                         }
+                    } else if (sessionRepository.isLoggedIn() && postReadingView != null) {
+                        final entities.User currentUser = sessionRepository.getCurrentUser();
+                        postReadingView.loadUserData(currentUser);
                     }
                 }
             }
         });
-    }
-
-    /**
-     * Adds the Login View to the application.
-     * @return this builder
-     */
-    public AppBuilder addLoginView() {
-        loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel);
-        cardPanel.add(loginView, loginView.getViewName());
-        return this;
     }
 
     /**
@@ -195,12 +170,24 @@ public class AppBuilder {
     }
 
     /**
+     * Adds the Login View to the application.
+     * @return this builder
+     */
+    public AppBuilder addLoginView() {
+        loginViewModel = new LoginViewModel();
+        loginView = new LoginView(loginViewModel);
+        cardPanel.add(loginView, loginView.getViewName());
+        return this;
+    }
+
+    /**
      * Adds the Browse Posts View to the application.
      * @return this builder
      */
     public AppBuilder addBrowsePostsView() {
         browsePostsViewModel = new BrowsePostsViewModel();
-        browsePostsView = new BrowsePostsView(browsePostsViewModel);
+        createPostViewModel = new CreatePostViewModel();
+        browsePostsView = new BrowsePostsView(browsePostsViewModel, createPostViewModel);
         cardPanel.add(browsePostsView, browsePostsView.getViewName());
         return this;
     }
@@ -211,7 +198,7 @@ public class AppBuilder {
      */
     public AppBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        postReadingView = new PostReadingView(readPostViewModel, translationViewModel); // NEW added new param
+        postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
         cardPanel.add(postReadingView, postReadingView.getViewName());
         return this;
     }
@@ -227,7 +214,17 @@ public class AppBuilder {
         return this;
     }
 
-    // NEW: for translation.
+    /**
+     * Adds the Create Post View to the application.
+     * Should be called after browse posts view.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostView() {
+        creatingPostView = new CreatingPostView(this.createPostViewModel);
+        cardPanel.add(creatingPostView, creatingPostView.getViewName());
+        return this;
+    }
+
     /**
      * Adds the Translation Use Case to the application.
      * This is where the real TranslationDataAccessObject is instantiated and injected.
@@ -261,16 +258,6 @@ public class AppBuilder {
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);
-        return this;
-    }
-
-    /**
-     * Adds the Login View to the application.
-     * @return this builder
-     */
-    public AppBuilder addLoginView() {
-        loginView = new LoginView(loginViewModel);
-        cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
@@ -315,6 +302,9 @@ public class AppBuilder {
     public AppBuilder addBrowsePostsUseCase() {
         final BrowsePostsOutputBoundary browsePostsOutputBoundary =
                 new BrowsePostsPresenter(browsePostsViewModel);
+        browsePostsOutputBoundary.setCreatePostViewModel(createPostViewModel);
+        browsePostsOutputBoundary.setViewManagerModel(viewManagerModel);
+
         final BrowsePostsInputBoundary browsePostsInteractor =
                 new BrowsePostsInteractor(postDataAccessObject, browsePostsOutputBoundary);
 
@@ -369,17 +359,14 @@ public class AppBuilder {
             viewManagerModel.setState(browsePostsView.getViewName());
             viewManagerModel.firePropertyChanged();
         });
-        
+
         // Set up view referenced post button to navigate to the referenced post
         postReadingView.setOnViewReferencedPostClick(() -> {
-            // Get the referenced post ID from the current state and load it
             final interface_adapter.read_post.ReadPostState state = readPostViewModel.getState();
             if (state.getReferencedPost() != null && postReadingView != null) {
                 final long referencedPostId = state.getReferencedPost().getId();
-                // Ensure we're on the post reading view
                 viewManagerModel.setState(postReadingView.getViewName());
                 viewManagerModel.firePropertyChanged();
-                // Load the referenced post
                 postReadingView.loadPost(referencedPostId);
             }
         });
@@ -398,7 +385,6 @@ public class AppBuilder {
 
         return this;
     }
-
 
     /**
      * Adds the Edit Profile Use Case to the application.
@@ -443,6 +429,23 @@ public class AppBuilder {
             postReadingView.setVoteController(voteController);
         }
 
+        return this;
+    }
+
+    /**
+     * Adds the Create Post Use Case to the application.
+     * Should be called after views are ready.
+     * @return this builder
+     */
+    public AppBuilder addCreatePostUseCase() {
+        final CreatePostOutputBoundary createPostOutputBoundary =
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
+        final CreatePostInputBoundary createPostInteractor =
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
+
+        final CreatePostController controller = new CreatePostController(createPostInteractor);
+        creatingPostView.setController(controller);
+        createPostOutputBoundary.setPostReadingView(this.postReadingView);
         return this;
     }
 

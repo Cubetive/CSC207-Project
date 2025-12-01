@@ -12,7 +12,7 @@ public class CreatePostViewModel extends ViewModel<CreatePostState> {
     private final String TITLE_LABEL = "Create Post";
     private final String NEW_CONTENT_LABEL = "Enter Text";
     private final String NEW_TITLE_LABEL = "Enter Title";
-    private final String CREATE_BUTTON_LABEL = "Create Post";
+    public final static String CREATE_BUTTON_LABEL = "Create Post";
     private final String LOGOUT_BUTTON_LABEL = "Logout";
     private final String BROWSE_BUTTON_LABEL = "Browse";
     private final String SEARCH_BUTTON_LABEL = "Search";

@@ -60,16 +60,6 @@ public class User {
         return List.of();
     }
 
-    public List<OriginalPost> searchPosts(String keyword) {
-        List<OriginalPost> search_list = new ArrayList<OriginalPost>();
-        for(int i = 0; i < this.original_posts.size(); i++) {
-            if (this.original_posts.get(i).getTitle().contains(keyword)) {
-                search_list.add(this.original_posts.get(i));
-            }
-        }
-        return search_list;
-    }
-
     public String translateText(Post post, String output_lang) {
         // TODO: Implement translateText
         return output_lang;

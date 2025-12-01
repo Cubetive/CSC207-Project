@@ -4,14 +4,12 @@ package interface_adapter.create_post;
  * The state for the Create Post View Model.
  */
 public class CreatePostState {
-    private String creator_username = "";
     private String title = "";
     private String content = "";
     private String missingError = "";
     private String referencedPostId = null; // ID of the post being referenced
 
     public CreatePostState(CreatePostState failedState) {
-        this.creator_username = failedState.creator_username;
         this.title = failedState.title;
         this.content = failedState.content;
         this.missingError = failedState.missingError;
@@ -20,9 +18,6 @@ public class CreatePostState {
     public CreatePostState() {}
 
     //Getters
-    public String getCreator_username() {
-        return creator_username;
-    }
 
     public String getTitle() {
         return title;
@@ -37,9 +32,6 @@ public class CreatePostState {
     }
 
     //Setters
-    public void setCreator_username(String creator_username) {
-        this.creator_username = creator_username;
-    }
 
     public void setTitle(String title) {
         this.title = title;

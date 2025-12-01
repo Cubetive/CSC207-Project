@@ -1,5 +1,8 @@
 package use_case.browse_posts;
 
+import interface_adapter.ViewManagerModel;
+import interface_adapter.create_post.CreatePostViewModel;
+
 /**
  * Output Boundary for the Browse Posts use case.
  */
@@ -16,4 +19,10 @@ public interface BrowsePostsOutputBoundary {
      * @param errorMessage the error message
      */
     void prepareFailView(String errorMessage);
+
+    void switchToCreatePostView();
+
+    void setCreatePostViewModel(CreatePostViewModel createPostViewModel);
+
+    void setViewManagerModel(ViewManagerModel viewManagerModel);
 }

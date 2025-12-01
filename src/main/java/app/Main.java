@@ -3,7 +3,7 @@ package app;
 import javax.swing.*;
 
 /**
- * The Main class demonstrates how to use the Signup and Browse Posts functionality.
+ * The Main class allows the program to run, by adding all the use cases.
  */
 public class Main {
 
@@ -11,14 +11,12 @@ public class Main {
         final AppBuilder appBuilder = new AppBuilder();
 
         final JFrame application = appBuilder
-                .addLoginView()
                 .addSignupView()
                 .addLoginView()
                 .addBrowsePostsView()
                 .addReadPostView()
                 .addEditProfileView()
                 .addCreatePostView()
-                .addReferencePostView
                 .addLoginUseCase()
                 .addLogoutUseCase()
                 .addSignupUseCase()
@@ -29,7 +27,6 @@ public class Main {
                 .addReplyPostUseCase()
                 .addEditProfileUseCase()
                 .addCreatePostUseCase()
-                .addReferencePostUseCase()
                 .build();
 
         application.pack();

@@ -17,7 +17,6 @@ public class ReadPostPresenter implements ReadPostOutputBoundary {
     @Override
     public void prepareSuccessView(ReadPostOutputData outputData) {
         final ReadPostState state = new ReadPostState();
-        // 🔥 CRITICAL FIX: Add the line to set the Post ID
         state.setId(outputData.getId());
         state.setTitle(outputData.getTitle());
         state.setContent(outputData.getContent());

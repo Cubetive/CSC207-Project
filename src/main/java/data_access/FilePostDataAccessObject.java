@@ -18,6 +18,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+
 /**
  * File-based implementation of the DAO for reading post data from JSON.
  */
@@ -214,6 +218,31 @@ public class FilePostDataAccessObject implements
             gsonSaving.toJson(jsonArray, writer);
         } catch (IOException e) {
             throw new RuntimeException("Error writing file: " + e.getMessage());
+        }
+    }
+
+    public void editPostContent(long id, String contentNew) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            List<Map<String, Object>> postings = mapper.readValue(
+                    new File("posts.json"),
+                    new TypeReference<List<Map<String, Object>>>() {}
+            );
+
+            for (Map<String, Object> post : postings) {
+                if (((Number) post.get("id")).longValue() == id) {
+                    post.put("content", contentNew);
+                }
+            }
+
+            mapper.writerWithDefaultPrettyPrinter().writeValue(
+                    new File("posts.json"), postings
+            );
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

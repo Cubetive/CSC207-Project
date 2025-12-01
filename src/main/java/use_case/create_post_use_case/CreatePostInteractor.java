@@ -2,43 +2,48 @@ package use_case.create_post_use_case;
 
 import entities.OriginalPost;
 import entities.Post;
+import entities.User;
 import use_case.reference_post.ReferencePostDataAccessInterface;
-
-import java.util.Date;
+import use_case.session.SessionRepository;
 
 public class CreatePostInteractor implements CreatePostInputBoundary{
     private final CreatePostDataAccessInterface filePostAccess;
     private final CreatePostOutputBoundary createPostPresenter;
-    //TODO Replace interface with data access object when implemented.
+    private boolean success;
+    private final SessionRepository sessionRepository;
 
     public CreatePostInteractor(
             CreatePostDataAccessInterface filePostAccess,
-            CreatePostOutputBoundary createPostPresenter) {
+            CreatePostOutputBoundary createPostPresenter,
+            SessionRepository sessionRepository) {
         this.filePostAccess = filePostAccess;
         this.createPostPresenter = createPostPresenter;
+        this.success = false;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
     public void execute(CreatePostInputData createPostInputData) {
-        // TODO: Get the next original post id.
-        long next_id = 0;
-        String content = createPostInputData.getContent();
-        String title = createPostInputData.getTitle();
-        String username = createPostInputData.getCreator_username();
-        String referencedPostId = createPostInputData.getReferencedPostId();
+        final String content = createPostInputData.getContent();
+        final String title = createPostInputData.getTitle();
+        final String referencedPostId = createPostInputData.getReferencedPostId();
+        final User currentUser = sessionRepository.getCurrentUser();
+        final String username = currentUser != null ? currentUser.getUsername() : null;
+
+        if (username == null) {
+            createPostPresenter.prepareMissingFieldView("You must be logged in to create a post.");
+            return;
+        }
 
         if (content.isEmpty() || title.isEmpty()) {
             createPostPresenter.prepareMissingFieldView("Missing content or title.");
-        }
-        else {
-            OriginalPost originalPost = new OriginalPost(next_id, title, content, username,
-                    new Date(), 0, 0); // Create Post object.
+        } else {
+            final OriginalPost originalPost = new OriginalPost(username, title, content);
 
             // Attach referenced post if provided
             if (referencedPostId != null && !referencedPostId.trim().isEmpty()) {
-                // Check if filePostAccess also implements ReferencePostDataAccessInterface
                 if (filePostAccess instanceof ReferencePostDataAccessInterface) {
-                    final ReferencePostDataAccessInterface referenceAccess = 
+                    final ReferencePostDataAccessInterface referenceAccess =
                             (ReferencePostDataAccessInterface) filePostAccess;
                     final Post referencedPost = referenceAccess.getPostById(referencedPostId);
                     if (referencedPost != null) {
@@ -47,12 +52,11 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
                 }
             }
 
-            filePostAccess.save(originalPost); //saves the Post to Database.
+            filePostAccess.save(originalPost);
 
-            CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
-            //Create the output object for display.
-            createPostPresenter.prepareCreatedView(createPostOutputData); //Send output to presenter.
-
+            final CreatePostOutputData createPostOutputData = new CreatePostOutputData(originalPost);
+            createPostPresenter.prepareCreatedView(createPostOutputData);
+            this.success = true;
         }
     }
 
@@ -60,11 +64,11 @@ public class CreatePostInteractor implements CreatePostInputBoundary{
         createPostPresenter.switchToBrowseView();
     }
 
-    public void switchToSearchView() {
-        createPostPresenter.switchToSearchView();
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void switchToSignUpView() {
-        createPostPresenter.switchToSignUpView();
+    public void resetSuccess() {
+        this.success = false;
     }
 }

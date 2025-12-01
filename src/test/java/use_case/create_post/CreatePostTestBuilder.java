@@ -1,7 +1,8 @@
-package CreatePostTest;
+package use_case.create_post;
 
-import app.AppBuilder;
 import data_access.FilePostDataAccessObject;
+import data_access.InMemorySessionRepository;
+import entities.User;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.create_post.CreatePostController;
@@ -10,12 +11,14 @@ import interface_adapter.create_post.CreatePostViewModel;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.translate.TranslationViewModel;
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInteractor;
 import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.read_post.ReadPostInputBoundary;
 import use_case.read_post.ReadPostInteractor;
 import use_case.read_post.ReadPostOutputBoundary;
+import use_case.session.SessionRepository;
 import view.BrowsePostsView;
 import view.CreatingPostView;
 import view.PostReadingView;
@@ -33,11 +36,13 @@ public class CreatePostTestBuilder {
     private BrowsePostsView browsePostsView;
     private CreatePostViewModel createPostViewModel;
     private CreatingPostView creatingPostView;
+    private final SessionRepository sessionRepository;
 
     public CreatePostTestBuilder() {
         this.cardPanel.setLayout(new CardLayout());
         this.postDataAccessObject = new ExampleDataBaseObject("exampleposts.json");
-
+        this.sessionRepository = new InMemorySessionRepository();
+        this.readPostViewModel = new ReadPostViewModel();
     }
 
 
@@ -61,18 +66,22 @@ public class CreatePostTestBuilder {
 
     public CreatePostTestBuilder addCreatePostUseCase() {
         final CreatePostOutputBoundary createPostOutputBoundary =
-                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel);
+                new CreatePostPresenter(createPostViewModel, viewManagerModel, readPostViewModel, browsePostsViewModel);
         final CreatePostInputBoundary createPostInteractor =
-                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary);
+                new CreatePostInteractor(postDataAccessObject, createPostOutputBoundary, sessionRepository);
+        sessionRepository.setCurrentUser(new User("Personable", "username", "bopbop@mail.com",
+                "somethingsomething"));
 
         final CreatePostController controller = new CreatePostController(createPostInteractor);
         creatingPostView.setController(controller);
+        createPostOutputBoundary.setPostReadingView(this.postReadingView);
         return this;
     }
 
     public CreatePostTestBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        postReadingView = new PostReadingView(readPostViewModel);
+        TranslationViewModel translationViewModel = new TranslationViewModel();
+        postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
         cardPanel.add(postReadingView, postReadingView.getViewName());
         return this;
     }
@@ -81,13 +90,6 @@ public class CreatePostTestBuilder {
         this.createPostViewModel = new CreatePostViewModel();
         creatingPostView = new CreatingPostView(this.createPostViewModel);
         cardPanel.add(creatingPostView, creatingPostView.getViewName());
-        creatingPostView.setCreatePostClickListener(postId -> {
-            if (postReadingView != null) {
-                viewManagerModel.setState(postReadingView.getViewName());
-                viewManagerModel.firePropertyChanged();
-                postReadingView.loadPost(postId);
-            }
-        });
         return this;
     }
 

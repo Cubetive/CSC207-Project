@@ -34,61 +34,87 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         final JLabel header = new JLabel("Create New Post");
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JButton createPostButton = new  JButton("Create Post");
-        createPostButton.addActionListener(
-                // Button Logic
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(createPostButton)) {
-                            final CreatePostState currentState = createPostViewModel.getState();
+        final JButton createPostButton = new JButton(CreatePostViewModel.CREATE_BUTTON_LABEL);
+        createPostButton.addActionListener(evt -> {
+            final CreatePostState currentState = createPostViewModel.getState();
+            final String referencedPostId = currentState.getReferencedPostId();
 
-                            final String referencedPostId = currentState.getReferencedPostId();
-                            if (referencedPostId != null && !referencedPostId.isEmpty()) {
-                                createPostController.execute(currentState.getTitle(),
-                                        currentState.getContent(),
-                                        currentState.getCreator_username(),
-                                        referencedPostId
-                                );
-                            } else {
-                                createPostController.execute(currentState.getTitle(),
-                                        currentState.getContent(),
-                                        currentState.getCreator_username()
-                                );
-                            }
-                        }
-                    }
+            if (referencedPostId != null && !referencedPostId.isEmpty()) {
+                createPostController.execute(currentState.getTitle(), currentState.getContent(), referencedPostId);
+            } else {
+                createPostController.execute(currentState.getTitle(), currentState.getContent());
+            }
 
-                }
-        );
+            if (createPostController.isSuccess()) {
+                clearForm();
+                createPostController.resetSuccess();
+                setVisible(false);
+            }
+        });
 
-        //Document Listeners for input fields
-        addDocumentListener(titleTextField, this::updateTitle);
-        addDocumentListener(contentTextField, this::updateContent);
+        final JButton backToBrowse = new JButton("Back");
+        backToBrowse.addActionListener(evt -> {
+            clearForm();
+            createPostController.resetSuccess();
+            createPostController.switchToBrowseView();
+        });
 
-        //TODO: Discuss with fred integration problems. In the meantime, below is mouse tracker for updating to
-        //TODO: ReadingPostView.
-
-        //TODO: Add ActionListeners for other buttons.
-
-        //Placeholder Labels for future buttons
-        final JButton logout = new JButton("Logout");
-        final JButton search = new JButton("Search");
-        final JButton browse = new JButton("Browse");
-        final JButton profile = new JButton("Profile");
         final JButton referencePostButton = new JButton("Reference Post");
         referencePostButton.addActionListener(e -> {
             if (onReferencePostClick != null) {
                 onReferencePostClick.run();
             }
         });
+
         final JPanel buttons = new JPanel();
-        buttons.add(logout);
-        buttons.add(search);
-        buttons.add(browse);
-        buttons.add(profile);
+        buttons.add(backToBrowse);
         buttons.add(referencePostButton);
         buttons.add(createPostButton);
-        
+
+        //Grid Setup
+        JPanel grid = new JPanel();
+        grid.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        // Common constraints
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Title Label
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST; // Right align
+        gbc.weightx = 0.3; // 30% for labels
+        grid.add(new JLabel("Title:", SwingConstants.RIGHT), gbc);
+
+        // Title TextField
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.7; // 70% for input fields
+        grid.add(titleTextField, gbc);
+
+        // Content Label
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.NORTHEAST; // Right align at top
+        gbc.weightx = 0.3;
+        grid.add(new JLabel("Content:", SwingConstants.RIGHT), gbc);
+
+        // Content TextArea
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.7;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1.0; // Allow vertical expansion
+        JTextArea textArea = new JTextArea(5, 20);
+        grid.add(contentTextField, gbc);
+
+        //Document Listeners for input fields
+        addDocumentListener(titleTextField, this::updateTitle);
+        addDocumentListener(contentTextField, this::updateContent);
+
         // Referenced post display panel
         referencedPostPanel = new JPanel();
         referencedPostPanel.setLayout(new BoxLayout(referencedPostPanel, BoxLayout.Y_AXIS));
@@ -98,31 +124,16 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         referencedPostPanel.setVisible(false);
-        
+
         referencedPostLabel = new JLabel();
         referencedPostLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         referencedPostLabel.setForeground(new Color(80, 80, 80));
         referencedPostPanel.add(referencedPostLabel);
 
-        //Content setup.
-        final JPanel contentPanel = new JPanel();
-
-        final  JLabel content = new JLabel("Content");
-        contentPanel.add(content);
-        contentPanel.add(contentTextField);
-
-        //Title setup.
-        final JPanel titlePanel = new JPanel();
-
-        final JLabel title = new JLabel("Title");
-        titlePanel.add(title);
-        titlePanel.add(titleTextField);
-
         //Final Self Setup (This is a JPanel)
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(header);
-        this.add(titlePanel);
-        this.add(contentPanel);
+        this.add(grid);
         this.add(referencedPostPanel);
         this.add(buttons);
 
@@ -194,6 +205,12 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         createPostViewModel.setState(currentState);
     }
 
+    private void clearForm() {
+        contentTextField.setText("");
+        titleTextField.setText("");
+        clearReferencedPost();
+    }
+
     public String getViewName() {
         return this.createPostViewModel.getViewName();
     }
@@ -205,7 +222,6 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     public interface CreatePostClickListener {
         void onCreatePostClicked(long postId);
     }
-    
     public void setOnReferencePostClick(Runnable onReferencePostClick) {
         this.onReferencePostClick = onReferencePostClick;
     }

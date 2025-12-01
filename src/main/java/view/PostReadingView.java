@@ -1,5 +1,6 @@
 package view;
 
+import entities.User;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
 import interface_adapter.read_post.ReadPostViewModel;
@@ -11,6 +12,7 @@ import interface_adapter.translate.TranslationController; // NEW
 import interface_adapter.translate.TranslationViewModel; // NEW
 import interface_adapter.translate.TranslationState;
 import use_case.read_post.ReadPostOutputData;
+import use_case.session.SessionRepository;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,7 +85,11 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private final JPanel referenceBannerPanel;
     private final JButton referenceBannerButton;
 
+    private User cur_user;
+    private JButton editButton;
+
     public PostReadingView(ReadPostViewModel viewModel, TranslationViewModel translationViewModel) {
+
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
         this.translationViewModel = translationViewModel;
@@ -138,6 +144,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(new Color(245, 245, 245));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        editButton = new JButton("Edit Post");
+        editButton.setPreferredSize(new Dimension(120, 40));
 
         // Post content container
         final JPanel contentContainer = new JPanel(new BorderLayout());
@@ -279,6 +288,7 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         controlPanel.add(translateLabel);
         controlPanel.add(languageDropdown);
         controlPanel.add(translateButton);
+        controlPanel.add(editButton);
         translationPanel.add(controlPanel);
 
         // Translation Status and Content Area
@@ -389,6 +399,12 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         commentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        commentButton.addActionListener(e -> {
+            final ReadPostState readPostState = viewModel.getState();
+            final String content = commentField.getText();
+            final long parentId = readPostState.getId();
+            sendReply(content, parentId);
+        });
 
         commentInputPanel.add(commentField, BorderLayout.CENTER);
         commentInputPanel.add(commentButton, BorderLayout.EAST);
@@ -507,6 +523,10 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         this.add(scrollPane, BorderLayout.CENTER);
     }
 
+    public void loadUserData(User cur_user) {
+        this.cur_user = cur_user;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == viewModel) {
@@ -526,7 +546,9 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
             SwingUtilities.invokeLater(() -> {
                 handleTranslationChange(state);
             });
-        } else if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
+        }
+
+        if (evt.getPropertyName().equals(ReplyPostPresenter.REPLY_SUCCESS)) {
             // Clear comment field
             commentField.setText("");
             // "Refresh" page
@@ -744,6 +766,19 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         }
         referencingPostsListPanel.revalidate();
         referencingPostsListPanel.repaint();
+
+        if (cur_user != null && cur_user.getUsername().equals(state.getUsername())) {
+            editButton.setVisible(true);
+            for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
+                editButton.removeActionListener(listener);
+            }
+            editButton.addActionListener(e -> new EditPostView(contentArea, state, cur_user));
+        } else {
+            editButton.setVisible(false);
+            for (java.awt.event.ActionListener listener : editButton.getActionListeners()) {
+                editButton.removeActionListener(listener);
+            }
+        }
 
         // Clear and update replies
         repliesPanel.removeAll();

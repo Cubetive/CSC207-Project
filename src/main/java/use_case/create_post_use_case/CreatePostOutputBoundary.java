@@ -1,5 +1,7 @@
 package use_case.create_post_use_case;
 
+import view.PostReadingView;
+
 public interface CreatePostOutputBoundary {
 
     void prepareCreatedView(CreatePostOutputData createPostOutputData);
@@ -8,7 +10,5 @@ public interface CreatePostOutputBoundary {
 
     void switchToBrowseView();
 
-    void switchToSearchView();
-
-    void switchToSignUpView();
+    void setPostReadingView(PostReadingView postReadingView);
 }

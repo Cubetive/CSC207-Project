@@ -3,22 +3,24 @@ package view;
 import interface_adapter.browse_posts.BrowsePostsController;
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
-import interface_adapter.logout.LogoutController;
+import interface_adapter.create_post.CreatePostViewModel;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.search_post.SearchPostController;
 import use_case.browse_posts.BrowsePostsOutputData;
+import use_case.search_post.SearchPostInputData;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
-
-import interface_adapter.search_post.SearchPostController;
-import use_case.search_post.SearchPostInputData;
 
 /**
  * The View for browsing posts.
@@ -26,6 +28,7 @@ import use_case.search_post.SearchPostInputData;
 public class BrowsePostsView extends JPanel implements PropertyChangeListener {
 
     private final BrowsePostsViewModel viewModel;
+    private final CreatePostViewModel createPostViewModel;
     private BrowsePostsController controller;
     private static PostClickListener postClickListener;
     private Runnable onLogoutAction;
@@ -34,6 +37,7 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private final JScrollPane scrollPane;
     private final JButton refreshButton;
     private final JButton editProfileButton;
+    private final JButton createPostButton;
     private final JLabel profilePictureLabel;
     private final JPanel titlePanel;
     private Runnable onEditProfileClick;
@@ -43,9 +47,10 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
     private static JTextField searchField;
     private JPanel searchPanel;
 
-    public BrowsePostsView(BrowsePostsViewModel viewModel) {
+    public BrowsePostsView(BrowsePostsViewModel viewModel, CreatePostViewModel createPostViewModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
+        this.createPostViewModel = createPostViewModel;
 
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
@@ -182,18 +187,20 @@ public class BrowsePostsView extends JPanel implements PropertyChangeListener {
                 controller.execute();
             }
         });
-        
+
         // Create Post button
-        final JButton createPostButton = new JButton("Create Post");
+        createPostButton = new JButton(CreatePostViewModel.CREATE_BUTTON_LABEL);
         createPostButton.setFont(new Font("Arial", Font.PLAIN, 14));
         createPostButton.setFocusPainted(false);
-        createPostButton.setBackground(new Color(34, 139, 34)); // Green color
+        createPostButton.setBackground(new Color(34, 139, 34));
         createPostButton.setForeground(Color.WHITE);
         createPostButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         createPostButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         createPostButton.addActionListener(e -> {
             if (onCreatePostClick != null) {
                 onCreatePostClick.run();
+            } else if (controller != null) {
+                controller.switchToCreatePostView();
             }
         });
 

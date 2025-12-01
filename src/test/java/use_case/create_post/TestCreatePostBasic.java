@@ -1,6 +1,10 @@
-package CreatePostTest;
+package use_case.create_post;
 
+import data_access.InMemorySessionRepository;
+import interface_adapter.browse_posts.BrowsePostsViewModel;
 import interface_adapter.read_post.ReadPostViewModel;
+import interface_adapter.translate.TranslationViewModel;
+import use_case.session.SessionRepository;
 import view.CreatingPostView;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_post.CreatePostController;
@@ -17,20 +21,23 @@ public class TestCreatePostBasic {
     public static void main(String[] args) {
         CreatePostViewModel viewModel = new CreatePostViewModel();
         ReadPostViewModel readPostViewModel = new ReadPostViewModel();
+        TranslationViewModel  translationViewModel = new TranslationViewModel();
+        BrowsePostsViewModel browsePostsViewModel = new BrowsePostsViewModel();
         final CreatePostOutputBoundary presenter = new CreatePostPresenter(
                 viewModel,
                 new ViewManagerModel(),
-                readPostViewModel
+                readPostViewModel,
+                browsePostsViewModel
         );
-
+        SessionRepository sessionRepository = new InMemorySessionRepository();
         final CreatePostInputBoundary interactor = new CreatePostInteractor(
                 new ExampleDataBaseObject("posts.json"),
-                presenter
-
+                presenter,
+                sessionRepository
         );
 
 
-        PostReadingView postReadingView = new PostReadingView(readPostViewModel);
+        PostReadingView postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
 
         CreatePostController controller = new CreatePostController(interactor);
         CreatingPostView view = new CreatingPostView(viewModel);

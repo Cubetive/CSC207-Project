@@ -26,6 +26,9 @@ import interface_adapter.read_post.ReadPostPresenter;
 import interface_adapter.read_post.ReadPostViewModel;
 import interface_adapter.reply_post.ReplyPostController;
 import interface_adapter.reply_post.ReplyPostPresenter;
+import interface_adapter.reference_post.ReferencePostController;
+import interface_adapter.reference_post.ReferencePostPresenter;
+import interface_adapter.reference_post.ReferencePostViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -72,6 +75,7 @@ import view.CreatingPostView;
 import view.EditProfileView;
 import view.LoginView;
 import view.PostReadingView;
+import view.ReferencePostView;
 import view.SignupView;
 import view.ViewManager;
 
@@ -106,6 +110,7 @@ public class AppBuilder {
     private TranslationViewModel translationViewModel;
     private EditProfileViewModel editProfileViewModel;
     private CreatePostViewModel createPostViewModel;
+    private ReferencePostViewModel referencePostViewModel;
 
     // Views
     private SignupView signupView;
@@ -114,10 +119,14 @@ public class AppBuilder {
     private PostReadingView postReadingView;
     private EditProfileView editProfileView;
     private CreatingPostView creatingPostView;
+    private ReferencePostView referencePostView;
 
     // Translation components
     private TranslationController translationController;
     private TranslationDataAccessInterface translationDataAccessObject;
+
+    // Reference post components
+    private ReferencePostController referencePostController;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -226,6 +235,55 @@ public class AppBuilder {
     }
 
     /**
+     * Adds the Reference Post View to the application and wires it to the
+     * create-post workflow.
+     * Should be called after the create post view has been added.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostView() {
+        referencePostViewModel = new ReferencePostViewModel();
+        referencePostView = new ReferencePostView(referencePostViewModel);
+
+        // When the user cancels referencing, go back to the create-post view.
+        referencePostView.setOnCancelAction(() -> {
+            if (createPostViewModel != null) {
+                viewManagerModel.setState(createPostViewModel.getViewName());
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
+        // When the user selects a post to reference, update the create-post state
+        // and UI, then return to the create-post view.
+        referencePostView.setOnReferenceSelected(() -> {
+            if (referencePostView == null || createPostViewModel == null || creatingPostView == null) {
+                return;
+            }
+
+            final use_case.reference_post.ReferencePostOutputData.PostSearchResult selected =
+                    referencePostView.getSelectedReferencedPost();
+            if (selected != null) {
+                final interface_adapter.create_post.CreatePostState createState =
+                        createPostViewModel.getState();
+                createState.setReferencedPostId(selected.getPostId());
+                createPostViewModel.setState(createState);
+
+                creatingPostView.setReferencedPost(
+                        selected.getTitle(),
+                        selected.getContent()
+                );
+
+                referencePostView.clearSelectedReferencedPost();
+            }
+
+            viewManagerModel.setState(createPostViewModel.getViewName());
+            viewManagerModel.firePropertyChanged();
+        });
+
+        cardPanel.add(referencePostView, referencePostView.getViewName());
+        return this;
+    }
+
+    /**
      * Adds the Translation Use Case to the application.
      * This is where the real TranslationDataAccessObject is instantiated and injected.
      * @return this builder
@@ -243,6 +301,39 @@ public class AppBuilder {
         if (postReadingView != null) {
             postReadingView.setTranslationController(translationController);
         }
+        return this;
+    }
+
+    /**
+     * Adds the Reference Post Use Case to the application.
+     * Wires the reference-post controller to its view.
+     * @return this builder
+     */
+    public AppBuilder addReferencePostUseCase() {
+        final use_case.reference_post.ReferencePostOutputBoundary referencePostOutputBoundary =
+                new ReferencePostPresenter(referencePostViewModel, viewManagerModel);
+        final use_case.reference_post.ReferencePostInputBoundary referencePostInteractor =
+                new use_case.reference_post.ReferencePostInteractor(postDataAccessObject, referencePostOutputBoundary);
+
+        referencePostController = new ReferencePostController(referencePostInteractor);
+        if (referencePostView != null) {
+            referencePostView.setController(referencePostController);
+        }
+
+        // Wire the "Reference Post" button in the create-post view to open the reference-post view.
+        if (creatingPostView != null && referencePostView != null) {
+            creatingPostView.setOnReferencePostClick(() -> {
+                if (referencePostViewModel != null) {
+                    final interface_adapter.reference_post.ReferencePostState state =
+                            new interface_adapter.reference_post.ReferencePostState();
+                    referencePostViewModel.setState(state);
+                    referencePostViewModel.firePropertyChanged();
+                }
+                viewManagerModel.setState(referencePostView.getViewName());
+                viewManagerModel.firePropertyChanged();
+            });
+        }
+
         return this;
     }
 

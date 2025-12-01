@@ -170,10 +170,6 @@ class ReadPostInteractorTest {
             }
             return posts.get(id);
         }
-
-        public List<OriginalPost> getAllPosts() {
-            return null;
-        }
     }
 
     private static class TestReadPostOutputBoundary implements ReadPostOutputBoundary {

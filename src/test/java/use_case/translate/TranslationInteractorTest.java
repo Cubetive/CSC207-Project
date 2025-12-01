@@ -22,10 +22,6 @@ class TranslationInteractorTest {
             public OriginalPost getPostById(long id) {
                 return null;
             }
-
-            public List<OriginalPost> getAllPosts() {
-                return null;
-            }
         };
 
         // Fake Translation DAO (Simulates the API)
@@ -75,10 +71,6 @@ class TranslationInteractorTest {
                 // Return a dummy post
                 return new OriginalPost(1L, "Title", "Hello", "User", new Date(), 0, 0);
             }
-
-            public List<OriginalPost> getAllPosts() {
-                return null;
-            }
         };
 
         // Fake Translation DAO
@@ -125,10 +117,6 @@ class TranslationInteractorTest {
         ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
             public OriginalPost getPostById(long id) {
-                return null;
-            }
-
-            public List<OriginalPost> getAllPosts() {
                 return null;
             }
         };

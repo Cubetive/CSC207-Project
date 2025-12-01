@@ -4,11 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f50f51d3-c4b3-404c-ad71-43b0a70619c4" name="Changes" comment="UML">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="f50f51d3-c4b3-404c-ad71-43b0a70619c4" name="Changes" comment="CheckStyle part 3">
+      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostPresenter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/create_post/CreatePostViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInputData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputBoundary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/use_case/create_post_use_case/CreatePostOutputData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/view/CreatingPostView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -162,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764602353026</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="CheckStyle part 3">
+      <option name="closed" value="true" />
+      <created>1764608434412</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1764608434412</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -171,7 +182,8 @@
     </ignored-roots>
     <MESSAGE value="Checkstyle part1" />
     <MESSAGE value="UML" />
-    <option name="LAST_COMMIT_MESSAGE" value="UML" />
+    <MESSAGE value="CheckStyle part 3" />
+    <option name="LAST_COMMIT_MESSAGE" value="CheckStyle part 3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CSC207_Project$CreatePostInteractorTest_testCreatePostEmptyTitle.ic" NAME="CreatePostInteractorTest.testCreatePostEmptyTitle Coverage Results" MODIFIED="1764597867318" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">

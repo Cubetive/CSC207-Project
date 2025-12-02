@@ -2,9 +2,6 @@ package use_case.create_post_use_case;
 
 import entities.OriginalPost;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
-
 public class CreatePostOutputData {
     /**
      * The post successfully created.
@@ -21,6 +18,7 @@ public class CreatePostOutputData {
 
     /**
      * Getter for stored data.
+     * @return the post created.
      */
     public OriginalPost getOriginalPost() {
         return originalPost;

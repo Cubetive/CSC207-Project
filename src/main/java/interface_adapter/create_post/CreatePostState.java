@@ -19,7 +19,8 @@ public class CreatePostState {
     /**
      * Current referenced post, if any.
      */
-    private String referencedPostId = null; // ID of the post being referenced
+    private String referencedPostId;
+    // ID of the post being referenced
 
     /**
      * Constructor if needed.
@@ -34,10 +35,14 @@ public class CreatePostState {
     /**
      * Empty constructor if needed.
      */
-    public CreatePostState() { }
-    //Getters
+    public CreatePostState() {
+
+    }
+    // Getters
+
     /**
      * Get current title.
+     * @return title to be used.
      */
     public String getTitle() {
         return title;
@@ -45,6 +50,7 @@ public class CreatePostState {
 
     /**
      * Get current content.
+     * @return content to be used.
      */
     public String getContent() {
         return content;
@@ -52,12 +58,13 @@ public class CreatePostState {
 
     /**
      * Get current error, if any.
+     * @return current error.
      */
     public String getMissingError() {
         return missingError;
     }
+    // Setters
 
-    //Setters
     /**
      * Set current title.
      * @param title to set.
@@ -84,6 +91,7 @@ public class CreatePostState {
 
     /**
      * Get current referenced post id, if any.
+     * @return Id of referenced post.
      */
     public String getReferencedPostId() {
         return referencedPostId;

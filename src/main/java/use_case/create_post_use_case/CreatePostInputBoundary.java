@@ -3,6 +3,7 @@ package use_case.create_post_use_case;
 public interface CreatePostInputBoundary {
 
     /**
+     * Execute method for creating the post.
      * @param createPostInputData for post to be created and to be saved
      */
     void execute(CreatePostInputData createPostInputData);
@@ -13,6 +14,7 @@ public interface CreatePostInputBoundary {
     void switchToBrowseView();
 
     /**
+     * Reports if a post was successfully created.
      * @return True iff post created.
      */
     boolean isSuccess();

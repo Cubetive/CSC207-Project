@@ -1,27 +1,27 @@
 package use_case.create_post_use_case;
 
 public class CreatePostInputData {
+
     /**
-     * title of originalPost to be saved.
+     * Title of originalPost to be saved.
      */
     private final String newTitle;
     /**
-     * content of originalPost to be saved.
+     * Content of originalPost to be saved.
      */
     private final String newContent;
     /**
-     * id of referenced post, if present, of originalPost to be saved.
+     * Id of referenced post, if present, of originalPost to be saved.
      */
     private final String newReferencedPostId;
 
     /**
      * Constructor of originalPost to be saved.
-     * @param content content for new post.
-     * @param title title for new post.
+     * @param newContent content for new post.
+     * @param newTitle title for new post.
      */
-    @SuppressWarnings("checkstyle:HiddenField")
-    public CreatePostInputData(final String title, final String content) {
-        this(title, content, null);
+    public CreatePostInputData(final String newTitle, final String newContent) {
+        this(newTitle, newContent, null);
     }
 
     /**
@@ -38,18 +38,20 @@ public class CreatePostInputData {
     }
 
     /**
-     * gets title of originalPost to be saved.
+     * Gets title of originalPost to be saved.
      * @return the title of new post.
      */
     String getTitle() {
-        return newTitle; }
+        return newTitle;
+    }
 
     /**
      * Getter of content of originalPost to be saved.
      * @return the content of new post.
      */
     String getContent() {
-        return newContent; }
+        return newContent;
+    }
 
     /**
      * Getter of referenced post of originalPost to be saved.

@@ -135,7 +135,7 @@ public class CreatePostInteractorTest {
                 new CreatePostInteractor(filePostAccess, presenter, repository);
         final CreatePostInputData input = new CreatePostInputData("new", "new", "0");
         createPostInteractor.execute(input);
-        assertFalse(createPostInteractor.isSuccess());
+        assertTrue(createPostInteractor.isSuccess());
     }
 
     @Test

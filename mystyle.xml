@@ -345,8 +345,7 @@
         </module>
         <module name="IllegalCatch">
             <property name="illegalClassNames"
-                      value="java.lang.Exception,
-                       java.lang.Throwable,
+                      value="java.lang.Throwable,
                        java.lang.RuntimeException,
                        java.lang.NullPointerException"/>
         </module>
@@ -575,7 +574,6 @@
         </module>
 
         <!-- Imports -->
-        <module name="AvoidStarImport"/>
         <module name="AvoidStaticImport"/>
         <module name="CustomImportOrder">
             <property name="customImportOrderRules"

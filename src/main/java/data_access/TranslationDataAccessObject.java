@@ -1,36 +1,31 @@
 package data_access;
 
-import use_case.translate.TranslationDataAccessInterface; // Import the interface
-
+import java.awt.*;
 import java.io.*;
-import java.net.HttpURLConnection; // FIX: Added old import
-import java.net.URI;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL; // FIX: Added old import
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+// Import the interface
+import use_case.translate.TranslationDataAccessInterface;
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface.
  */
 public class TranslationDataAccessObject implements TranslationDataAccessInterface {
+    // Use the provided empty string
+    private static final String API_KEY;
+    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
+    private static final Set<String> SUPPORTED_LANGUAGES =
+            Set.of("ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru");
 
     // Key format: "postId_languageCode" (e.g., "123_fr")
     private final Map<String, String> translationCache = new HashMap<>();
-
-    private static final String API_KEY; // Use the provided empty string
-    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
-    private static final Set<String> SUPPORTED_LANGUAGES = Set.of( "ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru");
 
     // Helper function for creating the unique cache key
     private String createCacheKey(long postId, String languageCode) {
@@ -40,15 +35,18 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     static {
         String key = null;
         try (InputStream input = new FileInputStream("secrets.properties")) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             prop.load(input);
             key = prop.getProperty("GOOGLE_API_KEY");
             if (key == null || key.trim().isEmpty()) {
                 System.err.println("FATAL ERROR: GOOGLE_API_KEY not found in secrets.properties.");
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("FATAL ERROR: secrets.properties file not found. Have you created it and added your API key?");
-        } catch (Exception ex) {
+        }
+        catch (FileNotFoundException ex) {
+            System.err.println("FATAL ERROR: secrets.properties file not found. "
+                    + "Have you created it and added your API key?");
+        }
+        catch (Exception ex) {
             System.err.println("FATAL ERROR: Could not read secrets.properties: " + ex.getMessage());
         }
         API_KEY = key;

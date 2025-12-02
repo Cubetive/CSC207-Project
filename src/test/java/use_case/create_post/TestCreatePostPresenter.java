@@ -6,6 +6,11 @@ import view.PostReadingView;
 
 public class TestCreatePostPresenter implements CreatePostOutputBoundary {
 
+    /**
+     * Whether we are now browsing.
+     */
+    private String state;
+
     public TestCreatePostPresenter() {
 
     }
@@ -15,12 +20,21 @@ public class TestCreatePostPresenter implements CreatePostOutputBoundary {
     }
 
     public void prepareMissingFieldView(String error) {
+        this.state = "failed";
     }
 
     public void switchToBrowseView() {
-
+        this.state = "browse";
     }
 
     public void setPostReadingView(PostReadingView postReadingView) {
+    }
+
+    /**
+     * Check for current state.
+     * @return True iff browsing now.
+     */
+    public String isState() {
+        return this.state;
     }
 }

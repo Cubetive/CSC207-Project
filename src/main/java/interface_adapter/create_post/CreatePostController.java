@@ -2,7 +2,6 @@ package interface_adapter.create_post;
 
 import use_case.create_post_use_case.CreatePostInputBoundary;
 import use_case.create_post_use_case.CreatePostInputData;
-import use_case.create_post_use_case.CreatePostInteractor;
 
 public class CreatePostController {
     /**
@@ -12,7 +11,7 @@ public class CreatePostController {
     /**
      * A measure of whether a post has been successfully created.
      */
-    private boolean success = false;
+    private boolean success;
 
     /**
      * A Constructor of controller with necessary elements.
@@ -55,6 +54,7 @@ public class CreatePostController {
 
     /**
      * Reports if a post was successfully created.
+     * @return True iff success reported by Interactor.
      */
     public boolean isSuccess() {
         return success;

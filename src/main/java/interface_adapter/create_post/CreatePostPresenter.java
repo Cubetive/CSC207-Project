@@ -1,5 +1,8 @@
 package interface_adapter.create_post;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import interface_adapter.ViewManagerModel;
 import interface_adapter.browse_posts.BrowsePostsState;
 import interface_adapter.browse_posts.BrowsePostsViewModel;
@@ -9,8 +12,6 @@ import use_case.create_post_use_case.CreatePostOutputBoundary;
 import use_case.create_post_use_case.CreatePostOutputData;
 import use_case.read_post.ReadPostOutputData;
 import view.PostReadingView;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CreatePostPresenter implements CreatePostOutputBoundary {
 
@@ -22,8 +23,9 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
      * Read Post view model.
      */
     private ReadPostViewModel readPostViewModel;
+
     /**
-     * view manager model.
+     * View manager model.
      */
     private ViewManagerModel viewManagerModel;
     /**
@@ -72,7 +74,7 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
         readPostState.setContent(createPostOutputData.getOriginalPost().getContent());
         readPostState.setTitle(createPostOutputData.getOriginalPost().getTitle());
         readPostState.setId(createPostOutputData.getOriginalPost().getId());
-        List<ReadPostOutputData.ReplyData> replies = new ArrayList<>();
+        final List<ReadPostOutputData.ReplyData> replies = new ArrayList<>();
         readPostState.setReplies(replies);
         readPostState.setDownvotes(createPostOutputData.getOriginalPost().getVotes()[1]);
         readPostState.setUpvotes(createPostOutputData.getOriginalPost().getVotes()[0]);
@@ -96,7 +98,6 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
      * @param error error to display.
      */
     public void prepareMissingFieldView(String error) {
-        //TODO
         final CreatePostState createPostState = createPostViewModel.getState();
         createPostState.setMissingError(error);
         createPostViewModel.firePropertyChange();
@@ -106,12 +107,9 @@ public class CreatePostPresenter implements CreatePostOutputBoundary {
      * Back button has been pressed, switch to browse posts view.
      */
     public void switchToBrowseView() {
-        //TODO
         browsePostsViewModel.setState(new BrowsePostsState());
         viewManagerModel.setState(browsePostsViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
         System.out.println("DEBUG: should switch to BrowsePostsView");
     }
-
-
 }

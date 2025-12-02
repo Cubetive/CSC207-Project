@@ -2,7 +2,6 @@ package use_case.create_post;
 
 import data_access.FilePostDataAccessObject;
 import entities.OriginalPost;
-import use_case.create_post_use_case.CreatePostInteractor;
 
 public class ExampleDataBaseObject extends FilePostDataAccessObject implements TestDatabaseObject {
     /**
@@ -15,7 +14,6 @@ public class ExampleDataBaseObject extends FilePostDataAccessObject implements T
     }
 
     public void save(OriginalPost post) {
-        //Overwrite for test case.
         super.save(post);
     }
 

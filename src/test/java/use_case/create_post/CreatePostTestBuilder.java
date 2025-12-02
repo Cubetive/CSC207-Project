@@ -1,5 +1,9 @@
 package use_case.create_post;
 
+import java.awt.*;
+
+import javax.swing.*;
+
 import data_access.FilePostDataAccessObject;
 import data_access.InMemorySessionRepository;
 import entities.User;
@@ -23,12 +27,9 @@ import view.BrowsePostsView;
 import view.CreatingPostView;
 import view.PostReadingView;
 
-import javax.swing.*;
-import java.awt.*;
-
 public class CreatePostTestBuilder {
     private final JPanel cardPanel = new JPanel();
-    final ViewManagerModel viewManagerModel = new ViewManagerModel();
+    private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private ReadPostViewModel readPostViewModel;
     private FilePostDataAccessObject postDataAccessObject;
     private PostReadingView postReadingView;
@@ -44,7 +45,6 @@ public class CreatePostTestBuilder {
         this.sessionRepository = new InMemorySessionRepository();
         this.readPostViewModel = new ReadPostViewModel();
     }
-
 
     public CreatePostTestBuilder addReadPostUseCase() {
         final ReadPostOutputBoundary readPostOutputBoundary =
@@ -80,7 +80,7 @@ public class CreatePostTestBuilder {
 
     public CreatePostTestBuilder addReadPostView() {
         readPostViewModel = new ReadPostViewModel();
-        TranslationViewModel translationViewModel = new TranslationViewModel();
+        final TranslationViewModel translationViewModel = new TranslationViewModel();
         postReadingView = new PostReadingView(readPostViewModel, translationViewModel);
         cardPanel.add(postReadingView, postReadingView.getViewName());
         return this;
@@ -104,8 +104,6 @@ public class CreatePostTestBuilder {
         // Set initial view to creating post.
         viewManagerModel.setState(creatingPostView.getViewName());
         viewManagerModel.firePropertyChanged();
-
-
 
         return application;
     }

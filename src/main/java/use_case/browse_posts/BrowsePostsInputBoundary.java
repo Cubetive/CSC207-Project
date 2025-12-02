@@ -10,5 +10,8 @@ public interface BrowsePostsInputBoundary {
      */
     void execute();
 
+    /**
+     * Switches to the create post view.
+     */
     void switchToCreatePostView();
 }

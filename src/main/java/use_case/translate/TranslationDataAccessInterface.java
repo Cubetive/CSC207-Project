@@ -1,5 +1,8 @@
 package use_case.translate;
 
+/**
+ * Data access interface for translation operations.
+ */
 public interface TranslationDataAccessInterface {
 
     /**

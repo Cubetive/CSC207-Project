@@ -1,12 +1,12 @@
 package interface_adapter.translate;
 
-import interface_adapter.ViewModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import interface_adapter.ViewModel;
+
 /**
  * The ViewModel for the Translation Use Case.
- *
  * This holds the observable state (TranslationState) that the View listens to.
  * When the state changes (i.e., when the Presenter updates it), the View automatically
  * re-renders to display the new information (e.g., the translated text).
@@ -37,19 +37,26 @@ public class TranslationViewModel extends ViewModel {
 
     /**
      * Adds a listener to observe state changes.
+     *
+     * @param listener the property change listener to add
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 
-    // Getter and Setter for the current state
+    /**
+     * Gets the current translation state.
+     *
+     * @return the current state
+     */
     public TranslationState getState() {
         return state;
     }
 
     /**
-     * Setter for the current state.
-     * CRITICAL FIX: This now fires the property change event to notify listeners (the View).
+     * Sets the current state and fires a property change event.
+     *
+     * @param newState the new state to set
      */
     public void setState(TranslationState newState) {
         this.state = newState;

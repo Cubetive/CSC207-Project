@@ -13,6 +13,14 @@ public class SignupInteractor implements SignupInputBoundary {
     private final UserFactory userFactory;
     private final SessionRepository sessionRepository;
 
+    /**
+     * Constructs a SignupInteractor.
+     *
+     * @param signupDataAccessInterface the data access object for signup
+     * @param signupOutputBoundary the output boundary for presenting results
+     * @param userFactory the factory for creating users
+     * @param sessionRepository the session repository for managing user sessions
+     */
     public SignupInteractor(SignupDataAccessInterface signupDataAccessInterface,
                             SignupOutputBoundary signupOutputBoundary,
                             UserFactory userFactory,
@@ -97,7 +105,7 @@ public class SignupInteractor implements SignupInputBoundary {
      * @return true if email is valid, false otherwise
      */
     private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        final String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         return email.matches(emailRegex);
     }
 }

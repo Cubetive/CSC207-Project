@@ -39,7 +39,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
     private final JButton loginButton;
     private final JButton toSignupButton;
-    private boolean isUpdatingFromState = false;
+    private boolean isUpdatingFromState;
 
     public LoginView(LoginViewModel loginViewModel) {
         this.loginViewModel = loginViewModel;
@@ -106,6 +106,9 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds an input field with its label and error message to the view.
+     * @param labelText The label text
+     * @param inputField The input field
+     * @param errorField The error field
      */
     private void addInputField(String labelText, JTextField inputField, JLabel errorField) {
         final JPanel panel = new JPanel();
@@ -133,6 +136,8 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a document listener to a text field that calls the update function.
+     * @param textField The text field
+     * @param updateFunction The runnable update
      */
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -179,6 +184,7 @@ public class LoginView extends JPanel implements PropertyChangeListener {
 
     /**
      * Updates the view based on the current state.
+     * @param state The Login state
      */
     private void updateViewFromState(LoginState state) {
         isUpdatingFromState = true;

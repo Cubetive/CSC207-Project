@@ -1,10 +1,10 @@
 package data_access;
 
-import entities.User;
-import use_case.edit_profile.EditProfileDataAccessInterface;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import entities.User;
+import use_case.edit_profile.EditProfileDataAccessInterface;
 
 /**
  * In-memory implementation of the DAO for storing user data.
@@ -72,7 +72,7 @@ public class InMemoryUserDataAccessObject implements EditProfileDataAccessInterf
     @Override
     public void updateUserProfile(String currentUsername, String newUsername, String fullName, 
                                   String bio, String profilePicture) {
-        User user = usersByUsername.get(currentUsername);
+        final User user = usersByUsername.get(currentUsername);
         if (user != null) {
             // Update the user's profile information
             user.editProfile(fullName, bio, profilePicture);
@@ -94,7 +94,7 @@ public class InMemoryUserDataAccessObject implements EditProfileDataAccessInterf
      */
     @Override
     public void updatePassword(String username, String newPassword) {
-        User user = usersByUsername.get(username);
+        final User user = usersByUsername.get(username);
         if (user != null) {
             user.setPassword(newPassword);
         }

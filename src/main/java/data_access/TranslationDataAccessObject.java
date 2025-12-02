@@ -1,36 +1,31 @@
 package data_access;
 
-import use_case.translate.TranslationDataAccessInterface; // Import the interface
-
+import java.awt.*;
 import java.io.*;
-import java.net.HttpURLConnection; // FIX: Added old import
-import java.net.URI;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL; // FIX: Added old import
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+// Import the interface
+import use_case.translate.TranslationDataAccessInterface;
 
 /**
  * Concrete implementation of the TranslationDataAccessInterface.
  */
 public class TranslationDataAccessObject implements TranslationDataAccessInterface {
+    // Use the provided empty string
+    private static final String API_KEY;
+    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
+    private static final Set<String> SUPPORTED_LANGUAGES =
+            Set.of("ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru");
 
     // Key format: "postId_languageCode" (e.g., "123_fr")
     private final Map<String, String> translationCache = new HashMap<>();
-
-    private static final String API_KEY; // Use the provided empty string
-    private static final String TRANSLATE_API_BASE_URL = "https://translation.googleapis.com/language/translate/v2";
-    private static final Set<String> SUPPORTED_LANGUAGES = Set.of( "ar", "cn", "en", "es", "fr", "de", "hi", "it", "ja", "ko", "ru");
 
     // Helper function for creating the unique cache key
     private String createCacheKey(long postId, String languageCode) {
@@ -40,15 +35,18 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     static {
         String key = null;
         try (InputStream input = new FileInputStream("secrets.properties")) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             prop.load(input);
             key = prop.getProperty("GOOGLE_API_KEY");
             if (key == null || key.trim().isEmpty()) {
                 System.err.println("FATAL ERROR: GOOGLE_API_KEY not found in secrets.properties.");
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("FATAL ERROR: secrets.properties file not found. Have you created it and added your API key?");
-        } catch (Exception ex) {
+        }
+        catch (FileNotFoundException ex) {
+            System.err.println("FATAL ERROR: secrets.properties file not found. "
+                    + "Have you created it and added your API key?");
+        }
+        catch (Exception ex) {
             System.err.println("FATAL ERROR: Could not read secrets.properties: " + ex.getMessage());
         }
         API_KEY = key;
@@ -76,9 +74,9 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
         }
 
         try {
-            String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString());
+            final String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
 
-            String fullApiUrl = String.format(
+            final String fullApiUrl = String.format(
                     "%s?target=%s&key=%s&q=%s",
                     TRANSLATE_API_BASE_URL,
                     targetLang,
@@ -86,7 +84,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                     encodedText
             );
 
-            URL url = new URL(fullApiUrl);
+            final URL url = new URL(fullApiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
@@ -94,17 +92,18 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             connection.setReadTimeout(15000);
 
             // Get the response code (Blocking call)
-            int responseCode = connection.getResponseCode();
+            final int responseCode = connection.getResponseCode();
 
             // Read the response stream (either success or error stream)
-            BufferedReader br;
+            final BufferedReader br;
             if (responseCode >= 200 && responseCode < 300) {
                 br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            } else {
+            }
+            else {
                 br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
             }
 
-            StringBuilder response = new StringBuilder();
+            final StringBuilder response = new StringBuilder();
             String responseLine;
             // Read lines and join them, removing newline characters
             while ((responseLine = br.readLine()) != null) {
@@ -112,7 +111,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             }
             br.close();
 
-            String apiResponse = response.toString();
+            final String apiResponse = response.toString();
 
             System.out.println("DEBUG: DAO Response Code: " + responseCode);
 
@@ -122,23 +121,23 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
 
             // Parse the JSON response using the custom utility
             try {
-                Map<String, Object> root = SimpleJsonParser.parse(apiResponse);
+                final Map<String, Object> root = SimpleJsonParser.parse(apiResponse);
 
                 // Navigate the structure: root -> data -> translations (List)
                 if (root.containsKey("data")) {
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> data = (Map<String, Object>) root.get("data");
+                    final Map<String, Object> data = (Map<String, Object>) root.get("data");
 
                     if (data.containsKey("translations")) {
                         @SuppressWarnings("unchecked")
-                        List<Object> translations = (List<Object>) data.get("translations");
+                        final List<Object> translations = (List<Object>) data.get("translations");
 
                         if (!translations.isEmpty()) {
                             @SuppressWarnings("unchecked")
-                            Map<String, Object> firstTranslation = (Map<String, Object>) translations.get(0);
+                            final Map<String, Object> firstTranslation = (Map<String, Object>) translations.get(0);
 
                             // Extract the text
-                            String translatedText = (String) firstTranslation.get("translatedText");
+                            final String translatedText = (String) firstTranslation.get("translatedText");
 
                             System.out.println("DEBUG: DAO Parsed Text: [" + translatedText + "]");
                             // Unescape common JSON characters that might be returned in the text value
@@ -148,17 +147,22 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                     }
                 }
 
-                return "ERROR: Translation Failed: JSON response was successful but could not find the translation text.";
+                return "ERROR: Translation Failed: "
+                        + "JSON response was successful but could not find the translation text.";
 
-            } catch (Exception jsonEx) {
-                return "ERROR: Translation Failed: Failed to parse JSON response with utility. Raw Response: " + apiResponse +
-                        "\nParsing Error: " + jsonEx.getMessage();
+            }
+            catch (Exception jsonEx) {
+                return "ERROR: Translation Failed: Failed to parse JSON response with utility. Raw Response: "
+                        + apiResponse + "\nParsing Error: " + jsonEx.getMessage();
             }
 
-        } catch (Exception e) {
-            System.err.println("FATAL I/O/TIMEOUT ERROR: " + e.getMessage()); // FIX: Better error logging
-            return "ERROR: Translation Failed (Network/IO): " + e.getMessage();
-        } finally {
+        }
+        catch (Exception ex) {
+            // FIX: Better error logging
+            System.err.println("FATAL I/O/TIMEOUT ERROR: " + ex.getMessage());
+            return "ERROR: Translation Failed (Network/IO): " + ex.getMessage();
+        }
+        finally {
             if (connection != null) {
                 connection.disconnect();
             }
@@ -166,18 +170,30 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
     }
 
     /**
+     * Saves a newly generated translation into the in-memory cache.
+     * @param postId             The ID of the post.
+     * @param targetLanguageCode The language code of the translation.
+     * @param translatedText     The translated content to save.
+     */
+    @Override
+    public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {
+        final String key = createCacheKey(postId, targetLanguageCode);
+        translationCache.put(key, translatedText);
+    }
+
+    /**
      * A JSON parser to avoid external dependencies.
      * It parses the JSON string into standard Java Map and List objects.
      */
-    private static class SimpleJsonParser {
+    private static final class SimpleJsonParser {
         public static Map<String, Object> parse(String json) throws Exception {
             // Trim and check for object start/end
-            String trimmed = json.trim();
+            final String trimmed = json.trim();
             if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
                 throw new Exception("Invalid JSON object format.");
             }
             // Remove outer braces and split into key-value pairs
-            String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+            final String inner = trimmed.substring(1, trimmed.length() - 1).trim();
 
             // Use a simple state machine/tokenizing approach for robustness
             return parseObject(inner);
@@ -185,75 +201,103 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
 
         @SuppressWarnings("unchecked")
         private static Map<String, Object> parseObject(String content) throws Exception {
-            Map<String, Object> map = new HashMap<>();
+            final Map<String, Object> map = new HashMap<>();
 
             int i = 0;
             while (i < content.length()) {
                 // Skip non-significant whitespace
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
 
                 // Parse Key
-                if (content.charAt(i) != '"') throw new Exception("Expected start of key quote at: " + i);
-                int keyStart = ++i;
-                int keyEnd = content.indexOf('"', keyStart);
-                if (keyEnd == -1) throw new Exception("Missing closing quote for key at: " + keyStart);
-                String key = content.substring(keyStart, keyEnd);
+                if (content.charAt(i) != '"') {
+                    throw new Exception("Expected start of key quote at: " + i);
+                }
+                final int keyStart = ++i;
+                final int keyEnd = content.indexOf('"', keyStart);
+                if (keyEnd == -1) {
+                    throw new Exception("Missing closing quote for key at: " + keyStart);
+                }
+                final String key = content.substring(keyStart, keyEnd);
                 i = keyEnd + 1;
 
                 // Skip whitespace and find colon
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-                if (content.charAt(i) != ':') throw new Exception("Expected colon after key at: " + i);
-                i++; // Skip colon
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
+                if (content.charAt(i) != ':') {
+                    throw new Exception("Expected colon after key at: " + i);
+                }
+                // Skip colon
+                i++;
 
                 // Skip whitespace before value
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
 
                 // Parse Value
                 Object value;
-                char startChar = content.charAt(i);
+                final char startChar = content.charAt(i);
 
                 if (startChar == '"') {
                     // String value
-                    int valStart = ++i;
-                    StringBuilder val = new StringBuilder();
-                    while(i < content.length()) {
-                        char c = content.charAt(i);
-                        if (c == '"' && content.charAt(i-1) != '\\') { // Simple unescaped quote check
+                    final int valStart = ++i;
+                    final StringBuilder val = new StringBuilder();
+                    while (i < content.length()) {
+                        final char c = content.charAt(i);
+                        if (c == '"' && content.charAt(i - 1) != '\\') {
+                            // Simple unescaped quote check
                             break;
                         }
                         val.append(c);
                         i++;
                     }
-                    if (i == content.length()) throw new Exception("Unclosed string value at: " + valStart);
-                    value = val.toString().replace("\\\"", "\"").replace("\\n", "\n"); // Unescape
-                    i++; // Skip closing quote
-                } else if (startChar == '{') {
+                    if (i == content.length()) {
+                        throw new Exception("Unclosed string value at: " + valStart);
+                    }
+                    // Unescape
+                    value = val.toString().replace("\\\"", "\"").replace("\\n", "\n");
+                    // Skip closing quote
+                    i++;
+                }
+                else if (startChar == '{') {
                     // Nested object
-                    int objectEnd = findMatchingBrace(content, i);
+                    final int objectEnd = findMatchingBrace(content, i);
                     value = parseObject(content.substring(i + 1, objectEnd));
                     i = objectEnd + 1;
-                } else if (startChar == '[') {
+                }
+                else if (startChar == '[') {
                     // Array (List)
-                    int arrayEnd = findMatchingBracket(content, i);
+                    final int arrayEnd = findMatchingBracket(content, i);
                     value = parseArray(content.substring(i + 1, arrayEnd));
                     i = arrayEnd + 1;
-                } else {
+                }
+                else {
                     // Simple value (number, boolean, null)
                     int valueEnd = content.indexOf(',', i);
-                    if (valueEnd == -1) valueEnd = content.length();
-                    String simpleValue = content.substring(i, valueEnd).trim();
-                    value = simpleValue; // Return as String for simplicity
+                    if (valueEnd == -1) {
+                        valueEnd = content.length();
+                    }
+                    final String simpleValue = content.substring(i, valueEnd).trim();
+                    // Return as String for simplicity
+                    value = simpleValue;
                     i = valueEnd;
                 }
 
                 map.put(key, value);
 
                 // Skip whitespace and look for comma or end
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
 
                 if (i < content.length() && content.charAt(i) == ',') {
-                    i++; // Skip comma and continue loop
-                } else if (i < content.length()) {
+                    // Skip comma and continue loop
+                    i++;
+                }
+                else if (i < content.length()) {
                     // Unexpected characters remaining
                     throw new Exception("Unexpected character after value at: " + i);
                 }
@@ -262,24 +306,30 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
         }
 
         private static List<Object> parseArray(String content) throws Exception {
-            List<Object> list = new java.util.ArrayList<>();
+            final List<Object> list = new java.util.ArrayList<>();
             int i = 0;
 
             while (i < content.length()) {
                 // Skip whitespace
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
-                if (i >= content.length()) break; // End of array content
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
+                // End of array content
+                if (i >= content.length()) {
+                    break;
+                }
 
                 // Determine value type
-                char startChar = content.charAt(i);
+                final char startChar = content.charAt(i);
                 Object value;
 
                 if (startChar == '{') {
                     // Nested object
-                    int objectEnd = findMatchingBrace(content, i);
+                    final int objectEnd = findMatchingBrace(content, i);
                     value = parseObject(content.substring(i + 1, objectEnd));
                     i = objectEnd + 1;
-                } else {
+                }
+                else {
                     // Handle strings/numbers for safety.
                     throw new Exception("Unsupported value type in array at: " + i);
                 }
@@ -287,10 +337,13 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                 list.add(value);
 
                 // Skip whitespace and look for comma or end
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) i++;
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    i++;
+                }
 
                 if (i < content.length() && content.charAt(i) == ',') {
-                    i++; // Skip comma and continue loop
+                    // Skip comma and continue loop
+                    i++;
                 }
             }
             return list;
@@ -301,15 +354,21 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             int count = 0;
             boolean inString = false;
             for (int i = start; i < json.length(); i++) {
-                char c = json.charAt(i);
+                final char c = json.charAt(i);
                 if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
                     inString = !inString;
                 }
                 if (!inString) {
-                    if (c == '{') count++;
-                    else if (c == '}') count--;
+                    if (c == '{') {
+                        count++;
+                    }
+                    else if (c == '}') {
+                        count--;
+                    }
                 }
-                if (count == 0 && i > start) return i;
+                if (count == 0 && i > start) {
+                    return i;
+                }
             }
             throw new Exception("Unmatched brace starting at: " + start);
         }
@@ -319,26 +378,23 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
             int count = 0;
             boolean inString = false;
             for (int i = start; i < json.length(); i++) {
-                char c = json.charAt(i);
+                final char c = json.charAt(i);
                 if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
                     inString = !inString;
                 }
                 if (!inString) {
-                    if (c == '[') count++;
-                    else if (c == ']') count--;
+                    if (c == '[') {
+                        count++;
+                    }
+                    else if (c == ']') {
+                        count--;
+                    }
                 }
-                if (count == 0 && i > start) return i;
+                if (count == 0 && i > start) {
+                    return i;
+                }
             }
             throw new Exception("Unmatched bracket starting at: " + start);
         }
-    }
-
-    /**
-     * Saves a newly generated translation into the in-memory cache.
-     */
-    @Override
-    public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {
-        String key = createCacheKey(postId, targetLanguageCode);
-        translationCache.put(key, translatedText);
     }
 }

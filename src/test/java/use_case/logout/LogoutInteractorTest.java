@@ -1,32 +1,33 @@
 package use_case.logout;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
 import data_access.InMemorySessionRepository;
 import entities.CommonUserFactory;
 import entities.User;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class LogoutInteractorTest {
     @Test
     void successLogoutTest() {
-        InMemorySessionRepository sessionRepository = new InMemorySessionRepository();
+        final InMemorySessionRepository sessionRepository = new InMemorySessionRepository();
 
         // Create "logged in" user for our post
-        CommonUserFactory commonUserFactory = new CommonUserFactory();
-        User user = commonUserFactory.create("Elysia", "elysia",
+        final CommonUserFactory commonUserFactory = new CommonUserFactory();
+        final User user = commonUserFactory.create("Elysia", "elysia",
                 "misspinkelf@gmail.com", "mlleelferose1111");
         sessionRepository.setCurrentUser(user);
 
         // Successful logout presenter
-        LogoutOutputBoundary successPresenter = new LogoutOutputBoundary() {
+        final LogoutOutputBoundary successPresenter = new LogoutOutputBoundary() {
             @Override
             public void prepareSuccessView(LogoutOutputData outputData) {
                 assertEquals("elysia", outputData.getUsername());
             }
         };
 
-        LogoutInputBoundary interactor = new LogoutInteractor(sessionRepository, successPresenter);
+        final LogoutInputBoundary interactor = new LogoutInteractor(sessionRepository, successPresenter);
         interactor.execute();
         assertNull(sessionRepository.getCurrentUser());
     }

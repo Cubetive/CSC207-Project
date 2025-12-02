@@ -1,6 +1,5 @@
 package interface_adapter.reply_post;
 
-import interface_adapter.ViewManagerModel;
 import interface_adapter.read_post.ReadPostViewModel;
 import use_case.reply_post.ReplyPostOutputBoundary;
 import use_case.reply_post.ReplyPostOutputData;

@@ -10,7 +10,7 @@ public class LogoutController {
     }
 
     /**
-     * Executes the Logout Use Case
+     * Executes the Logout Use Case.
      */
     public void execute() {
         logoutUseCaseInteractor.execute();

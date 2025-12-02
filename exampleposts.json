@@ -1,54 +1,6 @@
 [
   {
-    "id": 1,
-    "title": "bew",
-    "username": "username",
-    "date": "12/01/2025",
-    "content": "bew",
-    "votes": [
-      0,
-      0
-    ],
-    "replies": []
-  },
-  {
-    "id": 1,
-    "title": "new",
-    "username": "blah",
-    "date": "12/01/2025",
-    "content": "new",
-    "votes": [
-      0,
-      0
-    ],
-    "replies": []
-  },
-  {
-    "id": 1,
-    "title": "new",
-    "username": "blah",
-    "date": "12/01/2025",
-    "content": "new",
-    "votes": [
-      0,
-      0
-    ],
-    "replies": []
-  },
-  {
-    "id": 1,
-    "title": "new",
-    "username": "blah",
-    "date": "12/01/2025",
-    "content": "new",
-    "votes": [
-      0,
-      0
-    ],
-    "replies": []
-  },
-  {
-    "id": 1,
+    "id": 132,
     "title": "new",
     "username": "blah",
     "date": "12/01/2025",

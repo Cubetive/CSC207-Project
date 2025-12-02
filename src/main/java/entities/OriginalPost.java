@@ -1,4 +1,5 @@
 package entities;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,8 @@ public class OriginalPost extends Post {
     private final String title;
     private final List<ReplyPost> replies = new ArrayList<>();
 
-    public OriginalPost(long id, String title, String content, String username, Date creation_date, int upvotes, int downvotes) {
+    public OriginalPost(long id, String title, String content, String username,
+                        Date creation_date, int upvotes, int downvotes) {
         super(id, username, content, creation_date, upvotes, downvotes);
         this.title = title;
     }
@@ -21,8 +23,14 @@ public class OriginalPost extends Post {
         return title;
     }
 
-    public List<ReplyPost> getReplies() { return this.replies; }
+    public List<ReplyPost> getReplies() {
+        return this.replies;
+    }
 
+    /**
+     * Adds a reply to the reply list of this post object.
+     * @param replyPost The reply post to be added
+     */
     public void addReply(ReplyPost replyPost) {
         this.replies.add(replyPost);
     }

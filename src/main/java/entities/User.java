@@ -1,81 +1,62 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 public class User {
-    private String full_name;
+    private String fullName;
     private String email;
     private String password;
     private String username;
-    private Date dateJoined;
+    private final Date dateJoined;
     private String profilePicture;
     private String bio;
-    private List<OriginalPost> original_posts;
-    private List<ReplyPost> replies;
+    private final List<OriginalPost> originalPosts;
+    private final List<ReplyPost> replies;
 
-    public User(String full_name, String username, String email, String password){
-        this.full_name = full_name;
+    public User(String fullName, String username, String email, String password) {
+        this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.dateJoined = new Date();
-        this.original_posts = new ArrayList<>();
+        this.originalPosts = new ArrayList<>();
         this.replies = new ArrayList<>();
     }
 
-    public void login() {
-        // TODO: Implement login
-    }
-
+    /**
+     * Change the user's password.
+     * @param oldPassword The old password
+     * @param newPassword The new password
+     */
     public void changePassword(String oldPassword, String newPassword) {
         if (this.password.equals(oldPassword)) {
             this.password = newPassword;
         }
     }
 
-    public void logout() {
-        // TODO: Implement logout
-    }
-
-    public void editProfile(String full_name, String bio, String profilePicture) {
-        if (full_name != null && !full_name.trim().isEmpty()) {
-            this.full_name = full_name;
+    /**
+     * Saves the changes made to the user's profile.
+     * @param newFullName The user's new full name
+     * @param newBio The user's new bio
+     * @param newProfilePicture The user's new profile picture path
+     */
+    public void editProfile(String newFullName, String newBio, String newProfilePicture) {
+        if (newFullName != null && !newFullName.trim().isEmpty()) {
+            this.fullName = newFullName;
         }
-        if (bio != null) {
-            this.bio = bio;
+        if (newBio != null) {
+            this.bio = newBio;
         }
-        if (profilePicture != null) {
-            this.profilePicture = profilePicture;
+        if (newProfilePicture != null) {
+            this.profilePicture = newProfilePicture;
         }
-    }
-
-    public void viewProfile() {
-        // TODO: Implement viewProfile
-    }
-
-    public List<OriginalPost> browsePosts() {
-        // TODO: Implement browsePosts
-        return List.of();
-    }
-
-    public String translateText(Post post, String output_lang) {
-        // TODO: Implement translateText
-        return output_lang;
-    }
-
-    public void upvotePost(Post post) {
-        // TODO: Implement upvotePost
-    }
-
-    public void downvotePost(Post post) {
-        // TODO: Implement downvotePoster
     }
 
     // Getters
     public String getFullName() {
-        return full_name;
+        return fullName;
     }
 
     public String getEmail() {
@@ -103,7 +84,7 @@ public class User {
     }
 
     public List<OriginalPost> getOriginalPosts() {
-        return original_posts;
+        return originalPosts;
     }
 
     public List<ReplyPost> getReplies() {
@@ -112,7 +93,7 @@ public class User {
 
     // Setters for mutable fields
     public void setFullName(String full_name) {
-        this.full_name = full_name;
+        this.fullName = full_name;
     }
 
     public void setUsername(String username) {
@@ -131,10 +112,18 @@ public class User {
         this.bio = bio;
     }
 
+    /**
+     * Add user's original post.
+     * @param post User's original post
+     */
     public void addOriginalPost(OriginalPost post) {
-        this.original_posts.add(post);
+        this.originalPosts.add(post);
     }
 
+    /**
+     * Add user's reply post.
+     * @param reply User's reply post
+     */
     public void addReply(ReplyPost reply) {
         this.replies.add(reply);
     }

@@ -1,17 +1,18 @@
 package view;
 
-import interface_adapter.create_post.CreatePostController;
-import interface_adapter.create_post.CreatePostState;
-import interface_adapter.create_post.CreatePostViewModel;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import interface_adapter.create_post.CreatePostController;
+import interface_adapter.create_post.CreatePostState;
+import interface_adapter.create_post.CreatePostViewModel;
 
 public class CreatingPostView extends JPanel implements ActionListener, PropertyChangeListener {
     /**
@@ -26,17 +27,17 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     /**
      * Content input field.
      */
-    private final JTextArea contentTextField = new  JTextArea(10, 30);
+    private final JTextArea contentTextField = new JTextArea(10, 30);
     /**
      * Content title field.
      */
-    private final JTextField titleTextField = new  JTextField(30);
+    private final JTextField titleTextField = new JTextField(30);
     /**
-     * referenced post panel for display.
+     * Referenced post panel for display.
      */
     private final JPanel referencedPostPanel;
     /**
-     * referenced post label.
+     * Referenced post label.
      */
     private final JLabel referencedPostLabel;
 
@@ -45,7 +46,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
      */
     private CreatePostController createPostController;
     /**
-     * referenced post click runnable.
+     * Referenced post click runnable.
      */
     private Runnable onReferencePostClick;
 
@@ -68,7 +69,8 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
             if (referencedPostId != null && !referencedPostId.isEmpty()) {
                 createPostController.execute(currentState.getTitle(),
                         currentState.getContent(), referencedPostId);
-            } else {
+            }
+            else {
                 createPostController.execute(currentState.getTitle(),
                         currentState.getContent());
             }
@@ -88,7 +90,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         });
 
         final JButton referencePostButton = new JButton("Reference Post");
-        referencePostButton.addActionListener(e -> {
+        referencePostButton.addActionListener(event -> {
             if (onReferencePostClick != null) {
                 onReferencePostClick.run();
             }
@@ -99,33 +101,38 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         buttons.add(referencePostButton);
         buttons.add(createPostButton);
 
-        //Grid Setup
-        JPanel grid = new JPanel();
+        // Grid Setup
+        final JPanel grid = new JPanel();
         grid.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
 
         // Common constraints
-        gbc.insets = new Insets(5, 5, 5, 5); // Padding
+        // Padding
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Title Label
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST; // Right align
-        gbc.weightx = 0.3; // 30% for labels
+        // Right align
+        gbc.anchor = GridBagConstraints.EAST;
+        // 30% for labels
+        gbc.weightx = 0.3;
         grid.add(new JLabel("Title:", SwingConstants.RIGHT), gbc);
 
         // Title TextField
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.weightx = 0.7; // 70% for input fields
+        // 70% for input fields
+        gbc.weightx = 0.7;
         grid.add(titleTextField, gbc);
 
         // Content Label
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.NORTHEAST; // Right align at top
+        // Right align at top
+        gbc.anchor = GridBagConstraints.NORTHEAST;
         gbc.weightx = 0.3;
         grid.add(new JLabel("Content:", SwingConstants.RIGHT), gbc);
 
@@ -135,11 +142,11 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         gbc.anchor = GridBagConstraints.WEST;
         gbc.weightx = 0.7;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0; // Allow vertical expansion
-        JTextArea textArea = new JTextArea(5, 20);
+        // Allow vertical expansion
+        gbc.weighty = 1.0;
         grid.add(contentTextField, gbc);
 
-        //Document Listeners for input fields
+        // Document Listeners for input fields
         addDocumentListener(titleTextField, this::updateTitle);
         addDocumentListener(contentTextField, this::updateContent);
 
@@ -159,7 +166,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         referencedPostLabel.setForeground(new Color(80, 80, 80));
         referencedPostPanel.add(referencedPostLabel);
 
-        //Final Self Setup (This is a JPanel)
+        // Final Self Setup (This is a JPanel)
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(header);
         this.add(grid);
@@ -227,7 +234,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     }
 
     /**
-     * property change method reacting to an error having occurred and
+     * Property change method reacting to an error having occurred and
      * recorded in the state.
      */
     @Override
@@ -266,6 +273,7 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
 
     /**
      * Getter for the view name.
+     * @return the name of the view
      */
     public String getViewName() {
         return this.createPostViewModel.getViewName();
@@ -280,10 +288,6 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         this.createPostClickListener = listener;
     }
 
-    public interface CreatePostClickListener {
-        void onCreatePostClicked(long postId);
-    }
-
     /**
      * Set up method for runnable item to be executed by
      * reference post use case.
@@ -294,10 +298,10 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
     }
     
     /**
-     *Updates the display of the referenced post.
-     *@param referencedPostTitle the title of the referenced post
+     * Updates the display of the referenced post.
+     * @param referencedPostTitle the title of the referenced post
      *                           (or content if no title)
-     *@param referencedPostContent the content preview of the referenced post
+     * @param referencedPostContent the content preview of the referenced post
      */
     public void setReferencedPost(String referencedPostTitle,
                                   String referencedPostContent) {
@@ -306,11 +310,12 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
                     + "<b>Content:</b> "
                     + (referencedPostContent.length() > 100
                             ? referencedPostContent.substring(0, 100) + "..."
-                            : referencedPostContent) +
-                    "</html>";
+                            : referencedPostContent)
+                    + "</html>";
             referencedPostLabel.setText(displayText);
             referencedPostPanel.setVisible(true);
-        } else {
+        }
+        else {
             referencedPostPanel.setVisible(false);
         }
         this.revalidate();
@@ -325,5 +330,16 @@ public class CreatingPostView extends JPanel implements ActionListener, Property
         referencedPostLabel.setText("");
         this.revalidate();
         this.repaint();
+    }
+
+    /**
+     * Interface for Create Post Click Listener.
+     */
+    public interface CreatePostClickListener {
+        /**
+         * Fires based on the post clicked.
+         * @param postId the id of the post clicked
+         */
+        void onCreatePostClicked(long postId);
     }
 }

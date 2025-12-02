@@ -39,6 +39,15 @@ public class FilePostDataAccessObject implements
         VoteDataAccessInterface,  
         CreatePostDataAccessInterface,
         use_case.reference_post.ReferencePostDataAccessInterface {
+    private static final String ID = "id";
+    private static final String TITLE = "title";
+    private static final String USERNAME = "username";
+    private static final String CONTENT = "content";
+    private static final String DATE = "date";
+    private static final String VOTES = "votes";
+    private static final String REPLIES = "replies";
+    private static final String REFERENCED_POST_ID = "referencedPostId";
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private final String filePath;
@@ -68,15 +77,15 @@ public class FilePostDataAccessObject implements
                 for (JsonElement element : jsonArray) {
                     final JsonObject postObj = element.getAsJsonObject();
 
-                    final long id = postObj.get("id").getAsLong();
-                    final String title = postObj.get("title").getAsString();
-                    final String username = postObj.get("username").getAsString();
-                    final String content = postObj.get("content").getAsString();
-                    final Date creationDate = dateFormat.parse(postObj.get("date").getAsString());
+                    final long id = postObj.get(ID).getAsLong();
+                    final String title = postObj.get(TITLE).getAsString();
+                    final String username = postObj.get(USERNAME).getAsString();
+                    final String content = postObj.get(CONTENT).getAsString();
+                    final Date creationDate = dateFormat.parse(postObj.get(DATE).getAsString());
                     int upvotes = 0;
                     int downvotes = 0;
-                    if (postObj.has("votes") && !postObj.get("votes").isJsonNull()) {
-                        final JsonArray votesArray = postObj.getAsJsonArray("votes");
+                    if (postObj.has(VOTES) && !postObj.get(VOTES).isJsonNull()) {
+                        final JsonArray votesArray = postObj.getAsJsonArray(VOTES);
                         if (votesArray.size() >= 2) {
                             upvotes = votesArray.get(0).getAsInt();
                             downvotes = votesArray.get(1).getAsInt();
@@ -87,8 +96,8 @@ public class FilePostDataAccessObject implements
                             creationDate, upvotes, downvotes);
                     postIdMap.put(id, post);
 
-                    if (postObj.has("replies")) {
-                        final JsonArray repliesArray = postObj.getAsJsonArray("replies");
+                    if (postObj.has(REPLIES)) {
+                        final JsonArray repliesArray = postObj.getAsJsonArray(REPLIES);
                         parseReplies(repliesArray, post.getReplies(), dateFormat);
                     }
 
@@ -100,8 +109,8 @@ public class FilePostDataAccessObject implements
                     final JsonElement element = jsonArray.get(i);
                     final JsonObject postObj = element.getAsJsonObject();
                     
-                    if (postObj.has("referencedPostId") && !postObj.get("referencedPostId").isJsonNull()) {
-                        final long referencedPostId = postObj.get("referencedPostId").getAsLong();
+                    if (postObj.has(REFERENCED_POST_ID) && !postObj.get(REFERENCED_POST_ID).isJsonNull()) {
+                        final long referencedPostId = postObj.get(REFERENCED_POST_ID).getAsLong();
                         final Post referencedPost = postIdMap.get(referencedPostId);
                         if (referencedPost != null) {
                             localPosts.get(i).setReferencedPost(referencedPost);
@@ -131,15 +140,15 @@ public class FilePostDataAccessObject implements
         for (JsonElement replyElement : repliesArray) {
             final JsonObject replyObj = replyElement.getAsJsonObject();
 
-            final long id = replyObj.get("id").getAsLong();
-            final String username = replyObj.get("username").getAsString();
-            final String content = replyObj.get("content").getAsString();
-            final Date creationDate = simpleDateFormat.parse(replyObj.get("date").getAsString());
+            final long id = replyObj.get(ID).getAsLong();
+            final String username = replyObj.get(USERNAME).getAsString();
+            final String content = replyObj.get(CONTENT).getAsString();
+            final Date creationDate = simpleDateFormat.parse(replyObj.get(DATE).getAsString());
 
             int upvotes = 0;
             int downvotes = 0;
-            if (replyObj.has("votes") && !replyObj.get("votes").isJsonNull()) {
-                final JsonArray votesArray = replyObj.getAsJsonArray("votes");
+            if (replyObj.has(VOTES) && !replyObj.get(VOTES).isJsonNull()) {
+                final JsonArray votesArray = replyObj.getAsJsonArray(VOTES);
                 if (votesArray.size() >= 2) {
                     upvotes = votesArray.get(0).getAsInt();
                     downvotes = votesArray.get(1).getAsInt();
@@ -155,8 +164,8 @@ public class FilePostDataAccessObject implements
             }
 
             // Recursively parse nested replies
-            if (replyObj.has("replies")) {
-                final JsonArray nestedRepliesArray = replyObj.getAsJsonArray("replies");
+            if (replyObj.has(REPLIES)) {
+                final JsonArray nestedRepliesArray = replyObj.getAsJsonArray(REPLIES);
                 parseReplies(nestedRepliesArray, reply.getReplies(), simpleDateFormat);
             }
 
@@ -193,20 +202,17 @@ public class FilePostDataAccessObject implements
 
         for (OriginalPost post : postsToSave) {
             final JsonObject postObj = new JsonObject();
-            postObj.addProperty("id", post.getId());
-            postObj.addProperty("title", post.getTitle());
-
-            postObj.addProperty("username", post.getCreatorUsername());
-
-            postObj.addProperty("date", dateFormat.format(post.getCreationDate()));
-
-            postObj.addProperty("content", post.getContent());
+            postObj.addProperty(ID, post.getId());
+            postObj.addProperty(TITLE, post.getTitle());
+            postObj.addProperty(USERNAME, post.getCreatorUsername());
+            postObj.addProperty(DATE, dateFormat.format(post.getCreationDate()));
+            postObj.addProperty(CONTENT, post.getContent());
 
             // Votes
             final JsonArray votesArray = new JsonArray();
             votesArray.add(post.getVotes()[0]);
             votesArray.add(post.getVotes()[1]);
-            postObj.add("votes", votesArray);
+            postObj.add(VOTES, votesArray);
 
             // Replies
             final JsonArray repliesArray = new JsonArray();
@@ -215,11 +221,11 @@ public class FilePostDataAccessObject implements
                 final JsonObject replyObj = formatReply(reply);
                 repliesArray.add(replyObj);
             }
-            postObj.add("replies", repliesArray);
+            postObj.add(REPLIES, repliesArray);
             
             // Referenced post ID (if this post references another post)
             if (post.hasReference() && post.getReferencedPost() != null) {
-                postObj.addProperty("referencedPostId", post.getReferencedPost().getId());
+                postObj.addProperty(REFERENCED_POST_ID, post.getReferencedPost().getId());
             }
 
             jsonArray.add(postObj);
@@ -249,8 +255,8 @@ public class FilePostDataAccessObject implements
             );
 
             for (Map<String, Object> post : postings) {
-                if (((Number) post.get("id")).longValue() == id) {
-                    post.put("content", contentNew);
+                if (((Number) post.get(ID)).longValue() == id) {
+                    post.put(CONTENT, contentNew);
                 }
             }
 
@@ -304,22 +310,22 @@ public class FilePostDataAccessObject implements
      */
     public JsonObject formatReply(ReplyPost replyPost) {
         final JsonObject replyPostObj = new JsonObject();
-        replyPostObj.addProperty("id", replyPost.getId());
-        replyPostObj.addProperty("username", replyPost.getCreatorUsername());
-        replyPostObj.addProperty("date", dateFormat.format(replyPost.getCreationDate()));
-        replyPostObj.addProperty("content", replyPost.getContent());
+        replyPostObj.addProperty(ID, replyPost.getId());
+        replyPostObj.addProperty(USERNAME, replyPost.getCreatorUsername());
+        replyPostObj.addProperty(DATE, dateFormat.format(replyPost.getCreationDate()));
+        replyPostObj.addProperty(CONTENT, replyPost.getContent());
         // Votes
         final JsonArray votesArray = new JsonArray();
         votesArray.add(replyPost.getVotes()[0]);
         votesArray.add(replyPost.getVotes()[1]);
-        replyPostObj.add("votes", votesArray);
+        replyPostObj.add(VOTES, votesArray);
         // Replies
         final JsonArray repliesArray = new JsonArray();
         for (ReplyPost reply : replyPost.getReplies()) {
             final JsonObject replyObj = formatReply(reply);
             repliesArray.add(replyObj);
         }
-        replyPostObj.add("replies", repliesArray);
+        replyPostObj.add(REPLIES, repliesArray);
 
         return replyPostObj;
     }

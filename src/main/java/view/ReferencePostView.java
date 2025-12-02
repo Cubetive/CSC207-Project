@@ -1,26 +1,27 @@
 package view;
 
-import interface_adapter.reference_post.ReferencePostController;
-import interface_adapter.reference_post.ReferencePostState;
-import interface_adapter.reference_post.ReferencePostViewModel;
-import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.*;
+
+import interface_adapter.reference_post.ReferencePostController;
+import interface_adapter.reference_post.ReferencePostState;
+import interface_adapter.reference_post.ReferencePostViewModel;
+import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
+
 /**
  * The View for referencing posts.
  * Allows users to search for posts and select one to reference.
  */
 public class ReferencePostView extends JPanel implements ActionListener, PropertyChangeListener {
-    
     public static final String VIEW_NAME = "referencePost";
+
+    // Font name constant
+    private static final String FONT_ARIAL = "Arial";
     
     private final ReferencePostViewModel viewModel;
     private ReferencePostController controller;
@@ -50,7 +51,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         
         // Title
         final JLabel titleLabel = new JLabel(ReferencePostViewModel.TITLE_LABEL);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setFont(new Font(FONT_ARIAL, Font.BOLD, 24));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setForeground(new Color(50, 50, 50));
         topPanel.add(titleLabel);
@@ -61,11 +62,11 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         searchPanel.setBackground(new Color(245, 245, 245));
         
         final JLabel searchLabel = new JLabel(ReferencePostViewModel.SEARCH_LABEL + ":");
-        searchLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        searchLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 14));
         searchPanel.add(searchLabel);
         
         searchField = new JTextField(30);
-        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+        searchField.setFont(new Font(FONT_ARIAL, Font.PLAIN, 14));
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
@@ -73,7 +74,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         searchPanel.add(searchField);
         
         searchButton = new JButton(ReferencePostViewModel.SEARCH_BUTTON_LABEL);
-        searchButton.setFont(new Font("Arial", Font.BOLD, 14));
+        searchButton.setFont(new Font(FONT_ARIAL, Font.BOLD, 14));
         searchButton.setFocusPainted(false);
         searchButton.setBackground(new Color(70, 130, 180));
         searchButton.setForeground(Color.WHITE);
@@ -91,7 +92,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         
         // Error label
         errorLabel = new JLabel();
-        errorLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        errorLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 14));
         errorLabel.setForeground(new Color(220, 53, 69));
         errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         errorLabel.setVisible(false);
@@ -99,7 +100,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         
         // No results label
         noResultsLabel = new JLabel(ReferencePostViewModel.NO_RESULTS_MESSAGE);
-        noResultsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        noResultsLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 16));
         noResultsLabel.setForeground(new Color(120, 120, 120));
         noResultsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         noResultsLabel.setVisible(false);
@@ -123,7 +124,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 20, 20));
         
         cancelButton = new JButton(ReferencePostViewModel.CANCEL_BUTTON_LABEL);
-        cancelButton.setFont(new Font("Arial", Font.BOLD, 14));
+        cancelButton.setFont(new Font(FONT_ARIAL, Font.BOLD, 14));
         cancelButton.setFocusPainted(false);
         cancelButton.setBackground(new Color(166, 166, 166));
         cancelButton.setForeground(Color.WHITE);
@@ -159,7 +160,8 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
                 // This will be handled when the post is created
                 controller.searchPosts(null, keyword);
             }
-        } else if (evt.getSource().equals(cancelButton)) {
+        }
+        else if (evt.getSource().equals(cancelButton)) {
             if (controller != null) {
                 controller.cancelReferencePost();
             }
@@ -194,7 +196,8 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
             errorLabel.setText(state.getErrorMessage());
             errorLabel.setVisible(true);
             noResultsLabel.setVisible(false);
-        } else {
+        }
+        else {
             errorLabel.setVisible(false);
         }
     }
@@ -207,13 +210,15 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         
         if (searchResults == null || searchResults.isEmpty()) {
             // Show "no results" message if we have an error message that says "No posts found"
-            if (state.getErrorMessage() != null && 
-                state.getErrorMessage().equals(ReferencePostViewModel.NO_RESULTS_MESSAGE)) {
+            if (state.getErrorMessage() != null
+                    && state.getErrorMessage().equals(ReferencePostViewModel.NO_RESULTS_MESSAGE)) {
                 noResultsLabel.setVisible(true);
-            } else {
+            }
+            else {
                 noResultsLabel.setVisible(false);
             }
-        } else {
+        }
+        else {
             noResultsLabel.setVisible(false);
             errorLabel.setVisible(false);
             
@@ -248,7 +253,7 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         // Title (if available)
         if (result.getTitle() != null && !result.getTitle().isEmpty()) {
             final JLabel titleLabel = new JLabel(result.getTitle());
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            titleLabel.setFont(new Font(FONT_ARIAL, Font.BOLD, 16));
             titleLabel.setForeground(new Color(50, 50, 50));
             infoPanel.add(titleLabel);
             infoPanel.add(Box.createVerticalStrut(5));
@@ -256,12 +261,12 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         
         // Content preview (truncated)
         final String content = result.getContent();
-        final String contentPreview = content.length() > 150 
+        final String contentPreview = content.length() > 150
                 ? content.substring(0, 150) + "..." 
                 : content;
-        final JLabel contentLabel = new JLabel("<html><body style='width: 400px'>" + 
-                contentPreview.replace("\n", "<br>") + "</body></html>");
-        contentLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        final JLabel contentLabel = new JLabel("<html><body style='width: 400px'>"
+                + contentPreview.replace("\n", "<br>") + "</body></html>");
+        contentLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 13));
         contentLabel.setForeground(new Color(80, 80, 80));
         infoPanel.add(contentLabel);
         infoPanel.add(Box.createVerticalStrut(8));
@@ -271,12 +276,12 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         metadataPanel.setBackground(Color.WHITE);
         
         final JLabel authorLabel = new JLabel("By: " + result.getCreatorUsername());
-        authorLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        authorLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
         authorLabel.setForeground(new Color(120, 120, 120));
         metadataPanel.add(authorLabel);
         
         final JLabel dateLabel = new JLabel("Date: " + result.getCreationDate());
-        dateLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        dateLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
         dateLabel.setForeground(new Color(120, 120, 120));
         metadataPanel.add(dateLabel);
         
@@ -289,17 +294,18 @@ public class ReferencePostView extends JPanel implements ActionListener, Propert
         buttonPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         
         final JButton referenceButton = new JButton(ReferencePostViewModel.REFERENCE_BUTTON_LABEL);
-        referenceButton.setFont(new Font("Arial", Font.BOLD, 13));
+        referenceButton.setFont(new Font(FONT_ARIAL, Font.BOLD, 13));
         referenceButton.setFocusPainted(false);
         referenceButton.setBackground(new Color(70, 130, 180));
         referenceButton.setForeground(Color.WHITE);
         referenceButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         referenceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         referenceButton.setOpaque(true);
-        referenceButton.addActionListener(e -> {
+        referenceButton.addActionListener(evt -> {
             if (controller != null && currentPostId != null) {
                 controller.referencePost(currentPostId, result.getPostId());
-            } else if (controller != null) {
+            }
+            else if (controller != null) {
                 // Store the referenced post ID for later use when creating the post
                 // This will be handled by the CreatePostState
                 if (onReferenceSelected != null) {

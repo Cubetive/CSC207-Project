@@ -13,11 +13,17 @@ public class ReadPostViewModel extends ViewModel<ReadPostState> {
     public static final String COMMENTS_LABEL = "Comments";
     public static final String CANCEL_REPLY = "Cancel";
 
+    /**
+     * Constructs a ReadPostViewModel.
+     */
     public ReadPostViewModel() {
         super("read post");
         setState(new ReadPostState());
     }
 
+    /**
+     * Fires a property change event to notify listeners.
+     */
     public void firePropertyChanged() {
         firePropertyChange();
     }

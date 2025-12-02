@@ -15,15 +15,21 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
     private CreatePostViewModel createPostViewModel;
     private ViewManagerModel viewManagerModel;
 
+    /**
+     * Constructs a BrowsePostsPresenter.
+     *
+     * @param viewModel the view model for browse posts
+     */
     public BrowsePostsPresenter(BrowsePostsViewModel viewModel) {
         this.viewModel = viewModel;
-
     }
 
+    @Override
     public void setCreatePostViewModel(CreatePostViewModel createPostViewModel) {
         this.createPostViewModel = createPostViewModel;
     }
 
+    @Override
     public void setViewManagerModel(ViewManagerModel viewManagerModel) {
         this.viewManagerModel = viewManagerModel;
     }
@@ -45,6 +51,7 @@ public class BrowsePostsPresenter implements BrowsePostsOutputBoundary {
         viewModel.firePropertyChange();
     }
 
+    @Override
     public void switchToCreatePostView() {
         createPostViewModel.setState(new CreatePostState());
         this.viewManagerModel.setState(createPostViewModel.getViewName());

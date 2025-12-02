@@ -10,6 +10,11 @@ public class LoginController {
 
     private final LoginInputBoundary loginUseCaseInteractor;
 
+    /**
+     * Constructs a LoginController.
+     *
+     * @param loginUseCaseInteractor the login use case interactor
+     */
     public LoginController(LoginInputBoundary loginUseCaseInteractor) {
         this.loginUseCaseInteractor = loginUseCaseInteractor;
     }

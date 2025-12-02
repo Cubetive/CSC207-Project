@@ -1,18 +1,27 @@
 package use_case.browse_posts;
 
-import entities.OriginalPost;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import entities.OriginalPost;
+import entities.Post;
 
 /**
  * Interactor for the Browse Posts use case.
  */
 public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
 
+    private static final int CONTENT_PREVIEW_LENGTH = 50;
+
     private final BrowsePostsDataAccessInterface postDataAccess;
     private final BrowsePostsOutputBoundary outputBoundary;
 
+    /**
+     * Constructs a BrowsePostsInteractor.
+     *
+     * @param postDataAccess the data access object for posts
+     * @param outputBoundary the output boundary for presenting results
+     */
     public BrowsePostsInteractor(
             BrowsePostsDataAccessInterface postDataAccess,
             BrowsePostsOutputBoundary outputBoundary) {
@@ -24,17 +33,17 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
     public void execute() {
         try {
             final List<OriginalPost> posts = postDataAccess.getAllPosts();
-            posts.sort((p1, p2) -> {
-                int score1 = p1.getVotes()[0] - p1.getVotes()[1];
-                int score2 = p2.getVotes()[0] - p2.getVotes()[1];
-                return score2 - score1; // Descending
+            posts.sort((firstPost, secondPost) -> {
+                final int scoreOne = firstPost.getVotes()[0] - firstPost.getVotes()[1];
+                final int scoreTwo = secondPost.getVotes()[0] - secondPost.getVotes()[1];
+                return scoreTwo - scoreOne;
             });
-            // Convert entity posts to output data
             final List<BrowsePostsOutputData.PostData> postDataList = getPostData(posts);
             final BrowsePostsOutputData outputData = new BrowsePostsOutputData(postDataList);
             outputBoundary.prepareSuccessView(outputData);
-        } catch (Exception e) {
-            outputBoundary.prepareFailView("Failed to load posts: " + e.getMessage());
+        }
+        catch (RuntimeException ex) {
+            outputBoundary.prepareFailView("Failed to load posts: " + ex.getMessage());
         }
     }
 
@@ -42,33 +51,32 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         final List<BrowsePostsOutputData.PostData> postDataList = new ArrayList<>();
         for (OriginalPost post : posts) {
             final int[] votes = post.getVotes();
-            
-            // Check if post has a reference
-            boolean hasReference = post.hasReference();
+
+            final boolean hasReference = post.hasReference();
             String referencedPostTitle = null;
             Long referencedPostId = null;
             if (hasReference && post.getReferencedPost() != null) {
-                final entities.Post referencedPost = post.getReferencedPost();
+                final Post referencedPost = post.getReferencedPost();
                 referencedPostId = referencedPost.getId();
                 if (referencedPost instanceof OriginalPost) {
                     referencedPostTitle = ((OriginalPost) referencedPost).getTitle();
-                } else {
-                    // For reply posts, use content preview
+                }
+                else {
                     final String content = referencedPost.getContent();
-                    referencedPostTitle = content.length() > 50 
-                            ? content.substring(0, 50) + "..." 
+                    referencedPostTitle = content.length() > CONTENT_PREVIEW_LENGTH
+                            ? content.substring(0, CONTENT_PREVIEW_LENGTH) + "..."
                             : content;
                 }
             }
-            
+
             final BrowsePostsOutputData.PostData postData = new BrowsePostsOutputData.PostData(
                     post.getId(),
                     post.getTitle(),
                     post.getContent(),
                     post.getCreatorUsername(),
                     post.getCreationDate(),
-                    votes[0],  // upvotes
-                    votes[1],  // downvotes
+                    votes[0],
+                    votes[1],
                     hasReference,
                     referencedPostTitle,
                     referencedPostId
@@ -78,6 +86,7 @@ public class BrowsePostsInteractor implements BrowsePostsInputBoundary {
         return postDataList;
     }
 
+    @Override
     public void switchToCreatePostView() {
         this.outputBoundary.switchToCreatePostView();
     }

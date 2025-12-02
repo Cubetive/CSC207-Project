@@ -9,6 +9,11 @@ public class BrowsePostsController {
 
     private final BrowsePostsInputBoundary browsePostsInteractor;
 
+    /**
+     * Constructs a BrowsePostsController.
+     *
+     * @param browsePostsInteractor the interactor for browse posts use case
+     */
     public BrowsePostsController(BrowsePostsInputBoundary browsePostsInteractor) {
         this.browsePostsInteractor = browsePostsInteractor;
     }
@@ -20,6 +25,9 @@ public class BrowsePostsController {
         browsePostsInteractor.execute();
     }
 
+    /**
+     * Switches to the create post view.
+     */
     public void switchToCreatePostView() {
         this.browsePostsInteractor.switchToCreatePostView();
     }

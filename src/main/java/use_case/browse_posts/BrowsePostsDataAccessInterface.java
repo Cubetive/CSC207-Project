@@ -1,7 +1,8 @@
 package use_case.browse_posts;
 
-import entities.OriginalPost;
 import java.util.List;
+
+import entities.OriginalPost;
 
 /**
  * Data Access Interface for browsing posts.

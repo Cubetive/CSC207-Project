@@ -12,6 +12,12 @@ public class SignupPresenter implements SignupOutputBoundary {
     private final SignupViewModel signupViewModel;
     private final ViewManagerModel viewManagerModel;
 
+    /**
+     * Constructs a SignupPresenter.
+     *
+     * @param signupViewModel  the signup view model
+     * @param viewManagerModel the view manager model
+     */
     public SignupPresenter(SignupViewModel signupViewModel,
                           ViewManagerModel viewManagerModel) {
         this.signupViewModel = signupViewModel;
@@ -48,13 +54,17 @@ public class SignupPresenter implements SignupOutputBoundary {
         // Set the appropriate error based on the error message
         if (errorMessage.contains("Username")) {
             signupState.setUsernameError(errorMessage);
-        } else if (errorMessage.contains("Email")) {
+        }
+        else if (errorMessage.contains("Email")) {
             signupState.setEmailError(errorMessage);
-        } else if (errorMessage.contains("Password") || errorMessage.contains("password")) {
+        }
+        else if (errorMessage.contains("Password") || errorMessage.contains("password")) {
             signupState.setPasswordError(errorMessage);
-        } else if (errorMessage.contains("Full name")) {
+        }
+        else if (errorMessage.contains("Full name")) {
             signupState.setFullNameError(errorMessage);
-        } else {
+        }
+        else {
             // Generic error - set it on username field
             signupState.setUsernameError(errorMessage);
         }

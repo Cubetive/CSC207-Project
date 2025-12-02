@@ -346,7 +346,6 @@
         <module name="IllegalCatch">
             <property name="illegalClassNames"
                       value="java.lang.Throwable,
-                       java.lang.RuntimeException,
                        java.lang.NullPointerException"/>
         </module>
         <module name="IllegalInstantiation">
@@ -476,6 +475,9 @@
         </module>
         <module name="MissingSwitchDefault"/>
         <module name="ModifiedControlVariable"/>
+        <module name="MultipleStringLiterals">
+            <property name="allowedDuplicates" value="2"/>
+        </module>
         <module name="MultipleVariableDeclarations"/>
         <module name="NestedForDepth">
             <property name="max" value="2"/>
@@ -729,9 +731,17 @@
         </module>
 
         <!-- Size Violations -->
+        <module name="ExecutableStatementCount">
+            <property name="max" value="50"/>
+        </module>
+        <module name="MethodCount">
+            <property name="maxTotal" value="100"/>
+        </module>
         <module name="MethodLength"/>
         <module name="OuterTypeNumber"/>
-        <module name="ParameterNumber"/>
+        <module name="ParameterNumber">
+            <property name="max" value="12"/>
+        </module>
         <module name="RecordComponentNumber"/>
 
         <!-- Whitespace -->

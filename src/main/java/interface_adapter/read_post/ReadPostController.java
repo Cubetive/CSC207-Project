@@ -10,12 +10,18 @@ public class ReadPostController {
 
     private final ReadPostInputBoundary interactor;
 
+    /**
+     * Constructs a ReadPostController.
+     *
+     * @param interactor the interactor for read post use case
+     */
     public ReadPostController(ReadPostInputBoundary interactor) {
         this.interactor = interactor;
     }
 
     /**
      * Executes the read post use case for the given post ID.
+     *
      * @param postId the unique identifier of the post to read
      */
     public void execute(long postId) {

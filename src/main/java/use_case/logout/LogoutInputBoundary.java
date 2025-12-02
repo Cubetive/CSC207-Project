@@ -1,5 +1,8 @@
 package use_case.logout;
 
+/**
+ * Input boundary for the Logout use case.
+ */
 public interface LogoutInputBoundary {
     /**
      * Executes log out use case. This clears

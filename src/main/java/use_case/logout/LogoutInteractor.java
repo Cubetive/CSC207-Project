@@ -2,10 +2,19 @@ package use_case.logout;
 
 import entities.User;
 
+/**
+ * The Logout Interactor for handling user logout.
+ */
 public class LogoutInteractor implements LogoutInputBoundary {
     private final LogoutDataAccessInterface logoutDataAccess;
     private final LogoutOutputBoundary logoutOutputBoundary;
 
+    /**
+     * Constructs a LogoutInteractor.
+     *
+     * @param logoutDataAccess the data access object for logout operations
+     * @param logoutOutputBoundary the output boundary for presenting results
+     */
     public LogoutInteractor(LogoutDataAccessInterface logoutDataAccess,
                             LogoutOutputBoundary logoutOutputBoundary) {
         this.logoutDataAccess = logoutDataAccess;

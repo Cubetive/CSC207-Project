@@ -45,7 +45,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
     private final JButton signUpButton;
     private final JButton toLoginButton;
-    private boolean isUpdatingFromState = false;
+    private boolean isUpdatingFromState;
 
     public SignupView(SignupViewModel signupViewModel) {
         this.signupViewModel = signupViewModel;
@@ -77,7 +77,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         // Set up button actions
         signUpButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (signupController != null) {
                     final SignupState currentState = signupViewModel.getState();
                     signupController.execute(
@@ -93,7 +93,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
         toLoginButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 if (signupController != null) {
                     signupController.switchToLoginView();
                 }
@@ -124,6 +124,9 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds an input field with its label and error message to the view.
+     * @param labelText The label text
+     * @param inputField The input field
+     * @param errorField The error field
      */
     private void addInputField(String labelText, JTextField inputField, JLabel errorField) {
         final JPanel panel = new JPanel();
@@ -151,21 +154,23 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a document listener to a text field that calls the update function.
+     * @param textField The text field
+     * @param updateFunction The update function
      */
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent evt) {
                 updateFunction.run();
             }
         });
@@ -221,6 +226,7 @@ public class SignupView extends JPanel implements PropertyChangeListener {
 
     /**
      * Updates the view based on the current state.
+     * @param state The Signup state
      */
     private void updateViewFromState(SignupState state) {
         isUpdatingFromState = true;
@@ -237,7 +243,8 @@ public class SignupView extends JPanel implements PropertyChangeListener {
         usernameErrorField.setText(state.getUsernameError() != null ? state.getUsernameError() : "");
         emailErrorField.setText(state.getEmailError() != null ? state.getEmailError() : "");
         passwordErrorField.setText(state.getPasswordError() != null ? state.getPasswordError() : "");
-        repeatPasswordErrorField.setText(state.getRepeatPasswordError() != null ? state.getRepeatPasswordError() : "");
+        final String repeatPwdError = state.getRepeatPasswordError();
+        repeatPasswordErrorField.setText(repeatPwdError != null ? repeatPwdError : "");
 
         isUpdatingFromState = false;
     }

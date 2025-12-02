@@ -1,15 +1,19 @@
 package use_case.signup;
 
-import entities.User;
-import entities.UserFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import use_case.session.SessionRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import entities.User;
+import entities.UserFactory;
+import use_case.session.SessionRepository;
 
 class SignupInteractorTest {
 
@@ -31,7 +35,7 @@ class SignupInteractorTest {
     @Test
     void executeSuccessfulSignup() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example.com", "password123", "password123"
         );
 
@@ -39,9 +43,9 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertTrue(outputBoundary.successCalled);
-        assertFalse(outputBoundary.failCalled);
-        assertNotNull(outputBoundary.outputData);
+        assertTrue(outputBoundary.isSuccessCalled());
+        assertFalse(outputBoundary.isFailCalled());
+        assertNotNull(outputBoundary.getOutputData());
 
         // Verify InputData getters (covers SignupInputData)
         assertEquals("John Doe", inputData.getFullName());
@@ -51,19 +55,19 @@ class SignupInteractorTest {
         assertEquals("password123", inputData.getRepeatPassword());
 
         // Verify OutputData getters (covers SignupOutputData)
-        assertEquals("johndoe", outputBoundary.outputData.getUsername());
-        assertEquals("John Doe", outputBoundary.outputData.getFullName());
-        assertFalse(outputBoundary.outputData.isUseCaseFailed());
+        assertEquals("johndoe", outputBoundary.getOutputData().getUsername());
+        assertEquals("John Doe", outputBoundary.getOutputData().getFullName());
+        assertFalse(outputBoundary.getOutputData().isUseCaseFailed());
 
-        assertTrue(dataAccess.userSaved);
+        assertTrue(dataAccess.isUserSaved());
         assertNotNull(sessionRepository.getCurrentUser());
     }
 
     @Test
     void executeFailureUsernameExists() {
         // Arrange
-        dataAccess.existingUsernames.add("johndoe");
-        SignupInputData inputData = new SignupInputData(
+        dataAccess.addExistingUsername("johndoe");
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example.com", "password123", "password123"
         );
 
@@ -71,16 +75,16 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Username already exists.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Username already exists.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureEmailExists() {
         // Arrange
-        dataAccess.existingEmails.add("john@example.com");
-        SignupInputData inputData = new SignupInputData(
+        dataAccess.addExistingEmail("john@example.com");
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example.com", "password123", "password123"
         );
 
@@ -88,15 +92,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Email already exists.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Email already exists.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailurePasswordsDoNotMatch() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example.com", "password123", "differentpassword"
         );
 
@@ -104,15 +108,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Passwords don't match.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Passwords don't match.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailurePasswordTooShort() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example.com", "pass", "pass"
         );
 
@@ -120,15 +124,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Password must be at least 6 characters long.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Password must be at least 6 characters long.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureInvalidEmailFormat() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "invalidemail", "password123", "password123"
         );
 
@@ -136,15 +140,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Invalid email format.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Invalid email format.", outputBoundary.getErrorMessage());
     }
 
     @Test
-    void executeFailureInvalidEmailFormatNoTLD() {
+    void executeFailureInvalidEmailFormatNoToplevelDomain() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "johndoe", "john@example", "password123", "password123"
         );
 
@@ -152,15 +156,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Invalid email format.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Invalid email format.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureEmptyFullName() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "   ", "johndoe", "john@example.com", "password123", "password123"
         );
 
@@ -168,15 +172,15 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Full name cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Full name cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureEmptyUsername() {
         // Arrange
-        SignupInputData inputData = new SignupInputData(
+        final SignupInputData inputData = new SignupInputData(
                 "John Doe", "   ", "john@example.com", "password123", "password123"
         );
 
@@ -184,9 +188,9 @@ class SignupInteractorTest {
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Username cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Username cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
@@ -195,38 +199,51 @@ class SignupInteractorTest {
         interactor.switchToLoginView();
 
         // Assert
-        assertTrue(outputBoundary.switchToLoginCalled);
+        assertTrue(outputBoundary.isSwitchToLoginCalled());
     }
 
     @Test
     void executeSuccessfulSignupWithValidEmailFormats() {
         // Test various valid email formats
-        String[] validEmails = {
-                "test@example.com",
-                "test.name@example.com",
-                "test+tag@example.com",
-                "test_name@example.org",
-                "test123@example.co.uk"
+        final String[] validEmails = {
+            "test@example.com",
+            "test.name@example.com",
+            "test+tag@example.com",
+            "test_name@example.org",
+            "test123@example.co.uk",
         };
 
         for (String email : validEmails) {
-            setUp(); // Reset for each test
-            SignupInputData inputData = new SignupInputData(
+            // Reset for each test
+            setUp();
+            final SignupInputData inputData = new SignupInputData(
                     "Test User", "testuser", email, "password123", "password123"
             );
 
             interactor.execute(inputData);
 
-            assertTrue(outputBoundary.successCalled, "Should succeed with email: " + email);
+            assertTrue(outputBoundary.isSuccessCalled(), "Should succeed with email: " + email);
         }
     }
 
     // Test helper classes
 
-    private static class TestSignupDataAccess implements SignupDataAccessInterface {
-        Set<String> existingUsernames = new HashSet<>();
-        Set<String> existingEmails = new HashSet<>();
-        boolean userSaved = false;
+    private static final class TestSignupDataAccess implements SignupDataAccessInterface {
+        private final Set<String> existingUsernames = new HashSet<>();
+        private final Set<String> existingEmails = new HashSet<>();
+        private boolean userSaved;
+
+        void addExistingUsername(String username) {
+            existingUsernames.add(username);
+        }
+
+        void addExistingEmail(String email) {
+            existingEmails.add(email);
+        }
+
+        boolean isUserSaved() {
+            return userSaved;
+        }
 
         @Override
         public boolean existsByUsername(String username) {
@@ -246,23 +263,43 @@ class SignupInteractorTest {
         }
     }
 
-    private static class TestSignupOutputBoundary implements SignupOutputBoundary {
-        boolean successCalled = false;
-        boolean failCalled = false;
-        boolean switchToLoginCalled = false;
-        SignupOutputData outputData;
-        String errorMessage;
+    private static final class TestSignupOutputBoundary implements SignupOutputBoundary {
+        private boolean successCalled;
+        private boolean failCalled;
+        private boolean switchToLoginCalled;
+        private SignupOutputData outputData;
+        private String errorMessage;
 
-        @Override
-        public void prepareSuccessView(SignupOutputData outputData) {
-            this.successCalled = true;
-            this.outputData = outputData;
+        boolean isSuccessCalled() {
+            return successCalled;
+        }
+
+        boolean isFailCalled() {
+            return failCalled;
+        }
+
+        boolean isSwitchToLoginCalled() {
+            return switchToLoginCalled;
+        }
+
+        SignupOutputData getOutputData() {
+            return outputData;
+        }
+
+        String getErrorMessage() {
+            return errorMessage;
         }
 
         @Override
-        public void prepareFailView(String errorMessage) {
+        public void prepareSuccessView(SignupOutputData data) {
+            this.successCalled = true;
+            this.outputData = data;
+        }
+
+        @Override
+        public void prepareFailView(String message) {
             this.failCalled = true;
-            this.errorMessage = errorMessage;
+            this.errorMessage = message;
         }
 
         @Override
@@ -271,14 +308,14 @@ class SignupInteractorTest {
         }
     }
 
-    private static class TestUserFactory implements UserFactory {
+    private static final class TestUserFactory implements UserFactory {
         @Override
         public User create(String fullName, String username, String email, String password) {
             return new User(fullName, username, email, password);
         }
     }
 
-    private static class TestSessionRepository implements SessionRepository {
+    private static final class TestSessionRepository implements SessionRepository {
         private User currentUser;
 
         @Override

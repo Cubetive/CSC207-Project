@@ -1,12 +1,20 @@
 package use_case.logout;
 
 import entities.User;
-import use_case.session.SessionRepository;
 
+/**
+ * The Logout Interactor for handling user logout.
+ */
 public class LogoutInteractor implements LogoutInputBoundary {
     private final LogoutDataAccessInterface logoutDataAccess;
     private final LogoutOutputBoundary logoutOutputBoundary;
 
+    /**
+     * Constructs a LogoutInteractor.
+     *
+     * @param logoutDataAccess the data access object for logout operations
+     * @param logoutOutputBoundary the output boundary for presenting results
+     */
     public LogoutInteractor(LogoutDataAccessInterface logoutDataAccess,
                             LogoutOutputBoundary logoutOutputBoundary) {
         this.logoutDataAccess = logoutDataAccess;
@@ -16,7 +24,6 @@ public class LogoutInteractor implements LogoutInputBoundary {
     @Override
     public void execute() {
         // Logout use case can only be accessed when the user is already logged in.
-
         // Get username of the current user.
         final User currentUser = logoutDataAccess.getCurrentUser();
         final String username = currentUser.getUsername();

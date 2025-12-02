@@ -2,14 +2,19 @@ package use_case.logout;
 
 import entities.User;
 
+/**
+ * Data access interface for logout operations.
+ */
 public interface LogoutDataAccessInterface {
     /**
-     * Get the current user in the session
+     * Gets the current user in the session.
+     *
+     * @return the current user of the session
      */
     User getCurrentUser();
 
     /**
-     * Clear the user of the current session
+     * Clears the user of the current session.
      */
     void clearSession();
 }

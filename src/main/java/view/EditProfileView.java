@@ -1,13 +1,5 @@
 package view;
 
-import interface_adapter.edit_profile.EditProfileController;
-import interface_adapter.edit_profile.EditProfileState;
-import interface_adapter.edit_profile.EditProfileViewModel;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,10 +7,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import interface_adapter.edit_profile.EditProfileController;
+import interface_adapter.edit_profile.EditProfileState;
+import interface_adapter.edit_profile.EditProfileViewModel;
+
 /**
  * The View for the Edit Profile Use Case.
  */
 public class EditProfileView extends JPanel implements PropertyChangeListener {
+    // Font name constant
+    private static final String FONT_ARIAL = "Arial";
 
     private final EditProfileViewModel editProfileViewModel;
     private EditProfileController editProfileController;
@@ -44,7 +47,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     private final JButton saveButton;
     private final JButton cancelButton;
-    private boolean isUpdatingFromState = false;
+    private boolean isUpdatingFromState;
 
     public EditProfileView(EditProfileViewModel editProfileViewModel) {
         this.editProfileViewModel = editProfileViewModel;
@@ -52,7 +55,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
         // Set up the view title
         final JLabel title = new JLabel(EditProfileViewModel.TITLE_LABEL);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setFont(new Font(FONT_ARIAL, Font.BOLD, 24));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Initialize buttons
@@ -81,10 +84,10 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         addDocumentListener(repeatNewPasswordInputField, this::updateRepeatNewPassword);
 
         // Set up browse image button
-        browseImageButton.addActionListener(e -> browseForImage());
+        browseImageButton.addActionListener(event -> browseForImage());
         
         // Style the selected image label
-        selectedImageLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        selectedImageLabel.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
         selectedImageLabel.setForeground(new Color(100, 100, 100));
 
         // Set up button actions
@@ -140,7 +143,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
         // Add general error field
         generalErrorField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        generalErrorField.setFont(new Font("Arial", Font.PLAIN, 12));
+        generalErrorField.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
         this.add(generalErrorField);
         this.add(Box.createVerticalStrut(5));
 
@@ -154,7 +157,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         // Add password fields section
         this.add(Box.createVerticalStrut(10));
         final JLabel passwordSectionLabel = new JLabel("Change Password (Optional)");
-        passwordSectionLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        passwordSectionLabel.setFont(new Font(FONT_ARIAL, Font.BOLD, 14));
         passwordSectionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.add(passwordSectionLabel);
         this.add(Box.createVerticalStrut(5));
@@ -174,6 +177,9 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds an input field with its label and error message to the view.
+     * @param labelText The label text
+     * @param inputField The input field
+     * @param errorField The error field
      */
     private void addInputField(String labelText, JTextField inputField, JLabel errorField) {
         final JPanel panel = new JPanel();
@@ -186,7 +192,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         inputField.setMaximumSize(new Dimension(300, 30));
 
         errorField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorField.setFont(new Font("Arial", Font.PLAIN, 12));
+        errorField.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
 
         panel.add(label);
         panel.add(Box.createVerticalStrut(5));
@@ -201,6 +207,10 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a profile picture field with a browse button.
+     * @param labelText The label text
+     * @param browseButton The browse button
+     * @param selectedImageLabel The selected image label
+     * @param errorField The error field
      */
     private void addProfilePictureField(String labelText, JButton browseButton, 
                                        JLabel selectedImageLabel, JLabel errorField) {
@@ -211,14 +221,14 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         browseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        browseButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        browseButton.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
         browseButton.setFocusPainted(false);
         browseButton.setMaximumSize(new Dimension(300, 30));
         
         selectedImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         errorField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorField.setFont(new Font("Arial", Font.PLAIN, 12));
+        errorField.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
 
         panel.add(label);
         panel.add(Box.createVerticalStrut(5));
@@ -259,6 +269,9 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a text area field with its label and error message to the view.
+     * @param labelText The label text
+     * @param textArea The text area
+     * @param errorField The error field
      */
     private void addTextAreaField(String labelText, JTextArea textArea, JLabel errorField) {
         final JPanel panel = new JPanel();
@@ -274,7 +287,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
         scrollPane.setMaximumSize(new Dimension(300, 100));
 
         errorField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorField.setFont(new Font("Arial", Font.PLAIN, 12));
+        errorField.setFont(new Font(FONT_ARIAL, Font.PLAIN, 12));
 
         panel.add(label);
         panel.add(Box.createVerticalStrut(5));
@@ -289,6 +302,8 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a document listener to a text field that calls the update function.
+     * @param textField The text field
+     * @param updateFunction The runnable update
      */
     private void addDocumentListener(JTextField textField, Runnable updateFunction) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -311,6 +326,8 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Adds a document listener to a text area that calls the update function.
+     * @param textArea The text area
+     * @param updateFunction The runnable update
      */
     private void addDocumentListener(JTextArea textArea, Runnable updateFunction) {
         textArea.getDocument().addDocumentListener(new DocumentListener() {
@@ -397,6 +414,7 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
 
     /**
      * Updates the view based on the current state.
+     * @param state The Edit Profile state
      */
     private void updateViewFromState(EditProfileState state) {
         isUpdatingFromState = true;
@@ -413,11 +431,13 @@ public class EditProfileView extends JPanel implements PropertyChangeListener {
             if (file.exists()) {
                 selectedImageLabel.setText(file.getName());
                 selectedImageLabel.setForeground(new Color(0, 100, 0));
-            } else {
+            }
+            else {
                 selectedImageLabel.setText("File not found: " + file.getName());
                 selectedImageLabel.setForeground(new Color(200, 0, 0));
             }
-        } else {
+        }
+        else {
             selectedImagePath = "";
             selectedImageLabel.setText("No image selected");
             selectedImageLabel.setForeground(new Color(100, 100, 100));

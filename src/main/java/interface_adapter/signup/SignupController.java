@@ -10,6 +10,11 @@ public class SignupController {
 
     private final SignupInputBoundary signupUseCaseInteractor;
 
+    /**
+     * Constructs a SignupController.
+     *
+     * @param signupUseCaseInteractor the signup use case interactor
+     */
     public SignupController(SignupInputBoundary signupUseCaseInteractor) {
         this.signupUseCaseInteractor = signupUseCaseInteractor;
     }

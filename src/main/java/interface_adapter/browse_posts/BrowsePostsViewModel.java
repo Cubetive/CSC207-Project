@@ -10,6 +10,9 @@ public class BrowsePostsViewModel extends ViewModel<BrowsePostsState> {
     public static final String TITLE_LABEL = "Browse Posts";
     public static final String REFRESH_BUTTON_LABEL = "Refresh";
 
+    /**
+     * Constructs a BrowsePostsViewModel.
+     */
     public BrowsePostsViewModel() {
         super("browse posts");
         setState(new BrowsePostsState());

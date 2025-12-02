@@ -11,7 +11,7 @@ public class ReplyPostController {
     }
 
     /**
-     * Executes the Reply Post Use Case
+     * Executes the Reply Post Use Case.
      * @param content the content of the reply
      * @param parentId the "parent" id of the reply "node"
      */

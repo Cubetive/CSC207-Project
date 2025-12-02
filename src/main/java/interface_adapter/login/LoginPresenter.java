@@ -12,6 +12,12 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final LoginViewModel loginViewModel;
     private final ViewManagerModel viewManagerModel;
 
+    /**
+     * Constructs a LoginPresenter.
+     *
+     * @param loginViewModel   the login view model
+     * @param viewManagerModel the view manager model
+     */
     public LoginPresenter(LoginViewModel loginViewModel,
                          ViewManagerModel viewManagerModel) {
         this.loginViewModel = loginViewModel;
@@ -42,7 +48,8 @@ public class LoginPresenter implements LoginOutputBoundary {
         // Set the appropriate error based on the error message
         if (errorMessage.contains("password") || errorMessage.contains("Password")) {
             loginState.setPasswordError(errorMessage);
-        } else {
+        }
+        else {
             // Default to username error
             loginState.setUsernameError(errorMessage);
         }

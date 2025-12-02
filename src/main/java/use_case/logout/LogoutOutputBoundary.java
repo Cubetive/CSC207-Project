@@ -1,7 +1,8 @@
 package use_case.logout;
 
-import use_case.login.LoginOutputData;
-
+/**
+ * Output boundary for the Logout use case.
+ */
 public interface LogoutOutputBoundary {
     /**
      * Prepares the success view for the Logout Use Case.

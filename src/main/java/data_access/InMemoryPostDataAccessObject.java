@@ -1,15 +1,15 @@
 package data_access;
 
-import entities.OriginalPost;
-import entities.Post;
-import entities.ReplyPost;
-import use_case.reply_post.ReplyPostDataAccessInterface;
-import use_case.reference_post.ReferencePostDataAccessInterface;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import entities.OriginalPost;
+import entities.Post;
+import entities.ReplyPost;
+import use_case.reference_post.ReferencePostDataAccessInterface;
+import use_case.reply_post.ReplyPostDataAccessInterface;
 
 /**
  * In-memory implementation of the DAO for storing post data.
@@ -47,6 +47,22 @@ public class InMemoryPostDataAccessObject implements ReplyPostDataAccessInterfac
     }
 
     @Override
+    public Post getPostById(String postId) {
+        try {
+            final long id = Long.parseLong(postId);
+            return postsById.get(id);
+        }
+        catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public void savePost(Post post) {
+        addPost(post.getId(), post);
+    }
+
+    @Override
     public List<Post> searchPostsByKeyword(String keyword) {
         final List<Post> results = new ArrayList<>();
         final String lowerKeyword = keyword.toLowerCase();
@@ -55,23 +71,20 @@ public class InMemoryPostDataAccessObject implements ReplyPostDataAccessInterfac
             boolean matches = false;
 
             // Search in content
-            if (post.getContent() != null &&
-                    post.getContent().toLowerCase().contains(lowerKeyword)) {
+            if (post.getContent() != null && post.getContent().toLowerCase().contains(lowerKeyword)) {
                 matches = true;
             }
 
             // Search in title for OriginalPost
             if (post instanceof OriginalPost) {
                 final OriginalPost originalPost = (OriginalPost) post;
-                if (originalPost.getTitle() != null &&
-                        originalPost.getTitle().toLowerCase().contains(lowerKeyword)) {
+                if (originalPost.getTitle() != null && originalPost.getTitle().toLowerCase().contains(lowerKeyword)) {
                     matches = true;
                 }
             }
 
             // Search in creator username
-            if (post.getCreatorUsername() != null &&
-                    post.getCreatorUsername().toLowerCase().contains(lowerKeyword)) {
+            if (post.getCreatorUsername() != null && post.getCreatorUsername().toLowerCase().contains(lowerKeyword)) {
                 matches = true;
             }
 
@@ -81,21 +94,6 @@ public class InMemoryPostDataAccessObject implements ReplyPostDataAccessInterfac
         }
 
         return results;
-    }
-
-    @Override
-    public Post getPostById(String postId) {
-        try {
-            final long id = Long.parseLong(postId);
-            return postsById.get(id);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void savePost(Post post) {
-        addPost(post.getId(), post);
     }
 
     /**

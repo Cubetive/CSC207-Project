@@ -10,6 +10,11 @@ public class ReadPostPresenter implements ReadPostOutputBoundary {
 
     private final ReadPostViewModel viewModel;
 
+    /**
+     * Constructs a ReadPostPresenter.
+     *
+     * @param viewModel the view model for read post
+     */
     public ReadPostPresenter(ReadPostViewModel viewModel) {
         this.viewModel = viewModel;
     }

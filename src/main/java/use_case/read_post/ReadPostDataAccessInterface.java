@@ -1,13 +1,13 @@
 package use_case.read_post;
 
+import java.util.List;
+
 import entities.OriginalPost;
 import entities.Post;
 
 /**
  * Data Access Interface for reading a specific post.
  */
-import java.util.List;
-
 public interface ReadPostDataAccessInterface {
 
     /**

@@ -1,9 +1,10 @@
 package interface_adapter.translate;
 
+import javax.swing.SwingUtilities;
+
+import interface_adapter.ViewManagerModel;
 import use_case.translate.TranslationOutputBoundary;
 import use_case.translate.TranslationOutputData;
-import interface_adapter.ViewManagerModel;
-import javax.swing.SwingUtilities; // FIX: Import SwingUtilities
 
 /**
  * Implements the TranslationOutputBoundary. It receives the Use Case result,
@@ -17,8 +18,9 @@ public class TranslationPresenter implements TranslationOutputBoundary {
 
     /**
      * Constructs a TranslationPresenter.
-     * @param translationViewModel The ViewModel to update.
-     * @param viewManagerModel The model to switch views (usually not needed for inline translation).
+     *
+     * @param translationViewModel the ViewModel to update
+     * @param viewManagerModel     the model to switch views
      */
     public TranslationPresenter(TranslationViewModel translationViewModel,
                                 ViewManagerModel viewManagerModel) {
@@ -28,17 +30,16 @@ public class TranslationPresenter implements TranslationOutputBoundary {
 
     /**
      * Handles a successful translation result, updating the ViewModel state.
-     * @param outputData The data object containing the translated text and metadata.
+     *
+     * @param outputData the data object containing the translated text and metadata
      */
     @Override
     public void presentSuccess(TranslationOutputData outputData) {
         SwingUtilities.invokeLater(() -> {
-            TranslationState translationState = translationViewModel.getState();
+            final TranslationState translationState = translationViewModel.getState();
             translationState.setTranslatedText(outputData.getTranslatedText());
             translationState.setTargetLanguage(outputData.getTargetLanguage());
-            translationState.setTranslationError(null); // Clear any previous error
-
-            System.out.println("DEBUG: Presenter setting isTranslationSuccessful = TRUE");
+            translationState.setTranslationError(null);
 
             translationState.setTranslationSuccessful(true);
 
@@ -48,16 +49,16 @@ public class TranslationPresenter implements TranslationOutputBoundary {
 
     /**
      * Handles a failed translation attempt, updating the ViewModel state with the error.
-     * (Fixes: Implements the 'presentFailure' method from the Output Boundary)
-     * @param errorMessage A descriptive error message.
+     *
+     * @param errorMessage a descriptive error message
      */
     @Override
     public void presentFailure(String errorMessage) {
         SwingUtilities.invokeLater(() -> {
-            TranslationState translationState = translationViewModel.getState();
+            final TranslationState translationState = translationViewModel.getState();
 
             translationState.setTranslationError("Error translating: " + errorMessage);
-            translationState.setTranslatedText(null); // Clear previous successful translation
+            translationState.setTranslatedText(null);
 
             translationState.setTranslationSuccessful(false);
 

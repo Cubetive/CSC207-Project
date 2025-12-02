@@ -1,14 +1,18 @@
 package use_case.login;
 
-import entities.User;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import use_case.session.SessionRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import entities.User;
+import use_case.session.SessionRepository;
 
 class LoginInteractorTest {
 
@@ -28,26 +32,26 @@ class LoginInteractorTest {
     @Test
     void executeSuccessfulLogin() {
         // Arrange
-        User user = new User("John Doe", "johndoe", "john@example.com", "password123");
+        final User user = new User("John Doe", "johndoe", "john@example.com", "password123");
         dataAccess.addUser(user);
-        LoginInputData inputData = new LoginInputData("johndoe", "password123");
+        final LoginInputData inputData = new LoginInputData("johndoe", "password123");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertTrue(outputBoundary.successCalled);
-        assertFalse(outputBoundary.failCalled);
-        assertNotNull(outputBoundary.outputData);
+        assertTrue(outputBoundary.isSuccessCalled());
+        assertFalse(outputBoundary.isFailCalled());
+        assertNotNull(outputBoundary.getOutputData());
 
         // Verify InputData getters (covers LoginInputData)
         assertEquals("johndoe", inputData.getUsername());
         assertEquals("password123", inputData.getPassword());
 
         // Verify OutputData getters (covers LoginOutputData)
-        assertEquals("johndoe", outputBoundary.outputData.getUsername());
-        assertEquals("John Doe", outputBoundary.outputData.getFullName());
-        assertFalse(outputBoundary.outputData.isUseCaseFailed());
+        assertEquals("johndoe", outputBoundary.getOutputData().getUsername());
+        assertEquals("John Doe", outputBoundary.getOutputData().getFullName());
+        assertFalse(outputBoundary.getOutputData().isUseCaseFailed());
 
         assertEquals(user, sessionRepository.getCurrentUser());
     }
@@ -55,115 +59,115 @@ class LoginInteractorTest {
     @Test
     void executeFailureEmptyUsername() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("", "password123");
+        final LoginInputData inputData = new LoginInputData("", "password123");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Username cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Username cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureNullUsername() {
         // Arrange
-        LoginInputData inputData = new LoginInputData(null, "password123");
+        final LoginInputData inputData = new LoginInputData(null, "password123");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Username cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Username cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureWhitespaceUsername() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("   ", "password123");
+        final LoginInputData inputData = new LoginInputData("   ", "password123");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Username cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Username cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureEmptyPassword() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("johndoe", "");
+        final LoginInputData inputData = new LoginInputData("johndoe", "");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Password cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Password cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureNullPassword() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("johndoe", null);
+        final LoginInputData inputData = new LoginInputData("johndoe", null);
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Password cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Password cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureWhitespacePassword() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("johndoe", "   ");
+        final LoginInputData inputData = new LoginInputData("johndoe", "   ");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Password cannot be empty.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Password cannot be empty.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureUserNotFound() {
         // Arrange
-        LoginInputData inputData = new LoginInputData("nonexistent", "password123");
+        final LoginInputData inputData = new LoginInputData("nonexistent", "password123");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("User not found.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("User not found.", outputBoundary.getErrorMessage());
     }
 
     @Test
     void executeFailureIncorrectPassword() {
         // Arrange
-        User user = new User("John Doe", "johndoe", "john@example.com", "password123");
+        final User user = new User("John Doe", "johndoe", "john@example.com", "password123");
         dataAccess.addUser(user);
-        LoginInputData inputData = new LoginInputData("johndoe", "wrongpassword");
+        final LoginInputData inputData = new LoginInputData("johndoe", "wrongpassword");
 
         // Act
         interactor.execute(inputData);
 
         // Assert
-        assertFalse(outputBoundary.successCalled);
-        assertTrue(outputBoundary.failCalled);
-        assertEquals("Incorrect password.", outputBoundary.errorMessage);
+        assertFalse(outputBoundary.isSuccessCalled());
+        assertTrue(outputBoundary.isFailCalled());
+        assertEquals("Incorrect password.", outputBoundary.getErrorMessage());
     }
 
     @Test
@@ -172,12 +176,12 @@ class LoginInteractorTest {
         interactor.switchToSignupView();
 
         // Assert
-        assertTrue(outputBoundary.switchToSignupCalled);
+        assertTrue(outputBoundary.isSwitchToSignupCalled());
     }
 
     // Test helper classes
 
-    private static class TestLoginDataAccess implements LoginDataAccessInterface {
+    private static final class TestLoginDataAccess implements LoginDataAccessInterface {
         private final Map<String, User> usersByUsername = new HashMap<>();
         private final Map<String, User> usersByEmail = new HashMap<>();
 
@@ -197,23 +201,43 @@ class LoginInteractorTest {
         }
     }
 
-    private static class TestLoginOutputBoundary implements LoginOutputBoundary {
-        boolean successCalled = false;
-        boolean failCalled = false;
-        boolean switchToSignupCalled = false;
-        LoginOutputData outputData;
-        String errorMessage;
+    private static final class TestLoginOutputBoundary implements LoginOutputBoundary {
+        private boolean successCalled;
+        private boolean failCalled;
+        private boolean switchToSignupCalled;
+        private LoginOutputData outputData;
+        private String errorMessage;
 
-        @Override
-        public void prepareSuccessView(LoginOutputData outputData) {
-            this.successCalled = true;
-            this.outputData = outputData;
+        boolean isSuccessCalled() {
+            return successCalled;
+        }
+
+        boolean isFailCalled() {
+            return failCalled;
+        }
+
+        boolean isSwitchToSignupCalled() {
+            return switchToSignupCalled;
+        }
+
+        LoginOutputData getOutputData() {
+            return outputData;
+        }
+
+        String getErrorMessage() {
+            return errorMessage;
         }
 
         @Override
-        public void prepareFailView(String errorMessage) {
+        public void prepareSuccessView(LoginOutputData data) {
+            this.successCalled = true;
+            this.outputData = data;
+        }
+
+        @Override
+        public void prepareFailView(String message) {
             this.failCalled = true;
-            this.errorMessage = errorMessage;
+            this.errorMessage = message;
         }
 
         @Override
@@ -222,7 +246,7 @@ class LoginInteractorTest {
         }
     }
 
-    private static class TestSessionRepository implements SessionRepository {
+    private static final class TestSessionRepository implements SessionRepository {
         private User currentUser;
 
         @Override

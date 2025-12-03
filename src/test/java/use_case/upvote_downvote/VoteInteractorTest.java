@@ -1,21 +1,23 @@
 package use_case.upvote_downvote;
 
-import entities.OriginalPost;
-import entities.Post;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
+
+import org.junit.jupiter.api.Test;
+
+import entities.OriginalPost;
+import entities.Post;
 
 class VoteInteractorTest {
 
     @Test
     void successUpvoteTest() {
         // 1. Arrange: Create input data (Upvote post #123)
-        VoteInputData inputData = new VoteInputData(true, 123L);
+        final VoteInputData inputData = new VoteInputData(true, 123L);
 
         // Create a fake DAO that returns a specific post
-        VoteDataAccessInterface successDAO = new VoteDataAccessInterface() {
+        final VoteDataAccessInterface successDao = new VoteDataAccessInterface() {
             @Override
             public Post getPostById(long id) {
                 // Return a dummy post with 0 upvotes
@@ -26,13 +28,13 @@ class VoteInteractorTest {
             public void saveVote(long contentId, int newUpvotes, int newDownvotes) {
                 // Verify the DAO is told to save the correct new numbers
                 assertEquals(123L, contentId);
-                assertEquals(1, newUpvotes); // Should increment from 0 to 1
+                assertEquals(1, newUpvotes);
                 assertEquals(0, newDownvotes);
             }
         };
 
         // Create a fake Presenter to capture the success output
-        VoteOutputBoundary successPresenter = new VoteOutputBoundary() {
+        final VoteOutputBoundary successPresenter = new VoteOutputBoundary() {
             @Override
             public void prepareSuccessView(VoteOutputData outputData) {
                 // Verify the output data sent to the presenter
@@ -49,17 +51,17 @@ class VoteInteractorTest {
         };
 
         // 2. Act: Execute the Interactor
-        VoteInteractor interactor = new VoteInteractor(successDAO, successPresenter);
+        final VoteInteractor interactor = new VoteInteractor(successDao, successPresenter);
         interactor.execute(inputData);
     }
 
     @Test
     void successDownvoteTest() {
         // 1. Arrange: Create input data (Downvote post #123)
-        VoteInputData inputData = new VoteInputData(false, 123L);
+        final VoteInputData inputData = new VoteInputData(false, 123L);
 
         // Fake DAO
-        VoteDataAccessInterface successDAO = new VoteDataAccessInterface() {
+        final VoteDataAccessInterface successDao = new VoteDataAccessInterface() {
             @Override
             public Post getPostById(long id) {
                 // Return a dummy post with 10 upvotes and 5 downvotes
@@ -70,13 +72,13 @@ class VoteInteractorTest {
             public void saveVote(long contentId, int newUpvotes, int newDownvotes) {
                 // Verify logic
                 assertEquals(123L, contentId);
-                assertEquals(10, newUpvotes); // Should stay same
-                assertEquals(6, newDownvotes); // Should increment from 5 to 6
+                assertEquals(10, newUpvotes);
+                assertEquals(6, newDownvotes);
             }
         };
 
         // Fake Presenter
-        VoteOutputBoundary successPresenter = new VoteOutputBoundary() {
+        final VoteOutputBoundary successPresenter = new VoteOutputBoundary() {
             @Override
             public void prepareSuccessView(VoteOutputData outputData) {
                 assertEquals(6, outputData.getNewDownvotes());
@@ -89,20 +91,20 @@ class VoteInteractorTest {
         };
 
         // 2. Act
-        VoteInteractor interactor = new VoteInteractor(successDAO, successPresenter);
+        final VoteInteractor interactor = new VoteInteractor(successDao, successPresenter);
         interactor.execute(inputData);
     }
 
     @Test
     void failurePostNotFoundTest() {
         // 1. Arrange: Input data for a non-existent ID
-        VoteInputData inputData = new VoteInputData(true, 999L);
+        final VoteInputData inputData = new VoteInputData(true, 999L);
 
         // Fake DAO that returns null
-        VoteDataAccessInterface failureDAO = new VoteDataAccessInterface() {
+        final VoteDataAccessInterface failureDao = new VoteDataAccessInterface() {
             @Override
             public Post getPostById(long id) {
-                return null; // Simulate post not found
+                return null;
             }
 
             @Override
@@ -112,7 +114,7 @@ class VoteInteractorTest {
         };
 
         // Fake Presenter that expects failure
-        VoteOutputBoundary failurePresenter = new VoteOutputBoundary() {
+        final VoteOutputBoundary failurePresenter = new VoteOutputBoundary() {
             @Override
             public void prepareSuccessView(VoteOutputData outputData) {
                 fail("Use case success is unexpected.");
@@ -126,7 +128,7 @@ class VoteInteractorTest {
         };
 
         // 2. Act
-        VoteInteractor interactor = new VoteInteractor(failureDAO, failurePresenter);
+        final VoteInteractor interactor = new VoteInteractor(failureDao, failurePresenter);
         interactor.execute(inputData);
     }
 }

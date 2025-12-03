@@ -1,8 +1,8 @@
 package use_case.edit_post;
 
-import interface_adapter.read_post.ReadPostState;
-
 import javax.swing.*;
+
+import interface_adapter.read_post.ReadPostState;
 
 public class EditPostInputData {
 
@@ -13,7 +13,8 @@ public class EditPostInputData {
     private String contentNew;
     private JDialog dialog;
 
-    public EditPostInputData(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+    public EditPostInputData(JTextArea contentArea, long id, String username, ReadPostState postToEdit,
+                             String contentNew, JDialog dialog) {
         this.contentArea = contentArea;
         this.id = id;
         this.username = username;
@@ -22,7 +23,9 @@ public class EditPostInputData {
         this.dialog = dialog;
     }
 
-    public JTextArea getContentArea() {return this.contentArea;}
+    public JTextArea getContentArea() {
+        return this.contentArea;
+    }
 
     public String getUsername() {
         return this.username;

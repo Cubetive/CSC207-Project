@@ -15,7 +15,7 @@ public class EditPostPresenter implements EditPostOutputBoundary {
 
     @Override
     public void prepareSuccessView(JDialog dialog) {
-        EditPostViewModel editPostViewModel = new EditPostViewModel();
+        final EditPostViewModel editPostViewModel = new EditPostViewModel();
         editPostViewModel.updateView(editPostOutputData.getOutputPost().getContent(), dialog);
     }
 }

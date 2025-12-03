@@ -238,7 +238,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
                 }
 
                 // Parse Value
-                Object value;
+                final Object value;
                 final char startChar = content.charAt(i);
 
                 if (startChar == '"') {
@@ -321,7 +321,7 @@ public class TranslationDataAccessObject implements TranslationDataAccessInterfa
 
                 // Determine value type
                 final char startChar = content.charAt(i);
-                Object value;
+                final Object value;
 
                 if (startChar == '{') {
                     // Nested object

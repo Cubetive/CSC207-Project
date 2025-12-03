@@ -12,6 +12,7 @@ public class VoteInputData {
     public boolean isUpvote() {
         return isUpvote;
     }
+
     public long getPostId() {
         return postId;
     }

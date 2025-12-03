@@ -13,8 +13,19 @@ public class VoteOutputData {
         this.useCaseFailed = useCaseFailed;
     }
 
-    public long getId() { return id; }
-    public int getNewUpvotes() { return newUpvotes; }
-    public int getNewDownvotes() { return newDownvotes; }
-    public boolean isUseCaseFailed() { return useCaseFailed; }
+    public long getId() {
+        return id;
+    }
+
+    public int getNewUpvotes() {
+        return newUpvotes;
+    }
+
+    public int getNewDownvotes() {
+        return newDownvotes;
+    }
+
+    public boolean isUseCaseFailed() {
+        return useCaseFailed;
+    }
 }

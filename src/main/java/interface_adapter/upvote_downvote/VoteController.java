@@ -8,7 +8,7 @@ import use_case.upvote_downvote.VoteInputData;
  * Takes input from the View (content ID and vote type) and triggers the Interactor.
  */
 public class VoteController {
-    final VoteInputBoundary voteInteractor;
+    private final VoteInputBoundary voteInteractor;
 
     public VoteController(VoteInputBoundary voteInteractor) {
         this.voteInteractor = voteInteractor;
@@ -21,8 +21,8 @@ public class VoteController {
      * @param isUpvote True for an upvote, false for a downvote.
      */
     public void execute(boolean isUpvote, long id) {
-        // 1. Package the raw input data into the DTO.
-        VoteInputData inputData = new VoteInputData(
+        // 1. Package the raw input data.
+        final VoteInputData inputData = new VoteInputData(
                 isUpvote,
                 id
         );

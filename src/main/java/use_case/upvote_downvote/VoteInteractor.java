@@ -3,8 +3,8 @@ package use_case.upvote_downvote;
 import entities.Post;
 
 public class VoteInteractor implements VoteInputBoundary {
-    final VoteDataAccessInterface voteDataAccessObject;
-    final VoteOutputBoundary votePresenter;
+    private final VoteDataAccessInterface voteDataAccessObject;
+    private final VoteOutputBoundary votePresenter;
 
     public VoteInteractor(VoteDataAccessInterface voteDataAccessObject,
                           VoteOutputBoundary votePresenter) {
@@ -14,11 +14,11 @@ public class VoteInteractor implements VoteInputBoundary {
 
     @Override
     public void execute(VoteInputData voteInputData) {
-        long id = voteInputData.getPostId();
-        boolean isUpvote = voteInputData.isUpvote();
+        final long id = voteInputData.getPostId();
+        final boolean isUpvote = voteInputData.isUpvote();
 
         // 1. Fetch the post (Original, Reply, or Thread)
-        Post post = voteDataAccessObject.getPostById(id);
+        final Post post = voteDataAccessObject.getPostById(id);
 
         if (post == null) {
             votePresenter.prepareFailView("Content with ID " + id + " not found.");
@@ -31,8 +31,11 @@ public class VoteInteractor implements VoteInputBoundary {
 
         if (isUpvote) {
             newUpvotes++;
-        } else {
-            newDownvotes++;
+        }
+        else {
+            if (newUpvotes - newDownvotes >= 1) {
+                newDownvotes++;
+            }
         }
 
         // 3. Save to DB/File
@@ -43,7 +46,7 @@ public class VoteInteractor implements VoteInputBoundary {
         post.setDownvotes(newDownvotes);
 
         // 5. Output
-        VoteOutputData outputData = new VoteOutputData(id, newUpvotes, newDownvotes, false);
+        final VoteOutputData outputData = new VoteOutputData(id, newUpvotes, newDownvotes, false);
         votePresenter.prepareSuccessView(outputData);
     }
 }

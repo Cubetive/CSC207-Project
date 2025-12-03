@@ -9,6 +9,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +35,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.User;
 import interface_adapter.read_post.ReadPostController;
 import interface_adapter.read_post.ReadPostState;
@@ -170,6 +177,8 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
     private User curUser;
     private JButton editButton;
 
+    private HashMap<String, Boolean> isUpvoted;
+
     /**
      * Creates a new PostReadingView.
      *
@@ -177,6 +186,33 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
      * @param translationVm the view model for translations
      */
     public PostReadingView(ReadPostViewModel readPostViewModel, TranslationViewModel translationVm) {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        final String fileName = "votesRecording.json";
+        String jsonString = null;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonString = line;
+            }
+        }
+        catch (IOException error) {
+            System.err.println("Error reading file: " + error.getMessage());
+        }
+
+        if (jsonString != null) {
+            try {
+                this.isUpvoted = mapper.readValue(jsonString, HashMap.class);
+            }
+            catch (Exception error) {
+                error.printStackTrace();
+            }
+        }
+        else {
+            this.isUpvoted = new HashMap<>();
+        }
+
         this.viewModel = readPostViewModel;
         this.viewModel.addPropertyChangeListener(this);
         this.translationViewModel = translationVm;
@@ -634,14 +670,20 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         votePanel.setBackground(BACKGROUND_COLOR);
 
         upvoteButton.addActionListener(evt -> {
-            if (voteController != null) {
+            if (voteController != null && (!this.isUpvoted.containsKey(Long.toString(currentPostId))
+                || !this.isUpvoted.get(Long.toString(currentPostId)))) {
                 voteController.execute(true, currentPostId);
+                this.isUpvoted.put(Long.toString(currentPostId), true);
+                updateHashmap();
             }
         });
 
         downvoteButton.addActionListener(evt -> {
-            if (voteController != null) {
+            if (voteController != null && (!this.isUpvoted.containsKey(Long.toString(currentPostId))
+                || this.isUpvoted.get(Long.toString(currentPostId)))) {
                 voteController.execute(false, currentPostId);
+                this.isUpvoted.put(Long.toString(currentPostId), false);
+                updateHashmap();
             }
         });
 
@@ -1163,14 +1205,20 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         final JPanel replyInputPanel = createReplyInputPanel(reply);
 
         replyUpvoteButton.addActionListener(evt -> {
-            if (voteController != null) {
+            if (voteController != null && (!this.isUpvoted.containsKey(Long.toString(reply.getId()))
+                || !this.isUpvoted.get(Long.toString(reply.getId())))) {
                 voteController.execute(true, reply.getId());
+                this.isUpvoted.put(Long.toString(reply.getId()), true);
+                updateHashmap();
             }
         });
 
         replyDownvoteButton.addActionListener(evt -> {
-            if (voteController != null) {
+            if (voteController != null && (!this.isUpvoted.containsKey(Long.toString(reply.getId()))
+                || this.isUpvoted.get(Long.toString(reply.getId())))) {
                 voteController.execute(false, reply.getId());
+                this.isUpvoted.put(Long.toString(reply.getId()), false);
+                updateHashmap();
             }
         });
 
@@ -1475,5 +1523,29 @@ public class PostReadingView extends JPanel implements PropertyChangeListener {
         });
 
         return panel;
+    }
+
+    /**
+     * Updates hashmap data JSON object in votesRecording.json.
+     */
+    public void updateHashmap() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            final String jsonString = objectMapper.writeValueAsString(this.isUpvoted);
+
+            final String fileName = "votesRecording.json";
+
+            try (FileWriter fileWriter = new FileWriter(fileName);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+                bufferedWriter.write(jsonString);
+            }
+            catch (IOException error) {
+                error.printStackTrace();
+            }
+
+        }
+        catch (Exception error) {
+            error.printStackTrace();
+        }
     }
 }

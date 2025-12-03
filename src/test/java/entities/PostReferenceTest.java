@@ -1,11 +1,11 @@
 package entities;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for Post reference-related methods.
@@ -32,7 +32,7 @@ public class PostReferenceTest {
     @Test
     void setReferencedPostTest() {
         post1.setReferencedPost(post2);
-        
+
         assertTrue(post1.hasReference());
         assertNotNull(post1.getReferencedPost());
         assertEquals(post2.getId(), post1.getReferencedPost().getId());
@@ -42,7 +42,7 @@ public class PostReferenceTest {
     @Test
     void setReferencedPostWithReplyPostTest() {
         post1.setReferencedPost(reply1);
-        
+
         assertTrue(post1.hasReference());
         assertNotNull(post1.getReferencedPost());
         assertEquals(reply1.getId(), post1.getReferencedPost().getId());
@@ -54,7 +54,7 @@ public class PostReferenceTest {
         // First set a reference
         post1.setReferencedPost(post2);
         assertTrue(post1.hasReference());
-        
+
         // Then remove it
         post1.setReferencedPost(null);
         assertFalse(post1.hasReference());
@@ -64,8 +64,8 @@ public class PostReferenceTest {
     @Test
     void getReferencedPostTest() {
         post1.setReferencedPost(post2);
-        
-        Post referenced = post1.getReferencedPost();
+
+        final Post referenced = post1.getReferencedPost();
         assertNotNull(referenced);
         assertEquals(post2.getId(), referenced.getId());
         assertEquals("user2", referenced.getCreatorUsername());
@@ -75,10 +75,10 @@ public class PostReferenceTest {
     @Test
     void hasReferenceAfterSettingTest() {
         assertFalse(post1.hasReference());
-        
+
         post1.setReferencedPost(post2);
         assertTrue(post1.hasReference());
-        
+
         post1.setReferencedPost(null);
         assertFalse(post1.hasReference());
     }
@@ -88,11 +88,11 @@ public class PostReferenceTest {
         // Create a chain: post1 references post2, post2 references reply1
         post1.setReferencedPost(post2);
         post2.setReferencedPost(reply1);
-        
+
         assertTrue(post1.hasReference());
         assertTrue(post2.hasReference());
         assertFalse(reply1.hasReference());
-        
+
         assertEquals(post2.getId(), post1.getReferencedPost().getId());
         assertEquals(reply1.getId(), post2.getReferencedPost().getId());
     }
@@ -100,13 +100,15 @@ public class PostReferenceTest {
     @Test
     void referenceWithPostLoadedFromStorageTest() {
         // Simulate a post loaded from storage (using the constructor with all parameters)
-        Date creationDate = new Date();
-        OriginalPost loadedPost = new OriginalPost(100L, "user1", "Title", "Content", creationDate, 5, 2);
-        
+        final Date creationDate = new Date();
+        final OriginalPost loadedPost = new OriginalPost(
+                100L, "user1", "Title", "Content", creationDate, 5, 2
+        );
+
         // Initially no reference
         assertFalse(loadedPost.hasReference());
         assertNull(loadedPost.getReferencedPost());
-        
+
         // Set reference
         loadedPost.setReferencedPost(post2);
         assertTrue(loadedPost.hasReference());
@@ -117,7 +119,7 @@ public class PostReferenceTest {
     void replyPostReferenceTest() {
         // Reply posts can also have references
         reply1.setReferencedPost(post1);
-        
+
         assertTrue(reply1.hasReference());
         assertEquals(post1.getId(), reply1.getReferencedPost().getId());
     }
@@ -127,11 +129,10 @@ public class PostReferenceTest {
         // Set initial reference
         post1.setReferencedPost(post2);
         assertEquals(post2.getId(), post1.getReferencedPost().getId());
-        
+
         // Change to a different reference
         post1.setReferencedPost(reply1);
         assertEquals(reply1.getId(), post1.getReferencedPost().getId());
         assertNotEquals(post2.getId(), post1.getReferencedPost().getId());
     }
 }
-

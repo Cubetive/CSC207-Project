@@ -1,5 +1,7 @@
 package use_case.reference_post;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +11,6 @@ import data_access.InMemoryPostDataAccessObject;
 import entities.OriginalPost;
 import entities.Post;
 import entities.ReplyPost;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for ReferencePostInteractor.

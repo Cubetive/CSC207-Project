@@ -1,4 +1,4 @@
-# Connectivity 23 test
+# Connectivity 23
 
 A forum built with Java that allows users to create, browse, and interact with posts.
 

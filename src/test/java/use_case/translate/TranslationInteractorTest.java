@@ -1,22 +1,23 @@
 package use_case.translate;
 
-import entities.OriginalPost;
-import entities.Post;
-import use_case.read_post.ReadPostDataAccessInterface;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
+
+import org.junit.jupiter.api.Test;
+
+import entities.OriginalPost;
+import use_case.read_post.ReadPostDataAccessInterface;
 
 class TranslationInteractorTest {
 
     @Test
     void successCommentTranslationTest() {
         // 1. Arrange: Input data for a comment (Post ID is null)
-        TranslationInputData inputData = new TranslationInputData("fr", "Hello world");
+        final TranslationInputData inputData = new TranslationInputData("fr", "Hello world");
 
         // Fake Post DAO (Not used for comments, can return null)
-        ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
+        final ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
             public OriginalPost getPostById(long id) {
                 return null;
@@ -29,12 +30,13 @@ class TranslationInteractorTest {
         };
 
         // Fake Translation DAO (Simulates the API)
-        TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
+        final TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
             @Override
             public String getTranslation(String text, String targetLanguage) {
                 assertEquals("Hello world", text);
                 assertEquals("fr", targetLanguage);
-                return "Bonjour le monde"; // Return fake translated text
+                // Return fake translated text
+                return "Bonjour le monde";
             }
 
             @Override
@@ -44,7 +46,7 @@ class TranslationInteractorTest {
         };
 
         // Fake Presenter (Verifies success)
-        TranslationOutputBoundary successPresenter = new TranslationOutputBoundary() {
+        final TranslationOutputBoundary successPresenter = new TranslationOutputBoundary() {
             @Override
             public void presentSuccess(TranslationOutputData outputData) {
                 assertEquals("Bonjour le monde", outputData.getTranslatedText());
@@ -58,7 +60,8 @@ class TranslationInteractorTest {
         };
 
         // 2. Act
-        TranslationInputBoundary interactor = new TranslationInteractor(postDAO, translationDAO, successPresenter);
+        final TranslationInputBoundary interactor =
+                new TranslationInteractor(postDAO, translationDAO, successPresenter);
         interactor.execute(inputData);
     }
 
@@ -66,10 +69,10 @@ class TranslationInteractorTest {
     void successPostTranslationTest() {
         // 1. Arrange: Input data for a Main Post (Has ID)
         // Note: We pass the content too, as per your controller logic
-        TranslationInputData inputData = new TranslationInputData("es", 1L, "Hello");
+        final TranslationInputData inputData = new TranslationInputData("es", 1L, "Hello");
 
         // Fake Post DAO (Returns a valid post)
-        ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
+        final ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
             public OriginalPost getPostById(long id) {
                 // Return a dummy post
@@ -83,10 +86,11 @@ class TranslationInteractorTest {
         };
 
         // Fake Translation DAO
-        TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
+        final TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
             @Override
             public String getTranslation(String text, String targetLanguage) {
-                return "Hola"; // Fake Spanish translation
+                // Fake Spanish translation
+                return "Hola";
             }
 
             @Override
@@ -99,7 +103,7 @@ class TranslationInteractorTest {
         };
 
         // Fake Presenter
-        TranslationOutputBoundary successPresenter = new TranslationOutputBoundary() {
+        final TranslationOutputBoundary successPresenter = new TranslationOutputBoundary() {
             @Override
             public void presentSuccess(TranslationOutputData outputData) {
                 assertEquals("Hola", outputData.getTranslatedText());
@@ -113,17 +117,18 @@ class TranslationInteractorTest {
         };
 
         // 2. Act
-        TranslationInputBoundary interactor = new TranslationInteractor(postDAO, translationDAO, successPresenter);
+        final TranslationInputBoundary interactor =
+                new TranslationInteractor(postDAO, translationDAO, successPresenter);
         interactor.execute(inputData);
     }
 
     @Test
     void failureEmptyTextTest() {
         // 1. Arrange: Empty input text
-        TranslationInputData inputData = new TranslationInputData("es", "");
+        final TranslationInputData inputData = new TranslationInputData("es", "");
 
         // DAOs can be null or minimal since we expect fail before calling them
-        ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
+        final ReadPostDataAccessInterface postDAO = new ReadPostDataAccessInterface() {
             @Override
             public OriginalPost getPostById(long id) {
                 return null;
@@ -134,17 +139,20 @@ class TranslationInteractorTest {
                 return new java.util.ArrayList<>();
             }
         };
-        TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
+        final TranslationDataAccessInterface translationDAO = new TranslationDataAccessInterface() {
             @Override
             public String getTranslation(String text, String targetLanguage) {
                 return "";
             }
+
             @Override
-            public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {}
+            public void saveTranslatedContent(long postId, String targetLanguageCode, String translatedText) {
+
+            }
         };
 
         // Fake Presenter (Expects Failure)
-        TranslationOutputBoundary failurePresenter = new TranslationOutputBoundary() {
+        final TranslationOutputBoundary failurePresenter = new TranslationOutputBoundary() {
             @Override
             public void presentSuccess(TranslationOutputData outputData) {
                 fail("Should not succeed with empty text.");
@@ -159,7 +167,8 @@ class TranslationInteractorTest {
         };
 
         // 2. Act
-        TranslationInputBoundary interactor = new TranslationInteractor(postDAO, translationDAO, failurePresenter);
+        final TranslationInputBoundary interactor =
+                new TranslationInteractor(postDAO, translationDAO, failurePresenter);
         interactor.execute(inputData);
     }
 }

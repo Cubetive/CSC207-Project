@@ -18,6 +18,8 @@ public class EditPostController {
      */
     public void editPost() {
         editPostInputBoundary = new EditPostInteractor();
-        editPostInputBoundary.editPost(editPostInputData.getContentArea(), editPostInputData.getID(), editPostInputData.getUsername(), editPostInputData.getPostToEdit(), editPostInputData.getNewContent(), editPostInputData.getDialog());
+        editPostInputBoundary.editPost(editPostInputData.getContentArea(), editPostInputData.getID(),
+                editPostInputData.getUsername(), editPostInputData.getPostToEdit(),
+                editPostInputData.getNewContent(), editPostInputData.getDialog());
     }
 }

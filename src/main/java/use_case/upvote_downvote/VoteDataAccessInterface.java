@@ -1,11 +1,13 @@
 package use_case.upvote_downvote;
 
-import entities.Post; // Or a common 'Post' interface/class
+import entities.Post;
 
 public interface VoteDataAccessInterface {
     /**
      * Finds a post or reply by its ID.
      * The Interactor needs this to get the *current* upvote/downvote count.
+     * @param contentId the id of the content
+     * @return Returns a post based on the ID
      */
     Post getPostById(long contentId);
 

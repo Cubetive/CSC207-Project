@@ -4,11 +4,14 @@ A forum built with Java that allows users to create, browse, and interact with p
 
 ## Features
 
-- **User Authentication**: Register, login, and logout with session management
-- **Post Creation & Browsing**: Create posts with titles and content, browse all posts
-- **Post Interactions**: Upvote/downvote posts, reply to posts and other replies
-- **Profile Management**: Edit user profiles with bio and profile picture support
+- **User Authentication**: Signup, login, and logout with session management
+- **Browsing, Reading & Searching Posts**: Browse & read all posts; search for posts with specific titles
+- **Post Creation**: Create posts with titles and content
+- **Post Interactions**: Upvote/downvote posts; reply to other posts to have discussions
+- **Profile Management**: Edit user profile's username, bio, password, profile picture etc.
 - **Translation**: Translate post content to multiple languages via Google Translate API
+- **Post Editing**: Edit posts to update thoughts
+- **Post Referencing**: Reference/link others' posts in your own
 
 ## Architecture
 
@@ -25,6 +28,7 @@ src/main/java/
 
 - **users.csv** - User account data
 - **posts.json** - Forum posts and replies
+- **votesRecording.json** - Forum tracking on whether upvote or downvote has been done on posts
 
 ## API Usage
 

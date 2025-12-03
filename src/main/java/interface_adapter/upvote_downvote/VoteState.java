@@ -5,13 +5,15 @@ package interface_adapter.upvote_downvote;
  * Contains information about the result of a vote action, primarily used to trigger a view update.
  */
 public class VoteState {
-    private long updatedId = -1; // Renamed from updatedContentId
-    private int newVoteScore = 0;
+    private long updatedId = -1;
+    private int newVoteScore;
     private long parentPostId = -1;
-    private String voteError = null;
+    private String voteError;
 
-    // Default constructor (required for ViewModel)
-    public VoteState() {}
+    // Default constructor
+    public VoteState() {
+
+    }
 
     // Copy constructor
     public VoteState(VoteState copy) {
@@ -22,7 +24,7 @@ public class VoteState {
     }
 
     // --- Getters ---
-    public long getUpdatedId() { // Renamed from getUpdatedContentId
+    public long getUpdatedId() {
         return updatedId;
     }
 
@@ -39,7 +41,7 @@ public class VoteState {
     }
 
     // --- Setters ---
-    public void setUpdatedId(long updatedId) { // Renamed from setUpdatedContentId
+    public void setUpdatedId(long updatedId) {
         this.updatedId = updatedId;
     }
 

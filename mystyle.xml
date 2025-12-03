@@ -74,12 +74,6 @@
         <property name="message" value="Content of source tag should not be Indented"/>
     </module>
     <module name="RegexpMultiline">
-        <property name="id" value="noConsecutiveLines"/>
-        <property name="format" value="\r?\n[\t ]*\r?\n[\t ]*\r?\n"/>
-        <property name="fileExtensions" value="java,xml,properties"/>
-        <property name="message" value="Unnecessary consecutive lines"/>
-    </module>
-    <module name="RegexpMultiline">
         <property name="id" value="commentFirstSentenceMultiline"/>
         <property name="format" value="/\*\*\W+\* +\p{javaLowerCase}"/>
         <property name="fileExtensions" value="java"/>
@@ -365,7 +359,7 @@
         <module name="IllegalType">
             <property name="illegalClassNames"
                       value="java.util.HashSet, HashSet, java.util.LinkedHashMap, LinkedHashMap,
-                       java.util.TreeMap, TreeMap, java.util.HashMap, HashMap,
+                       java.util.TreeMap, TreeMap,
                        java.util.LinkedHashSet, LinkedHashSet, java.util.TreeSet, TreeSet,
                        java.lang.StringBuffer, StringBuffer"/>
         </module>

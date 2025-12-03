@@ -14,7 +14,7 @@ public class SearchPostPresenter implements SearchPostOutputBoundary {
 
     @Override
     public void prepareSuccessView(JPanel postsPanel) {
-        SearchPostViewModel searchPostViewModel = new SearchPostViewModel();
+        final SearchPostViewModel searchPostViewModel = new SearchPostViewModel();
         searchPostViewModel.updatePostList(postsPanel, searchPostOutputData.getState());
     }
 }

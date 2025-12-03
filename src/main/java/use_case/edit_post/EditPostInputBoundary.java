@@ -1,8 +1,8 @@
 package use_case.edit_post;
 
-import interface_adapter.read_post.ReadPostState;
-
 import javax.swing.*;
+
+import interface_adapter.read_post.ReadPostState;
 
 /**
  * Input Boundary for Edit Post use case.
@@ -17,5 +17,6 @@ public interface EditPostInputBoundary {
      * @param contentNew the newly submitted content
      * @param dialog the dialog box
      */
-    void editPost(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog);
+    void editPost(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew,
+                  JDialog dialog);
 }

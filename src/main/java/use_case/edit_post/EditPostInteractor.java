@@ -11,16 +11,17 @@ public class EditPostInteractor implements EditPostInputBoundary {
     private EditPostOutputBoundary editPostOutputBoundary;
 
     @Override
-    public void editPost(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew, JDialog dialog) {
+    public void editPost(JTextArea contentArea, long id, String username, ReadPostState postToEdit, String contentNew,
+                         JDialog dialog) {
         if (postToEdit.getUsername().equals(username) && contentNew.length() > 0) {
             postToEdit.setContent(contentNew);
             contentArea.setText(contentNew);
 
-            FilePostDataAccessObject dao = new FilePostDataAccessObject("posts.json");
+            final FilePostDataAccessObject dao = new FilePostDataAccessObject("posts.json");
             dao.editPostContent(id, contentNew);
         }
 
-        EditPostOutputData editPostOutputData = new EditPostOutputData(postToEdit);
+        final EditPostOutputData editPostOutputData = new EditPostOutputData(postToEdit);
         
         editPostOutputBoundary = new EditPostPresenter(editPostOutputData);
         editPostOutputBoundary.prepareSuccessView(dialog);

@@ -1,8 +1,8 @@
 package use_case.search_post;
 
-import interface_adapter.browse_posts.BrowsePostsState;
-
 import javax.swing.JPanel;
+
+import interface_adapter.browse_posts.BrowsePostsState;
 
 public class SearchPostInputData {
 
@@ -16,7 +16,7 @@ public class SearchPostInputData {
         this.keyword = keyword;
     }
 
-    public JPanel getJPanel() {
+    public JPanel getPanel() {
         return this.postsPanel;
     }
     

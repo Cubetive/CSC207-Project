@@ -1,16 +1,16 @@
 package use_case.reference_post;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import data_access.InMemoryPostDataAccessObject;
 import entities.OriginalPost;
 import entities.Post;
 import entities.ReplyPost;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for ReferencePostInteractor.
@@ -30,29 +30,32 @@ public class ReferencePostInteractorTest {
     @Test
     void successSearchPostsTest() {
         // Create test posts
-        OriginalPost post1 = new OriginalPost("user1", "Test Title", "This is test content");
-        OriginalPost post2 = new OriginalPost("user2", "Another Title", "More test content");
-        ReplyPost reply1 = new ReplyPost("user3", "Reply with test keyword");
-        
+        final OriginalPost post1 = new OriginalPost("user1", "Test Title", "This is test content");
+        final OriginalPost post2 = new OriginalPost("user2", "Another Title", "More test content");
+        final ReplyPost reply1 = new ReplyPost("user3", "Reply with test keyword");
+
         postRepository.savePost(post1);
         postRepository.savePost(post2);
         postRepository.savePost(reply1);
 
         // Create input data
-        ReferencePostInputData inputData = new ReferencePostInputData("1", "test");
+        final ReferencePostInputData inputData = new ReferencePostInputData("1", "test");
 
         // Create success presenter
-        ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 assertNotNull(outputData.getSearchResults());
                 assertEquals(3, outputData.getSearchResults().size());
                 assertEquals("1", outputData.getCurrentPostId());
                 assertFalse(outputData.isUseCaseFailed());
-                
+
                 // Verify search results contain expected posts
-                List<ReferencePostOutputData.PostSearchResult> results = outputData.getSearchResults();
-                boolean foundPost1 = false, foundPost2 = false, foundReply1 = false;
+                final List<ReferencePostOutputData.PostSearchResult> results =
+                        outputData.getSearchResults();
+                boolean foundPost1 = false;
+                boolean foundPost2 = false;
+                boolean foundReply1 = false;
                 for (ReferencePostOutputData.PostSearchResult result : results) {
                     if (result.getContent().contains("This is test content")) {
                         foundPost1 = true;
@@ -65,7 +68,8 @@ public class ReferencePostInteractorTest {
                     }
                     if (result.getContent().contains("Reply with test keyword")) {
                         foundReply1 = true;
-                        assertEquals("", result.getTitle()); // Reply posts have no title
+                        // Reply posts have no title
+                        assertEquals("", result.getTitle());
                     }
                 }
                 assertTrue(foundPost1 && foundPost2 && foundReply1);
@@ -93,9 +97,9 @@ public class ReferencePostInteractorTest {
 
     @Test
     void searchPostsEmptyKeywordTest() {
-        ReferencePostInputData inputData = new ReferencePostInputData("1", "");
+        final ReferencePostInputData inputData = new ReferencePostInputData("1", "");
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with empty keyword.");
@@ -123,9 +127,9 @@ public class ReferencePostInteractorTest {
 
     @Test
     void searchPostsNullKeywordTest() {
-        ReferencePostInputData inputData = new ReferencePostInputData("1", null);
+        final ReferencePostInputData inputData = new ReferencePostInputData("1", null);
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with null keyword.");
@@ -153,9 +157,9 @@ public class ReferencePostInteractorTest {
 
     @Test
     void searchPostsWhitespaceKeywordTest() {
-        ReferencePostInputData inputData = new ReferencePostInputData("1", "   ");
+        final ReferencePostInputData inputData = new ReferencePostInputData("1", "   ");
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with whitespace-only keyword.");
@@ -183,13 +187,14 @@ public class ReferencePostInteractorTest {
 
     @Test
     void searchPostsNoResultsTest() {
-        // Create a post that doesn't match
-        OriginalPost post = new OriginalPost("user1", "Title", "Content");
+        // Create a post that does not match
+        final OriginalPost post = new OriginalPost("user1", "Title", "Content");
         postRepository.savePost(post);
 
-        ReferencePostInputData inputData = new ReferencePostInputData("1", "nonexistent");
+        final ReferencePostInputData inputData =
+                new ReferencePostInputData("1", "nonexistent");
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with no results.");
@@ -217,12 +222,12 @@ public class ReferencePostInteractorTest {
 
     @Test
     void searchPostsCaseInsensitiveTest() {
-        OriginalPost post = new OriginalPost("user1", "Test Title", "Content");
+        final OriginalPost post = new OriginalPost("user1", "Test Title", "Content");
         postRepository.savePost(post);
 
-        ReferencePostInputData inputData = new ReferencePostInputData("1", "TEST");
+        final ReferencePostInputData inputData = new ReferencePostInputData("1", "TEST");
 
-        ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 assertNotNull(outputData.getSearchResults());
@@ -254,9 +259,11 @@ public class ReferencePostInteractorTest {
     @Test
     void successReferencePostTest() {
         // Create posts
-        OriginalPost referencedPost = new OriginalPost("user1", "Referenced Title", "Referenced content");
-        OriginalPost currentPost = new OriginalPost("user2", "Current Title", "Current content");
-        
+        final OriginalPost referencedPost =
+                new OriginalPost("user1", "Referenced Title", "Referenced content");
+        final OriginalPost currentPost =
+                new OriginalPost("user2", "Current Title", "Current content");
+
         postRepository.savePost(referencedPost);
         postRepository.savePost(currentPost);
 
@@ -264,13 +271,13 @@ public class ReferencePostInteractorTest {
         assertFalse(currentPost.hasReference());
         assertNull(currentPost.getReferencedPost());
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            String.valueOf(currentPost.getId()),
-            null,
-            String.valueOf(referencedPost.getId())
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                String.valueOf(currentPost.getId()),
+                null,
+                String.valueOf(referencedPost.getId())
         );
 
-        ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("prepareSearchResultsView should not be called.");
@@ -281,8 +288,9 @@ public class ReferencePostInteractorTest {
                 assertNotNull(outputData.getReferencedPost());
                 assertEquals(String.valueOf(currentPost.getId()), outputData.getCurrentPostId());
                 assertFalse(outputData.isUseCaseFailed());
-                
-                ReferencePostOutputData.PostSearchResult result = outputData.getReferencedPost();
+
+                final ReferencePostOutputData.PostSearchResult result =
+                        outputData.getReferencedPost();
                 assertEquals(String.valueOf(referencedPost.getId()), result.getPostId());
                 assertEquals("Referenced Title", result.getTitle());
                 assertEquals("Referenced content", result.getContent());
@@ -305,7 +313,7 @@ public class ReferencePostInteractorTest {
         interactor.referencePost(inputData);
 
         // Verify the reference was set
-        Post savedPost = postRepository.getPostById(String.valueOf(currentPost.getId()));
+        final Post savedPost = postRepository.getPostById(String.valueOf(currentPost.getId()));
         assertNotNull(savedPost);
         assertTrue(savedPost.hasReference());
         assertNotNull(savedPost.getReferencedPost());
@@ -315,19 +323,20 @@ public class ReferencePostInteractorTest {
     @Test
     void referencePostWithReplyPostTest() {
         // Test referencing a ReplyPost (which has no title)
-        ReplyPost referencedPost = new ReplyPost("user1", "Reply content");
-        OriginalPost currentPost = new OriginalPost("user2", "Current Title", "Current content");
-        
+        final ReplyPost referencedPost = new ReplyPost("user1", "Reply content");
+        final OriginalPost currentPost =
+                new OriginalPost("user2", "Current Title", "Current content");
+
         postRepository.savePost(referencedPost);
         postRepository.savePost(currentPost);
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            String.valueOf(currentPost.getId()),
-            null,
-            String.valueOf(referencedPost.getId())
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                String.valueOf(currentPost.getId()),
+                null,
+                String.valueOf(referencedPost.getId())
         );
 
-        ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("prepareSearchResultsView should not be called.");
@@ -335,8 +344,10 @@ public class ReferencePostInteractorTest {
 
             @Override
             public void prepareSuccessView(ReferencePostOutputData outputData) {
-                ReferencePostOutputData.PostSearchResult result = outputData.getReferencedPost();
-                assertEquals("", result.getTitle()); // Reply posts have no title
+                final ReferencePostOutputData.PostSearchResult result =
+                        outputData.getReferencedPost();
+                // Reply posts have no title
+                assertEquals("", result.getTitle());
                 assertEquals("Reply content", result.getContent());
             }
 
@@ -357,16 +368,16 @@ public class ReferencePostInteractorTest {
 
     @Test
     void referencePostEmptyReferencedPostIdTest() {
-        OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
+        final OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
         postRepository.savePost(currentPost);
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            String.valueOf(currentPost.getId()),
-            null,
-            ""
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                String.valueOf(currentPost.getId()),
+                null,
+                ""
         );
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with empty referenced post ID.");
@@ -394,16 +405,16 @@ public class ReferencePostInteractorTest {
 
     @Test
     void referencePostNullReferencedPostIdTest() {
-        OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
+        final OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
         postRepository.savePost(currentPost);
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            String.valueOf(currentPost.getId()),
-            null,
-            null
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                String.valueOf(currentPost.getId()),
+                null,
+                null
         );
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail with null referenced post ID.");
@@ -431,16 +442,16 @@ public class ReferencePostInteractorTest {
 
     @Test
     void referencePostReferencedPostNotFoundTest() {
-        OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
+        final OriginalPost currentPost = new OriginalPost("user1", "Title", "Content");
         postRepository.savePost(currentPost);
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            String.valueOf(currentPost.getId()),
-            null,
-            "999"
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                String.valueOf(currentPost.getId()),
+                null,
+                "999"
         );
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail when referenced post not found.");
@@ -468,16 +479,16 @@ public class ReferencePostInteractorTest {
 
     @Test
     void referencePostCurrentPostNotFoundTest() {
-        OriginalPost referencedPost = new OriginalPost("user1", "Title", "Content");
+        final OriginalPost referencedPost = new OriginalPost("user1", "Title", "Content");
         postRepository.savePost(referencedPost);
 
-        ReferencePostInputData inputData = new ReferencePostInputData(
-            "999",
-            null,
-            String.valueOf(referencedPost.getId())
+        final ReferencePostInputData inputData = new ReferencePostInputData(
+                "999",
+                null,
+                String.valueOf(referencedPost.getId())
         );
 
-        ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary failurePresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("Should fail when current post not found.");
@@ -507,7 +518,7 @@ public class ReferencePostInteractorTest {
 
     @Test
     void cancelReferencePostTest() {
-        ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
+        final ReferencePostOutputBoundary successPresenter = new ReferencePostOutputBoundary() {
             @Override
             public void prepareSearchResultsView(ReferencePostOutputData outputData) {
                 fail("prepareSearchResultsView should not be called.");
@@ -534,4 +545,3 @@ public class ReferencePostInteractorTest {
         interactor.cancelReferencePost();
     }
 }
-

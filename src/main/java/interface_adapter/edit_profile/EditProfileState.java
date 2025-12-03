@@ -12,7 +12,7 @@ public class EditProfileState {
     private String currentPassword = "";
     private String newPassword = "";
     private String repeatNewPassword = "";
-    
+
     private String usernameError;
     private String fullNameError;
     private String bioError;
@@ -156,11 +156,11 @@ public class EditProfileState {
 
     @Override
     public String toString() {
-        return "EditProfileState{" +
-                "currentUsername='" + currentUsername + '\'' +
-                ", newUsername='" + newUsername + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", bio='" + bio + '\'' +
-                '}';
+        return "EditProfileState{"
+                + "currentUsername='" + currentUsername + '\''
+                + ", newUsername='" + newUsername + '\''
+                + ", fullName='" + fullName + '\''
+                + ", bio='" + bio + '\''
+                + '}';
     }
 }

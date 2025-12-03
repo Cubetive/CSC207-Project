@@ -1,14 +1,15 @@
 package use_case.edit_profile;
 
-import entities.User;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import use_case.session.SessionRepository;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import entities.User;
+import use_case.session.SessionRepository;
 
 class EditProfileInteractorTest {
 
@@ -31,38 +32,38 @@ class EditProfileInteractorTest {
 
     @Test
     void executeSuccessfulProfileAndPasswordChange() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user",
-            "new_user",
-            "Updated Name",
-            "Updated bio",
-            "picture.png",
-            "currentPass!",
-            "newPass123",
-            "newPass123"
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user",
+                "new_user",
+                "Updated Name",
+                "Updated bio",
+                "picture.png",
+                "currentPass!",
+                "newPass123",
+                "newPass123"
         );
 
         interactor.execute(inputData);
 
-        assertTrue(presenter.successCalled);
-        assertFalse(presenter.failCalled);
-        assertNotNull(presenter.outputData);
-        assertEquals("new_user", presenter.outputData.getUsername());
-        assertEquals("Updated Name", presenter.outputData.getFullName());
-        assertEquals("Updated bio", presenter.outputData.getBio());
-        assertEquals("picture.png", presenter.outputData.getProfilePicture());
-        assertFalse(presenter.outputData.isUseCaseFailed());
+        assertTrue(presenter.isSuccessCalled());
+        assertFalse(presenter.isFailCalled());
+        assertNotNull(presenter.getOutputData());
+        assertEquals("new_user", presenter.getOutputData().getUsername());
+        assertEquals("Updated Name", presenter.getOutputData().getFullName());
+        assertEquals("Updated bio", presenter.getOutputData().getBio());
+        assertEquals("picture.png", presenter.getOutputData().getProfilePicture());
+        assertFalse(presenter.getOutputData().isUseCaseFailed());
 
         assertEquals("new_user", sessionRepository.getCurrentUser().getUsername());
-        assertEquals("newPass123", dataAccess.updatedPasswordValue);
-        assertEquals("existing_user", dataAccess.updatedProfileCurrentUsername);
-        assertEquals("new_user", dataAccess.updatedProfileNewUsername);
+        assertEquals("existing_user", dataAccess.getUpdatedProfileCurrentUsername());
+        assertEquals("new_user", dataAccess.getUpdatedProfileNewUsername());
+        assertEquals("newPass123", dataAccess.getUpdatedPasswordValue());
     }
 
     @Test
     void inputDataChangeFlagsCoverGetters() {
-        EditProfileInputData noChangeData = new EditProfileInputData(
-            "same_user", "same_user", "Name", "Bio", null, null, null, null
+        final EditProfileInputData noChangeData = new EditProfileInputData(
+                "same_user", "same_user", "Name", "Bio", null, null, null, null
         );
         assertEquals("same_user", noChangeData.getCurrentUsername());
         assertEquals("same_user", noChangeData.getNewUsername());
@@ -75,8 +76,8 @@ class EditProfileInteractorTest {
         assertFalse(noChangeData.isChangingUsername());
         assertFalse(noChangeData.isChangingPassword());
 
-        EditProfileInputData changeData = new EditProfileInputData(
-            "old", "new", "Name", "Bio", "", "oldPass", "newPass", "newPass"
+        final EditProfileInputData changeData = new EditProfileInputData(
+                "old", "new", "Name", "Bio", "", "oldPass", "newPass", "newPass"
         );
         assertTrue(changeData.isChangingUsername());
         assertTrue(changeData.isChangingPassword());
@@ -84,8 +85,8 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureUserNotFound() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "unknown", "unknown", "Name", "Bio", null, null, null, null
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "unknown", "unknown", "Name", "Bio", null, null, null, null
         );
 
         interactor.execute(inputData);
@@ -95,8 +96,8 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureEmptyFullName() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "existing_user", "", "Bio", null, null, null, null
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "existing_user", "", "Bio", null, null, null, null
         );
 
         interactor.execute(inputData);
@@ -106,9 +107,9 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureBioTooLong() {
-        String longBio = "a".repeat(501);
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "existing_user", "Name", longBio, null, null, null, null
+        final String longBio = "a".repeat(501);
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "existing_user", "Name", longBio, null, null, null, null
         );
 
         interactor.execute(inputData);
@@ -118,8 +119,8 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureUsernameEmptyWhenChanging() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "", "Name", "Bio", null, null, null, null
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "", "Name", "Bio", null, null, null, null
         );
 
         interactor.execute(inputData);
@@ -129,11 +130,11 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureUsernameAlreadyExists() {
-        User otherUser = new User("Other", "taken_user", "other@example.com", "pass");
+        final User otherUser = new User("Other", "taken_user", "other@example.com", "pass");
         dataAccess.addUser(otherUser);
 
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "taken_user", "Name", "Bio", null, null, null, null
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "taken_user", "Name", "Bio", null, null, null, null
         );
 
         interactor.execute(inputData);
@@ -143,9 +144,9 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureCurrentPasswordIncorrect() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "existing_user", "Name", "Bio", null,
-            "wrongPass", "newPass123", "newPass123"
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "existing_user", "Name", "Bio", null,
+                "wrongPass", "newPass123", "newPass123"
         );
 
         interactor.execute(inputData);
@@ -155,9 +156,9 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureNewPasswordsMismatch() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "existing_user", "Name", "Bio", null,
-            "currentPass!", "newPass123", "different"
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "existing_user", "Name", "Bio", null,
+                "currentPass!", "newPass123", "different"
         );
 
         interactor.execute(inputData);
@@ -167,9 +168,9 @@ class EditProfileInteractorTest {
 
     @Test
     void executeFailureNewPasswordTooShort() {
-        EditProfileInputData inputData = new EditProfileInputData(
-            "existing_user", "existing_user", "Name", "Bio", null,
-            "currentPass!", "short", "short"
+        final EditProfileInputData inputData = new EditProfileInputData(
+                "existing_user", "existing_user", "Name", "Bio", null,
+                "currentPass!", "short", "short"
         );
 
         interactor.execute(inputData);
@@ -177,40 +178,43 @@ class EditProfileInteractorTest {
         assertFailWithMessage("New password must be at least 6 characters long.");
     }
 
-    private void assertFailWithMessage(String expectedMessage) {
-        assertFalse(presenter.successCalled);
-        assertTrue(presenter.failCalled);
-        assertEquals(expectedMessage, presenter.errorMessage);
+    private void assertFailWithMessage(final String expectedMessage) {
+        assertFalse(presenter.isSuccessCalled());
+        assertTrue(presenter.isFailCalled());
+        assertEquals(expectedMessage, presenter.getErrorMessage());
     }
 
-    private static class TestEditProfileDataAccess implements EditProfileDataAccessInterface {
+    private static final class TestEditProfileDataAccess implements EditProfileDataAccessInterface {
         private final Map<String, User> users = new HashMap<>();
         private String updatedProfileCurrentUsername;
         private String updatedProfileNewUsername;
         private String updatedPasswordUsername;
         private String updatedPasswordValue;
 
-        void addUser(User user) {
+        void addUser(final User user) {
             users.put(user.getUsername(), user);
         }
 
         @Override
-        public boolean existsByUsername(String username) {
+        public boolean existsByUsername(final String username) {
             return users.containsKey(username);
         }
 
         @Override
-        public User getUserByUsername(String username) {
+        public User getUserByUsername(final String username) {
             return users.get(username);
         }
 
         @Override
-        public void updateUserProfile(String currentUsername, String newUsername, String fullName,
-                                      String bio, String profilePicture) {
+        public void updateUserProfile(final String currentUsername,
+                                      final String newUsername,
+                                      final String fullName,
+                                      final String bio,
+                                      final String profilePicture) {
             this.updatedProfileCurrentUsername = currentUsername;
             this.updatedProfileNewUsername = newUsername;
 
-            User user = users.remove(currentUsername);
+            final User user = users.remove(currentUsername);
             if (user != null) {
                 user.setUsername(newUsername);
                 user.setFullName(fullName);
@@ -221,40 +225,77 @@ class EditProfileInteractorTest {
         }
 
         @Override
-        public void updatePassword(String username, String newPassword) {
+        public void updatePassword(final String username, final String newPassword) {
             this.updatedPasswordUsername = username;
             this.updatedPasswordValue = newPassword;
-            User user = users.get(username);
+
+            final User user = users.get(username);
             if (user != null) {
                 user.setPassword(newPassword);
             }
         }
+
+        public Map<String, User> getUsers() {
+            return users;
+        }
+
+        public String getUpdatedProfileCurrentUsername() {
+            return updatedProfileCurrentUsername;
+        }
+
+        public String getUpdatedProfileNewUsername() {
+            return updatedProfileNewUsername;
+        }
+
+        public String getUpdatedPasswordUsername() {
+            return updatedPasswordUsername;
+        }
+
+        public String getUpdatedPasswordValue() {
+            return updatedPasswordValue;
+        }
     }
 
-    private static class TestEditProfilePresenter implements EditProfileOutputBoundary {
-        boolean successCalled;
-        boolean failCalled;
-        EditProfileOutputData outputData;
-        String errorMessage;
+    private static final class TestEditProfilePresenter implements EditProfileOutputBoundary {
+        private boolean successCalled;
+        private boolean failCalled;
+        private EditProfileOutputData outputData;
+        private String errorMessage;
 
         @Override
-        public void prepareSuccessView(EditProfileOutputData outputData) {
+        public void prepareSuccessView(final EditProfileOutputData outputData) {
             this.successCalled = true;
             this.outputData = outputData;
         }
 
         @Override
-        public void prepareFailView(String errorMessage) {
+        public void prepareFailView(final String errorMessage) {
             this.failCalled = true;
             this.errorMessage = errorMessage;
         }
+
+        public boolean isSuccessCalled() {
+            return successCalled;
+        }
+
+        public boolean isFailCalled() {
+            return failCalled;
+        }
+
+        public EditProfileOutputData getOutputData() {
+            return outputData;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
     }
 
-    private static class TestSessionRepository implements SessionRepository {
+    private static final class TestSessionRepository implements SessionRepository {
         private User currentUser;
 
         @Override
-        public void setCurrentUser(User user) {
+        public void setCurrentUser(final User user) {
             this.currentUser = user;
         }
 
@@ -274,4 +315,3 @@ class EditProfileInteractorTest {
         }
     }
 }
-

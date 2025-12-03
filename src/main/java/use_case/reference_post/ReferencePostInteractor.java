@@ -1,12 +1,12 @@
 package use_case.reference_post;
 
-import entities.OriginalPost;
-import entities.Post;
-import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import entities.OriginalPost;
+import entities.Post;
+import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
 
 /**
  * The Reference Post Interactor.
@@ -16,7 +16,7 @@ public class ReferencePostInteractor implements ReferencePostInputBoundary {
     private final ReferencePostOutputBoundary presenter;
 
     public ReferencePostInteractor(ReferencePostDataAccessInterface dataAccess,
-                                  ReferencePostOutputBoundary presenter) {
+                                   ReferencePostOutputBoundary presenter) {
         this.dataAccess = dataAccess;
         this.presenter = presenter;
     }
@@ -50,20 +50,21 @@ public class ReferencePostInteractor implements ReferencePostInputBoundary {
                 title = ((OriginalPost) post).getTitle();
             }
 
+            // Use actual post ID
             final PostSearchResult result = new PostSearchResult(
-                String.valueOf(post.getId()), // Use actual post ID
-                title,
-                post.getContent(),
-                post.getCreatorUsername(),
-                dateFormat.format(post.getCreationDate())
+                    String.valueOf(post.getId()),
+                    title,
+                    post.getContent(),
+                    post.getCreatorUsername(),
+                    dateFormat.format(post.getCreationDate())
             );
             searchResults.add(result);
         }
 
         // Prepare success view with search results
         final ReferencePostOutputData outputData = new ReferencePostOutputData(
-            searchResults,
-            inputData.getCurrentPostId()
+                searchResults,
+                inputData.getCurrentPostId()
         );
         presenter.prepareSearchResultsView(outputData);
     }
@@ -88,7 +89,7 @@ public class ReferencePostInteractor implements ReferencePostInputBoundary {
 
         // Get current post and attach reference
         final Post currentPost = dataAccess.getPostById(inputData.getCurrentPostId());
-        
+
         if (currentPost == null) {
             presenter.prepareFailView("Current post not found.");
             return;
@@ -108,17 +109,17 @@ public class ReferencePostInteractor implements ReferencePostInputBoundary {
         }
 
         final PostSearchResult referencedPostResult = new PostSearchResult(
-            referencedPostId,
-            title,
-            referencedPost.getContent(),
-            referencedPost.getCreatorUsername(),
-            dateFormat.format(referencedPost.getCreationDate())
+                referencedPostId,
+                title,
+                referencedPost.getContent(),
+                referencedPost.getCreatorUsername(),
+                dateFormat.format(referencedPost.getCreationDate())
         );
 
         final ReferencePostOutputData outputData = new ReferencePostOutputData(
-            referencedPostResult,
-            inputData.getCurrentPostId(),
-            false
+                referencedPostResult,
+                inputData.getCurrentPostId(),
+                false
         );
 
         presenter.prepareSuccessView(outputData);

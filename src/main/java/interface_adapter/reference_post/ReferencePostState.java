@@ -1,7 +1,8 @@
 package interface_adapter.reference_post;
 
-import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
 import java.util.List;
+
+import use_case.reference_post.ReferencePostOutputData.PostSearchResult;
 
 /**
  * State for the Reference Post View Model.
@@ -9,9 +10,9 @@ import java.util.List;
 public class ReferencePostState {
     private String currentPostId = "";
     private String searchKeyword = "";
-    private List<PostSearchResult> searchResults = null;
-    private PostSearchResult referencedPost = null;
-    private String errorMessage = null;
+    private List<PostSearchResult> searchResults;
+    private PostSearchResult referencedPost;
+    private String errorMessage;
 
     public ReferencePostState(ReferencePostState copy) {
         this.currentPostId = copy.currentPostId;

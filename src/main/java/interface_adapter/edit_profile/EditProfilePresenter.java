@@ -13,7 +13,7 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
     private final ViewManagerModel viewManagerModel;
 
     public EditProfilePresenter(EditProfileViewModel editProfileViewModel,
-                               ViewManagerModel viewManagerModel) {
+                                ViewManagerModel viewManagerModel) {
         this.editProfileViewModel = editProfileViewModel;
         this.viewManagerModel = viewManagerModel;
     }
@@ -22,19 +22,19 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
     public void prepareSuccessView(EditProfileOutputData response) {
         // On success, update the state with the new information and clear errors
         final EditProfileState editProfileState = editProfileViewModel.getState();
-        
+
         // Update the current username to reflect any username change
         editProfileState.setCurrentUsername(response.getUsername());
         editProfileState.setNewUsername(response.getUsername());
         editProfileState.setFullName(response.getFullName());
         editProfileState.setBio(response.getBio());
         editProfileState.setProfilePicture(response.getProfilePicture());
-        
+
         // Clear password fields for security
         editProfileState.setCurrentPassword("");
         editProfileState.setNewPassword("");
         editProfileState.setRepeatNewPassword("");
-        
+
         // Clear all errors
         editProfileState.setUsernameError(null);
         editProfileState.setFullNameError(null);
@@ -58,15 +58,20 @@ public class EditProfilePresenter implements EditProfileOutputBoundary {
         // Set the appropriate error based on the error message
         if (errorMessage.toLowerCase().contains("username")) {
             editProfileState.setUsernameError(errorMessage);
-        } else if (errorMessage.toLowerCase().contains("full name")) {
+        }
+        else if (errorMessage.toLowerCase().contains("full name")) {
             editProfileState.setFullNameError(errorMessage);
-        } else if (errorMessage.toLowerCase().contains("bio")) {
+        }
+        else if (errorMessage.toLowerCase().contains("bio")) {
             editProfileState.setBioError(errorMessage);
-        } else if (errorMessage.toLowerCase().contains("password")) {
+        }
+        else if (errorMessage.toLowerCase().contains("password")) {
             editProfileState.setPasswordError(errorMessage);
-        } else if (errorMessage.toLowerCase().contains("profile picture")) {
+        }
+        else if (errorMessage.toLowerCase().contains("profile picture")) {
             editProfileState.setProfilePictureError(errorMessage);
-        } else {
+        }
+        else {
             // Generic error
             editProfileState.setGeneralError(errorMessage);
         }

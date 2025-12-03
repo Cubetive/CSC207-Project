@@ -1,7 +1,8 @@
 package use_case.reference_post;
 
-import entities.Post;
 import java.util.List;
+
+import entities.Post;
 
 /**
  * Data Access Interface for the Reference Post Use Case.
